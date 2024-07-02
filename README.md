@@ -7,6 +7,7 @@ speech functionality.
 
 ### Installation
 Install this package into your environment using your chosen package manager:
+
 **pip**:
 ```bash
 pip install git+ssh://git@github.com/neuphonic/pyneuphonic.git
