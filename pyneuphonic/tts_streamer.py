@@ -44,6 +44,10 @@ class TTSStreamer:
         self.text_queue = asyncio.Queue()
 
     def play_audio(self):
+        """
+        Hooks into the self.audio_queue object (which stores the bytes sent back from the websocket api)
+        and plays the audio.
+        """
         audio_player = pyaudio.PyAudio()  # create the pyaudio audio player
 
         stream = audio_player.open(
