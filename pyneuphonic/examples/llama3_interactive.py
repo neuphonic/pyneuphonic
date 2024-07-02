@@ -1,16 +1,12 @@
 import ollama
 import asyncio
+import pyneuphonic
 from pyneuphonic import TTSStreamer
 import logging
 
 logging.basicConfig(
     level=logging.INFO, format='%(asctime)s :: %(levelname)s :: %(message)s'
 )
-
-
-def check_ollama_working_fine():
-    # TODO
-    return True
 
 
 async def async_llama_chat_stream(user_input):
@@ -42,19 +38,26 @@ async def async_llama_chat_stream(user_input):
         yield chunk
 
 
-async def conversational_loop(tts):
-    if check_ollama_working_fine():
-        while True:
-            user_input = input('Type your question: ')
-            if user_input.lower() in ['exit', 'quit']:
-                break
-            text_generator = async_llama_chat_stream(user_input)
-            try:
-                await asyncio.wait_for(tts.stream(text_generator), timeout=60)
-            except Exception as e:
-                print(f'Error in conversational loop: {e}')
-    else:
-        print('Ollama process not running, please check')
+async def conversational_loop(tts: pyneuphonic.TTSStreamer):
+    """
+    Defines a conversational loop.
+
+    Takes output from ollama llama3:8b and piecewise feeds this into the Neuphonic Websocket API to produce text.
+
+    Parameters
+    ----------
+    tts : pyneuphonic.TTSStreamer
+        An instantiated object of TTSStreamer.
+    """
+    while True:
+        user_input = input('Type your question: ')
+        if user_input.lower() in ['exit', 'quit']:
+            break
+        text_generator = async_llama_chat_stream(user_input)
+        try:
+            await asyncio.wait_for(tts.stream(text_generator), timeout=60)
+        except Exception as e:
+            print(f'Error in conversational loop: {e}')
 
 
 async def llama3_interactive():
