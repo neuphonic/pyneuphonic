@@ -57,7 +57,6 @@ async def conversational_loop(tts):
         print('Ollama process not running, please check')
 
 
-if __name__ == '__main__':
-    print('Ask me anything!')
+async def llama3_interactive():
     tts = TTSStreamer()
     asyncio.run(conversational_loop(tts))
