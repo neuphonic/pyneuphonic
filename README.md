@@ -61,3 +61,7 @@ the `ollama` package with **llama3:8b**, alongside `TTSStreamer` to stream text-
 use of Neuphonic's low-latency TTS engine).
 
 This is how the `TTSStreamer` should be used in practise.
+
+The audio is played to the systems speaker using `PyAudio`, however if you would like to edit how audio bytes
+received from the WebSocket API are processed and handled by your system, override the `TTSStreamer.play_audio`
+method.
