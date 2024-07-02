@@ -1,1 +1,1 @@
-from .tts_streaming import TTS
+from .tts_streamer import TTSStreamer

@@ -17,7 +17,7 @@ from typing import AsyncGenerator
 nest_asyncio.apply()
 
 
-class TTS:
+class TTSStreamer:
     def __init__(self, API_TOKEN=None, WEBSOCKET_URL='wss://neuphonic.us/speak/en'):
         if API_TOKEN is None:
             API_TOKEN = os.getenv('NEUPHONIC_API_TOKEN')
@@ -63,6 +63,7 @@ class TTS:
 
                 buffer += audio_data
 
+                # play a small chunk at a time
                 while len(buffer) >= 4096:
                     stream.write(buffer[:4096])
                     buffer = buffer[4096:]
@@ -70,9 +71,11 @@ class TTS:
                 if self.end_of_audio.is_set() and self.audio_queue.empty():
                     break
 
+        # play the rest of the audio
         if len(buffer) > 0:
             stream.write(buffer)
 
+        # clean up everything
         stream.stop_stream()
         stream.close()
         audio_player.terminate()
@@ -145,7 +148,7 @@ class TTS:
                 break
             output.append(f'{text}')  # Add each chunk to output list
 
-    async def tts(self, text_generator: AsyncGenerator):
+    async def stream(self, text_generator: AsyncGenerator):
         """
         Entry point for text-to-speech.
 

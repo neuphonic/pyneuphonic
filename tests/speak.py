@@ -1,4 +1,4 @@
-from pyneuphonic import TTS
+from pyneuphonic import TTSStreamer
 import argparse
 import asyncio
 import logging
@@ -10,9 +10,9 @@ async def main(input_text):
     async def text_generator():
         yield input_text
 
-    tts = TTS()
+    tts = TTSStreamer()
 
-    await asyncio.wait_for(tts.tts(text_generator()), timeout=60)
+    await asyncio.wait_for(tts.stream(text_generator()), timeout=60)
 
 
 if __name__ == '__main__':
