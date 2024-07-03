@@ -62,7 +62,7 @@ class NeuphonicSocketManager:
         ssl_context = ssl.create_default_context(cafile=certifi.where())
 
         self.ws = await websockets.connect(
-            self.WEBSOCKET_URL,
+            f'{self.WEBSOCKET_URL}/{self._NEUPHONIC_API_TOKEN}',
             ssl=ssl_context,
             timeout=self.timeout,
             **self._proxy_params,
@@ -136,6 +136,7 @@ class NeuphonicSocketManager:
             self.logger.debug('Websocket connection closed.')
 
     def _callback(self, callback, *args):
+        self.logger.debug(f'Callback {callback} called with {args}')
         if callback:
             try:
                 callback(self, *args)
