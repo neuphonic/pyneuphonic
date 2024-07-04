@@ -5,7 +5,7 @@ import os
 import asyncio
 import websockets
 from pyneuphonic.lib import parse_proxies
-from typing import Callable, Optional, Any, Awaitable
+from typing import Optional
 
 
 class NeuphonicSocketManager:
@@ -13,21 +13,6 @@ class NeuphonicSocketManager:
         self,
         NEUPHONIC_API_TOKEN: str,
         WEBSOCKET_URL: str,
-        on_audio_message: Optional[
-            Callable[['NeuphonicSocketManager', bytes], Awaitable[None]]
-        ] = None,
-        on_non_audio_message: Optional[
-            Callable[['NeuphonicSocketManager', Any], Awaitable[None]]
-        ] = None,
-        on_open: Optional[Callable[['NeuphonicSocketManager'], Awaitable[None]]] = None,
-        on_close: Optional[
-            Callable[['NeuphonicSocketManager'], Awaitable[None]]
-        ] = None,
-        on_error: Optional[
-            Callable[['NeuphonicSocketManager', Exception], Awaitable[None]]
-        ] = None,
-        on_ping: Optional[Callable[['NeuphonicSocketManager'], Awaitable[None]]] = None,
-        on_pong: Optional[Callable[['NeuphonicSocketManager'], Awaitable[None]]] = None,
         logger: Optional[logging.Logger] = None,
         timeout: Optional[float] = None,  # TODO
         proxies: Optional[dict] = None,  # TODO - implement SSL with this
@@ -47,15 +32,7 @@ class NeuphonicSocketManager:
 
         self._NEUPHONIC_API_TOKEN = NEUPHONIC_API_TOKEN
         self.WEBSOCKET_URL = WEBSOCKET_URL
-
-        self.on_audio_message = on_audio_message
-        self.on_non_audio_message = on_non_audio_message
-        self.on_open = on_open
-        self.on_close = on_close
-        self.on_error = on_error
         self.timeout = timeout
-        self.on_ping = on_ping
-        self.on_pong = on_pong
 
         self.ws = None
 
@@ -79,7 +56,7 @@ class NeuphonicSocketManager:
             f'WebSocket connection has been established: {self.WEBSOCKET_URL}, proxies: {self._proxy_params}',
         )
 
-        await self._callback(self.on_open)
+        await self.on_open()
 
     async def send_message(self, message):
         self.logger.debug(f'Sending message to Neuphonic WebSocket Server: {message}')
@@ -95,7 +72,7 @@ class NeuphonicSocketManager:
             self.logger.debug('Ping sent to WebSocket server.')
         except Exception as e:
             self.logger.error(f'Error sending ping: {e}')
-            await self._handle_exception(e)
+            await self.on_error(e)
 
     async def ping_periodically(self, interval: int = 20):
         while True:
@@ -108,23 +85,19 @@ class NeuphonicSocketManager:
                 self.logger.debug('Received message.')
                 if isinstance(message, bytes):
                     self.logger.debug(f'Handling audio message: {len(message)} bytes')
-                    await self._callback(
-                        self.on_audio_message, message
-                    )  # handle audio messages
+                    await self.on_audio_message(message)
                 else:
                     self.logger.debug(f'Handling non-audio message: {message}')
-                    await self._callback(
-                        self.on_non_audio_message, message
-                    )  # handle everything else
+                    await self.on_non_audio_message(message)
         except websockets.exceptions.ConnectionClosedError as e:
             self.logger.error(f'WebSocket connection closed: {e}')
-            await self._handle_exception(e)
+            await self.on_error(e)
         except Exception as e:
             self.logger.error(f'Exception in message_handler: {e}')
-            await self._handle_exception(e)
+            await self.on_error(e)
         finally:
             self.logger.error('On close')
-            await self._callback(self.on_close)
+            await self.on_close()
 
     async def start(self):
         while True:
@@ -140,10 +113,10 @@ class NeuphonicSocketManager:
 
             except websockets.exceptions.ConnectionClosedError as e:
                 self.logger.error('Lost websocket connection')
-                await self._handle_exception(e)
+                await self.on_error(e)
             except Exception as e:
                 self.logger.error(f'Error in WebSocket process: {e}')
-                await self._handle_exception(e)
+                await self.on_error(e)
             finally:
                 if self.ws.open:
                     await self.ws.close()
@@ -154,17 +127,23 @@ class NeuphonicSocketManager:
             await self.ws.close()
             self.logger.debug('Websocket connection closed.')
 
-    async def _callback(self, callback, *args):
-        self.logger.debug(f'Callback {callback} called with {type(args), len(args)}')
-        if callback:
-            try:
-                await callback(self, *args)
-            except Exception as e:
-                self.logger.error(f'Error from callback {callback}: {e}')
-                await self._handle_exception(e)
+    async def on_audio_message(self, message: bytes):
+        pass
 
-    async def _handle_exception(self, e):
-        if self.on_error:
-            self.on_error(self, e)
-        else:
-            raise e
+    async def on_non_audio_message(self, message: bytes):
+        pass
+
+    async def on_open(self):
+        pass
+
+    async def on_close(self):
+        pass
+
+    async def on_error(self, e: Exception):
+        raise e
+
+    async def on_ping(self):
+        pass
+
+    async def on_pong(self):
+        pass
