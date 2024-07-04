@@ -4,7 +4,7 @@ import certifi
 import os
 import asyncio
 import websockets
-from pyneuphonic.lib import parse_proxies
+from pyneuphonic.websocket.libs import parse_proxies
 from typing import Optional
 
 
