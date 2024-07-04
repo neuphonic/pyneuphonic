@@ -27,12 +27,6 @@ class NeuphonicWebsocketClient(NeuphonicSocketManager):
         logger: Optional[logging.Logger] = None,
         timeout: Optional[float] = None,
         proxies: Optional[dict] = None,
-        setup_audio_player: Optional[
-            Callable[['NeuphonicWebsocketClient'], Awaitable[None]]
-        ] = None,
-        teardown_audio_player: Optional[
-            Callable[['NeuphonicWebsocketClient'], Awaitable[None]]
-        ] = None,
     ):
         super().__init__(
             NEUPHONIC_API_TOKEN,
@@ -49,19 +43,4 @@ class NeuphonicWebsocketClient(NeuphonicSocketManager):
             proxies=proxies,
         )
 
-        self.setup_audio_player = setup_audio_player
-        self.teardown_audio_player = teardown_audio_player
-
-    async def start(self):
-        if self.setup_audio_player:
-            await self.setup_audio_player(self)
-            self.logger.debug('Audio player setup completed.')
-
-        self.logger.debug('NeuphonicWebsocketClient.start')
-        await super().start()
-
-    async def stop(self):
-        await super().close()
-
-        if self.teardown_audio_player:
-            await self.teardown_audio_player(self)
+        self.audio_buffer = bytearray()

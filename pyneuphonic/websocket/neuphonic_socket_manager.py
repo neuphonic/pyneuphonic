@@ -105,7 +105,7 @@ class NeuphonicSocketManager:
     async def _handle_message(self):
         try:
             async for message in self.ws:
-                self.logger.debug(f'Received message: {message}')
+                self.logger.debug('Received message.')
                 if isinstance(message, bytes):
                     self.logger.debug(f'Handling audio message: {len(message)} bytes')
                     await self._callback(
@@ -155,7 +155,7 @@ class NeuphonicSocketManager:
             self.logger.debug('Websocket connection closed.')
 
     async def _callback(self, callback, *args):
-        self.logger.debug(f'Callback {callback} called with {args}')
+        self.logger.debug(f'Callback {callback} called with {type(args), len(args)}')
         if callback:
             try:
                 await callback(self, *args)
