@@ -8,8 +8,8 @@ from pyneuphonic.websocket import NeuphonicSocketManager
 class NeuphonicWebsocketClient(NeuphonicSocketManager):
     def __init__(
         self,
-        NEUPHONIC_API_TOKEN: str,
-        WEBSOCKET_URL: str,
+        NEUPHONIC_API_TOKEN: str = None,
+        NEUPHONIC_WEBSOCKET_URL: str = None,
         logger: Optional[logging.Logger] = None,
         timeout: Optional[float] = None,
         proxies: Optional[dict] = None,
@@ -37,7 +37,7 @@ class NeuphonicWebsocketClient(NeuphonicSocketManager):
     ):
         super().__init__(
             NEUPHONIC_API_TOKEN,
-            WEBSOCKET_URL,
+            NEUPHONIC_WEBSOCKET_URL,
             logger=logger,
             timeout=timeout,
             proxies=proxies,

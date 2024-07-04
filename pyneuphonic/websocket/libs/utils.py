@@ -1,4 +1,9 @@
 from urllib.parse import urlparse
+import re
+
+
+def split_text(text):
+    return re.findall(r'\S+\s*', text)
 
 
 def parse_proxies(proxies: dict):

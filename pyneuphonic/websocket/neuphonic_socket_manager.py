@@ -11,8 +11,8 @@ from typing import Optional
 class NeuphonicSocketManager:
     def __init__(
         self,
-        NEUPHONIC_API_TOKEN: str,
-        WEBSOCKET_URL: str,
+        NEUPHONIC_API_TOKEN: str = None,
+        NEUPHONIC_WEBSOCKET_URL: str = None,
         logger: Optional[logging.Logger] = None,
         timeout: Optional[float] = None,  # TODO
         proxies: Optional[dict] = None,  # TODO - implement SSL with this
@@ -25,13 +25,21 @@ class NeuphonicSocketManager:
                     'NEUPHONIC_API_TOKEN has not been passed in and is not set in the environment.'
                 )
 
+        if NEUPHONIC_WEBSOCKET_URL is None:
+            NEUPHONIC_WEBSOCKET_URL = os.getenv('NEUPHONIC_WEBSOCKET_URL')
+
+            if NEUPHONIC_WEBSOCKET_URL is None:
+                raise EnvironmentError(
+                    'NEUPHONIC_WEBSOCKET_URL has not been passed in and is not set in the environment.'
+                )
+
         if not logger:
             logger = logging.getLogger(__name__)
 
         self.logger = logger
 
         self._NEUPHONIC_API_TOKEN = NEUPHONIC_API_TOKEN
-        self.WEBSOCKET_URL = WEBSOCKET_URL
+        self.NEUPHONIC_WEBSOCKET_URL = NEUPHONIC_WEBSOCKET_URL
         self.timeout = timeout
 
         self.ws = None
@@ -40,23 +48,21 @@ class NeuphonicSocketManager:
 
     async def create_ws_connection(self):
         self.logger.debug(
-            f'Creating connection with WebSocket Server: {self.WEBSOCKET_URL}, proxies: {self._proxy_params}',
+            f'Creating connection with WebSocket Server: {self.NEUPHONIC_WEBSOCKET_URL}, proxies: {self._proxy_params}',
         )
 
         ssl_context = ssl.create_default_context(cafile=certifi.where())
 
         self.ws = await websockets.connect(
-            f'{self.WEBSOCKET_URL}/{self._NEUPHONIC_API_TOKEN}',
+            f'{self.NEUPHONIC_WEBSOCKET_URL}/{self._NEUPHONIC_API_TOKEN}',
             ssl=ssl_context,
             timeout=self.timeout,
             **self._proxy_params,
         )
 
         self.logger.debug(
-            f'WebSocket connection has been established: {self.WEBSOCKET_URL}, proxies: {self._proxy_params}',
+            f'WebSocket connection has been established: {self.NEUPHONIC_WEBSOCKET_URL}, proxies: {self._proxy_params}',
         )
-
-        await self.on_open()
 
     async def send_message(self, message):
         self.logger.debug(f'Sending message to Neuphonic WebSocket Server: {message}')
@@ -99,11 +105,13 @@ class NeuphonicSocketManager:
             self.logger.error('On close')
             await self.on_close()
 
-    async def start(self):
+    async def open(self):
+        await self.create_ws_connection()
+        await self.on_open()
+
+    async def listen(self):
         while True:
             try:
-                await self.create_ws_connection()
-
                 receive_task = asyncio.create_task(self._handle_message())
                 ping_task = asyncio.create_task(self.ping_periodically())
 
