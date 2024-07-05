@@ -137,8 +137,6 @@ class NeuphonicWebsocketClient:
             **self._proxy_params,
         )
 
-        self.ws.on_pong = self.on_pong
-
         self.logger.debug(
             f'WebSocket connection has been established: {self.NEUPHONIC_WEBSOCKET_URL}, proxies: {self._proxy_params}',
         )
