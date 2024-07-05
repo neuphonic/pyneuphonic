@@ -49,7 +49,6 @@ from pyneuphonic.websocket import NeuphonicWebsocketClient
 # Define callback functions
 async def on_audio_message(client, message):
     print(f"Received audio data: {len(message)} bytes")
-    # Process the audio data here
 
 async def on_non_audio_message(client, message):
     print(f"Received non-audio message: {message}")
