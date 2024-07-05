@@ -8,10 +8,10 @@ async def send_async_generator(
 ):
     """Helper function to piecewise send text from an AsyncGenerator."""
     async for text in text_generator:
-        await client.send_message(text)
+        await client.send(text)
 
 
 async def send_string(client: NeuphonicWebsocketClient, text: str):
     """Helper function to piecewise send text from a string."""
     for word in split_text(text):
-        await client.send_message(word)
+        await client.send(word)

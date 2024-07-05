@@ -5,14 +5,39 @@ import os
 import asyncio
 import websockets
 from pyneuphonic.websocket.libs import parse_proxies
-from typing import Optional
+from typing import Optional, Callable, Awaitable, Any
+from types import MethodType
 
 
-class NeuphonicSocketManager:
+class NeuphonicWebsocketClient:
     def __init__(
         self,
         NEUPHONIC_API_TOKEN: str = None,
         NEUPHONIC_WEBSOCKET_URL: str = None,
+        on_audio_message: Optional[
+            Callable[['NeuphonicWebsocketClient', bytes], Awaitable[None]]
+        ] = None,
+        on_non_audio_message: Optional[
+            Callable[['NeuphonicWebsocketClient', Any], Awaitable[None]]
+        ] = None,
+        on_open: Optional[
+            Callable[['NeuphonicWebsocketClient'], Awaitable[None]]
+        ] = None,
+        on_close: Optional[
+            Callable[['NeuphonicWebsocketClient'], Awaitable[None]]
+        ] = None,
+        on_error: Optional[
+            Callable[['NeuphonicWebsocketClient', Exception], Awaitable[None]]
+        ] = None,
+        on_ping: Optional[
+            Callable[['NeuphonicWebsocketClient'], Awaitable[None]]
+        ] = None,
+        on_pong: Optional[
+            Callable[['NeuphonicWebsocketClient'], Awaitable[None]]
+        ] = None,
+        on_send: Optional[
+            Callable[['NeuphonicWebsocketClient', str], Awaitable[None]]
+        ] = None,
         logger: Optional[logging.Logger] = None,
         timeout: Optional[float] = None,  # TODO
         proxies: Optional[dict] = None,  # TODO - implement SSL with this
@@ -45,6 +70,55 @@ class NeuphonicSocketManager:
         self.ws = None
 
         self._proxy_params = parse_proxies(proxies) if proxies else {}
+        self._initialise_callbacks(
+            on_audio_message,
+            on_non_audio_message,
+            on_open,
+            on_close,
+            on_error,
+            on_ping,
+            on_pong,
+            on_send,
+        )
+
+    def _initialise_callbacks(
+        self,
+        on_audio_message,
+        on_non_audio_message,
+        on_open,
+        on_close,
+        on_error,
+        on_ping,
+        on_pong,
+        on_send,
+    ):
+        self.logger.debug('Initialising callbacks.')
+
+        if on_audio_message:
+            self.on_audio_message = MethodType(on_audio_message, self)
+
+        if on_non_audio_message:
+            self.on_non_audio_message = MethodType(on_non_audio_message, self)
+
+        if on_open:
+            self.on_open = MethodType(on_open, self)
+
+        if on_close:
+            self.on_close = MethodType(on_close, self)
+
+        if on_error:
+            self.on_error = MethodType(on_error, self)
+
+        if on_ping:
+            self.on_ping = MethodType(on_ping, self)
+
+        if on_pong:
+            self.on_pong = MethodType(on_pong, self)
+
+        if on_send:
+            self.on_send = MethodType(on_send, self)
+
+        self.logger.debug('Completed initialising callbacks.')
 
     async def create_ws_connection(self):
         self.logger.debug(
@@ -64,11 +138,12 @@ class NeuphonicSocketManager:
             f'WebSocket connection has been established: {self.NEUPHONIC_WEBSOCKET_URL}, proxies: {self._proxy_params}',
         )
 
-    async def send_message(self, message):
+    async def send(self, message):
         self.logger.debug(f'Sending message to Neuphonic WebSocket Server: {message}')
 
         if self.ws:
             await self.ws.send(message)
+            await self.on_send(message)
         else:
             self.logger.debug('Failed to send message, no WebSocket Server available')
 
@@ -155,4 +230,7 @@ class NeuphonicSocketManager:
         pass
 
     async def on_pong(self):
+        pass
+
+    async def on_send(self, message: str):
         pass
