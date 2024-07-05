@@ -29,6 +29,7 @@ async def on_close(self: NeuphonicWebsocketClient):
     self.stream.stop_stream()  # type: ignore[attr-defined]
     self.stream.close()  # type: ignore[attr-defined]
     self.audio_player.terminate()  # type: ignore[attr-defined]
+    self.logger.debug('Terminated PyAudio resources.')
 
 
 async def on_audio_buffer_update(self: NeuphonicWebsocketClient):

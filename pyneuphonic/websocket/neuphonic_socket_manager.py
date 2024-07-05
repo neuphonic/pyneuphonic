@@ -110,7 +110,7 @@ class NeuphonicSocketManager:
         await self.on_open()
 
     async def listen(self):
-        while True:
+        while self.ws.open:
             try:
                 receive_task = asyncio.create_task(self._handle_message())
                 ping_task = asyncio.create_task(self.ping_periodically())
@@ -128,12 +128,13 @@ class NeuphonicSocketManager:
             finally:
                 if self.ws.open:
                     await self.ws.close()
-                await asyncio.sleep(5)  # wait before attempting to reconnect
 
     async def close(self):
         if self.ws and self.ws.open:
             await self.ws.close()
             self.logger.debug('Websocket connection closed.')
+
+        await self.on_close()
 
     async def on_audio_message(self, message: bytes):
         pass

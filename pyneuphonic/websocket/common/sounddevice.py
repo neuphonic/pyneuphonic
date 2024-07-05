@@ -1,7 +1,7 @@
 import sounddevice as sd
-import numpy as np
 from pyneuphonic.websocket import NeuphonicWebsocketClient
 from pyneuphonic.websocket.libs import SubscriptableAsyncByteArray
+import numpy as np
 
 
 async def on_open(self: NeuphonicWebsocketClient):
@@ -25,6 +25,7 @@ async def on_close(self: NeuphonicWebsocketClient):
     """Close the sounddevice resources opened up by on_open"""
     self.stream.stop()  # type: ignore[attr-defined]
     self.stream.close()  # type: ignore[attr-defined]
+    self.logger.debug('Terminated sounddevice resources.')
 
 
 async def on_audio_buffer_update(self: NeuphonicWebsocketClient):
