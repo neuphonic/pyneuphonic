@@ -209,7 +209,7 @@ class NeuphonicWebsocketClient:
     async def on_audio_message(self, message: bytes):
         pass
 
-    async def on_non_audio_message(self, message: bytes):
+    async def on_non_audio_message(self, message: Any):
         pass
 
     async def on_open(self):
