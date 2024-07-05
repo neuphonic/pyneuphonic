@@ -4,6 +4,7 @@ import certifi
 import os
 import asyncio
 import websockets
+
 from pyneuphonic.websocket.libs import parse_proxies
 from typing import Optional, Callable, Awaitable, Any
 from types import MethodType
@@ -120,7 +121,7 @@ class NeuphonicWebsocketClient:
 
         self.logger.debug('Completed initialising callbacks.')
 
-    async def create_ws_connection(self):
+    async def create_ws_connection(self, ping_interval, ping_timeout):
         self.logger.debug(
             f'Creating connection with WebSocket Server: {self.NEUPHONIC_WEBSOCKET_URL}, proxies: {self._proxy_params}',
         )
@@ -131,8 +132,12 @@ class NeuphonicWebsocketClient:
             f'{self.NEUPHONIC_WEBSOCKET_URL}/{self._NEUPHONIC_API_TOKEN}',
             ssl=ssl_context,
             timeout=self.timeout,
+            ping_interval=ping_interval,
+            ping_timeout=ping_timeout,
             **self._proxy_params,
         )
+
+        self.ws.on_pong = self.on_pong
 
         self.logger.debug(
             f'WebSocket connection has been established: {self.NEUPHONIC_WEBSOCKET_URL}, proxies: {self._proxy_params}',
@@ -155,11 +160,6 @@ class NeuphonicWebsocketClient:
             self.logger.error(f'Error sending ping: {e}')
             await self.on_error(e)
 
-    async def ping_periodically(self, interval: int = 20):
-        while True:
-            await self.ping()
-            await asyncio.sleep(interval)
-
     async def _handle_message(self):
         try:
             async for message in self.ws:
@@ -177,22 +177,19 @@ class NeuphonicWebsocketClient:
             self.logger.error(f'Exception in message_handler: {e}')
             await self.on_error(e)
         finally:
-            self.logger.error('On close')
+            self.logger.error('_handle_message.finally block')
             await self.on_close()
 
-    async def open(self):
-        await self.create_ws_connection()
+    async def open(self, ping_interval=20, ping_timeout=None):
+        await self.create_ws_connection(ping_interval, ping_timeout)
         await self.on_open()
 
     async def listen(self):
         while self.ws.open:
             try:
                 receive_task = asyncio.create_task(self._handle_message())
-                ping_task = asyncio.create_task(self.ping_periodically())
 
-                await asyncio.wait(
-                    [receive_task, ping_task], return_when=asyncio.FIRST_COMPLETED
-                )
+                await asyncio.wait([receive_task], return_when=asyncio.FIRST_COMPLETED)
 
             except websockets.exceptions.ConnectionClosedError as e:
                 self.logger.error('Lost websocket connection')
@@ -226,10 +223,12 @@ class NeuphonicWebsocketClient:
     async def on_error(self, e: Exception):
         raise e
 
-    async def on_ping(self):
+    async def on_ping(self, *args, **kwargs):
+        """TODO"""
         pass
 
-    async def on_pong(self):
+    async def on_pong(self, *args, **kwargs):
+        """TODO"""
         pass
 
     async def on_send(self, message: str):
