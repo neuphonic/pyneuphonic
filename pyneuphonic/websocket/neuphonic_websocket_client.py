@@ -177,7 +177,7 @@ class NeuphonicWebsocketClient:
             self.logger.error(f'Exception in message_handler: {e}')
             await self.on_error(e)
         finally:
-            self.logger.error('_handle_message.finally block')
+            self.logger.debug('_handle_message.finally block')
             await self.on_close()
 
     async def open(self, ping_interval=20, ping_timeout=None):

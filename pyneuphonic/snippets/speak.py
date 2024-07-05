@@ -11,6 +11,7 @@ logging.basicConfig(
 
 
 async def user_input_loop(client):
+    """Define an async function to wait for user input, in a non-blocking manner."""
     while True:
         user_text = await aioconsole.ainput("Enter text to speak (or 'quit' to exit): ")
         if user_text.lower() == 'quit':
