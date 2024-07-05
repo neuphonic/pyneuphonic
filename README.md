@@ -24,16 +24,20 @@ export NEUPHONIC_API_TOKEN=XXXXX
 ```
 
 The open a python shell in your terminal and do the following:
+
 ```python
 import asyncio
-from pyneuphonic.examples import speak
+from pyneuphonic.snippets import speak
+
 asyncio.run(speak('Hello, how are you?'))
 ```
 
 Also, try this one:
+
 ```python
 import asyncio
-from pyneuphonic.examples import llama3_interactive
+from pyneuphonic.snippets import llama3_interactive
+
 asyncio.run(llama3_interactive())
 ```
 Note that the `llama3_interactive` example required that you have `ollama` installed and have downloaded the `llama3:8b`
@@ -57,7 +61,7 @@ Ensure to pass in your `API_TOKEN` as required, or instead set your `NEUPHONIC_A
 will be loaded automatically.
 
 ### Advanced Usage - Production Level
-See [`pyneuphonic/examples/llama3_interactive`](pyneuphonic/examples/llama3_interactive.py) for an example on how to use
+See [`pyneuphonic/examples/llama3_interactive`](pyneuphonic/snippets/llama3_interactive.py) for an example on how to use
 the `ollama` package with **llama3:8b**, alongside `TTSStreamer` to stream text-to-speech token-by-token (to make full
 use of Neuphonic's low-latency TTS engine).
 
