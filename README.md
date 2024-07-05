@@ -17,52 +17,116 @@ pip install git+ssh://git@github.com/neuphonic/pyneuphonic.git
 poetry add git+ssh://git@github.com/neuphonic/pyneuphonic.git
 ```
 
-## Fun Examples
-Set your API key in your environment through the terminal or in your `~/.zshrc` file.
+### Set API Key
+Set the following environment variables:
 ```bash
-export NEUPHONIC_API_TOKEN=XXXXX
+export NEUPHONIC_API_TOKEN=XXX
+export NEUPHONIC_WEBSOCKET_URL=wss://neuphonic.us/speak/en
 ```
 
-The open a python shell in your terminal and do the following:
-```python
-import asyncio
-from pyneuphonic.examples import speak
-asyncio.run(speak('Hello, how are you?'))
-```
+### Interactive Example
+See [`pyneuphonic/snippets/`](pyneuphonic/snippets) for some examples on mini-programs.
+Run the `speak` example, which launches an interactive terminal where anything you type will be converted to text and
+spoken back to you.
 
-Also, try this one:
-```python
-import asyncio
-from pyneuphonic.examples import llama3_interactive
-asyncio.run(llama3_interactive())
-```
-Note that the `llama3_interactive` example required that you have `ollama` installed and have downloaded the `llama3:8b`
-model.
+Open a python terminal and run the following:
 
-### Basic Usage
-Everything that is important lives inside the `pyneuphonic.TTSStreamer` class.
-The below script will convert "Hello, world!" to speech, and speak it aloud.
-```python
-from pyneuphonic import TTSStreamer
-from pyneuphonic.utils import string_to_async_generator
+```bash
+from pyneuphonic.snippets import speak
 import asyncio
 
-text_generator = string_to_async_generator("Hello, world!")
-tts = TTSStreamer(API_TOKEN='XXXXXX')
-
-asyncio.run(asyncio.wait_for(tts.stream(text_generator), timeout=60))
+asyncio.run(speak())
 ```
 
-Ensure to pass in your `API_TOKEN` as required, or instead set your `NEUPHONIC_API_TOKEN` environment variable and this
-will be loaded automatically.
+## Basic Usage
 
-### Advanced Usage - Production Level
-See [`pyneuphonic/examples/llama3_interactive`](pyneuphonic/examples/llama3_interactive.py) for an example on how to use
-the `ollama` package with **llama3:8b**, alongside `TTSStreamer` to stream text-to-speech token-by-token (to make full
-use of Neuphonic's low-latency TTS engine).
+Here is a simple example of how to use the `NeuphonicWebsocketClient`.
 
-This is how the `TTSStreamer` should be used in practise.
+```python
+import asyncio
+from pyneuphonic.websocket import NeuphonicWebsocketClient
 
-The audio is played to the systems speaker using `PyAudio`, however if you would like to edit how audio bytes
-received from the WebSocket API are processed and handled by your system, override the `TTSStreamer.play_audio`
-method.
+# Define callback functions
+async def on_audio_message(client, message):
+    print(f"Received audio data: {len(message)} bytes")
+    # Process the audio data here
+
+async def on_non_audio_message(client, message):
+    print(f"Received non-audio message: {message}")
+
+async def on_open(client):
+    print("WebSocket connection opened")
+    await client.send("Hello, Neuphonic!")
+
+async def on_close(client):
+    print("WebSocket connection closed")
+
+# Create the client
+client = NeuphonicWebsocketClient(
+    on_audio_message=on_audio_message,
+    on_non_audio_message=on_non_audio_message,
+    on_open=on_open,
+    on_close=on_close
+)
+
+# Main function to run the client
+async def main():
+    await client.open()
+    await client.listen()
+
+# Run the client
+asyncio.run(main())
+```
+
+The `NeuphonicWebsocketClient` exposes the following callbacks:
+- `on_audio_message` - called after audio data (bytes) are received;
+- `on_non_audio_message` - called after any other non-audio message is received;
+- `on_open` -  called after websocket connection opens;
+- `on_close` - called after the websocket connected closes;
+- `on_error` - called to handle any exceptions;
+- `on_send` - hooks into `NeuphonicWebsocketClient.send` and is called after every send;
+- `on_ping` - called on every ping;
+- `on_pong` - called on every pong;
+
+Which can all be passed into the `NeuphonicWebsocketClient` constructor, as per the above example.
+Alternatively, you can inherit the `NeuphonicWebsocketClient` class for maximal flexibility.
+
+### Playing Audio
+There is maximal flexibility for you to use the `NeuphonicWebsocketClient` to play audio however you want via the callbacks.
+Default `PyAudio` and `sounddevice` implementations have been provided in [`pyneuphonic/websocket/common`](pyneuphonic/websocket/common),
+both of these packages are python wrappers for [PortAudio](https://www.portaudio.com/); these are available to use or
+implement yourself.
+
+Here is an example on how to use `PyAudio` to automatically play any received audio through your speaker.
+```python
+import asyncio
+from pyneuphonic.websocket import NeuphonicWebsocketClient
+from pyneuphonic.websocket.common.pyaudio import on_open, on_close, on_audio_message
+# from pyneuphonic.websocket.common.sounddevice import on_open, on_close, on_audio_message
+
+# Create the client
+client = NeuphonicWebsocketClient(
+    on_audio_message=on_audio_message,
+    on_open=on_open,
+    on_close=on_close
+)
+
+# Main function to run the client
+async def main():
+    await client.open()
+
+    await asyncio.gather(
+        client.listen(),
+        client.send('Hello, World! My name is Neu.'),
+    )
+
+# Run the client
+asyncio.run(main())
+```
+
+The imported `on_open, on_close` functions handle the set-up and tear-down of `PyAudio` resources,
+and `on_audio_message` handles streaming the received audio to the speaker.
+You can switch between `PyAudio` and `sounddevice` by simply un-commenting the respective lines (lines 3 and 4, above).
+
+### Documentation
+See XXX for full documentation.

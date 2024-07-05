@@ -11,5 +11,5 @@ if ollama_installed:
         print(f'Could not import llama3_interactive: {e}')
 else:
     print(
-        'ollama package is not installed, skipping import of pyneuphonic.examples.llama3_interactive'
+        'ollama package is not installed, skipping import of pyneuphonic.snippets.llama3_interactive'
     )

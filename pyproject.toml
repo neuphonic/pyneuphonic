@@ -10,9 +10,11 @@ readme = "README.md"
 python = "^3.10"
 nest-asyncio = "1.6.0"
 pyaudio = "^0.2.14"
-sounddevice = "^0.4.7"
 websockets = "^12.0"
 certifi = "^2024.6.2"
+aioconsole = "^0.7.1"
+sounddevice = "^0.4.7"
+numpy = ">=1.18.0,<3.0.0"
 
 [tool.poetry.dev-dependencies]
 ollama = "0.2.1"
