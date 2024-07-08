@@ -126,7 +126,12 @@ class NeuphonicWebsocketClient:
             f'Creating connection with WebSocket Server: {self.NEUPHONIC_WEBSOCKET_URL}, proxies: {self._proxy_params}',
         )
 
-        ssl_context = ssl.create_default_context(cafile=certifi.where())
+        if 'wss' in self.NEUPHONIC_WEBSOCKET_URL[:3]:
+            ssl_context = ssl.create_default_context(cafile=certifi.where())
+            self.logger.debug('Creating Encrypted SLL Connection.')
+        else:
+            ssl_context = None
+            self.logger.debug('Creating Unencrypted Connection.')
 
         self.ws = await websockets.connect(
             f'{self.NEUPHONIC_WEBSOCKET_URL}/{self._NEUPHONIC_API_TOKEN}',
