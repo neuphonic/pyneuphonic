@@ -25,7 +25,7 @@ export NEUPHONIC_WEBSOCKET_URL=wss://neuphonic.us/speak/en
 ```
 
 ### Interactive Example
-See [`pyneuphonic/snippets/`](pyneuphonic/snippets) for some examples on mini-programs.
+See [`pyneuphonic/snippets/`](snippets) for some examples on mini-programs.
 Run the `speak` example, which launches an interactive terminal where anything you type will be converted to text and
 spoken back to you.
 
