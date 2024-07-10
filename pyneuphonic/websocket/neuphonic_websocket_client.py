@@ -207,9 +207,8 @@ class NeuphonicWebsocketClient:
     async def close(self):
         if self.ws and self.ws.open:
             await self.ws.close()
+            await self.on_close()
             self.logger.debug('Websocket connection closed.')
-
-        await self.on_close()
 
     async def on_audio_message(self, message: bytes):
         pass
