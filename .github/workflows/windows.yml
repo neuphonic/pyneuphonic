@@ -1,0 +1,40 @@
+name: Windows tests
+
+# This file is meant for testing across supported Python versions.
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install Poetry
+      run: |
+        (Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | py -
+        $env:Path += ";$env:USERPROFILE\.poetry\bin"
+
+    - name: Install dependencies
+      run: |
+        poetry install
+
+    - name: Test with pytest
+      run: |
+        poetry run pytest --cov pyneuphonic
+
+    - name: Lint with ruff
+      run: |
+        poetry run ruff check .
