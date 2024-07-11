@@ -2,7 +2,11 @@ from pyneuphonic.websocket import NeuphonicWebsocketClient
 from pyneuphonic.websocket.libs import SubscriptableAsyncByteArray, import_if_installed
 
 # import pyaudio if it is installed
-pyaudio = import_if_installed('pyaudio')
+pyaudio = import_if_installed(
+    'pyaudio',
+    'You have attempted to import from pyneuphonic.websocket.common.pyaudio but PyAudio package is not '
+    'installed. Please install PyAudio first.',
+)
 
 
 async def on_open(self: NeuphonicWebsocketClient):
