@@ -1,7 +1,6 @@
-# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+name: Linux tests
 
-name: Python package
+# This file is meant for testing across supported Python versions.
 
 on:
   pull_request:
@@ -31,7 +30,7 @@ jobs:
         poetry install
     - name: Test with pytest
       run: |
-        poetry run pytest
+        poetry run pytest --cov pyneuphonic
     - name: Lint with ruff
       run: |
         poetry run ruff check .
