@@ -25,7 +25,7 @@ jobs:
     - name: Install Poetry
       run: |
         (Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | py -
-        $env:Path += ";$env:APPDATA\Python\Scripts"
+        set PATH=%PATH%;$env:APPDATA\Python\Scripts
         echo $env:Path
         echo $env:APPDATA
         echo $env:USERPROFILE
