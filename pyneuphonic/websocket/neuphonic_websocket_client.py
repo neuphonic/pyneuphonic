@@ -43,6 +43,26 @@ class NeuphonicWebsocketClient:
         timeout: Optional[float] = None,  # TODO
         proxies: Optional[dict] = None,  # TODO - implement SSL with this
     ):
+        """
+        Sample docstring.
+
+        Parameters
+        ----------
+        NEUPHONIC_API_TOKEN : str
+            API token for the Neuphonic websocket API.
+        NEUPHONIC_WEBSOCKET_URL
+        on_audio_message
+        on_non_audio_message
+        on_open
+        on_close
+        on_error
+        on_ping
+        on_pong
+        on_send
+        logger
+        timeout
+        proxies
+        """
         if NEUPHONIC_API_TOKEN is None:
             NEUPHONIC_API_TOKEN = os.getenv('NEUPHONIC_API_TOKEN')
 
