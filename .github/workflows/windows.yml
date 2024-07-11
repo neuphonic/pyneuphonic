@@ -25,19 +25,15 @@ jobs:
     - name: Install Poetry
       run: |
         (Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | py -
-        $currentPath = [System.Environment]::GetEnvironmentVariable('PATH', [System.EnvironmentVariableTarget]::Process)
-        $newPath = $currentPath + ";$env:APPDATA\Python\Scripts"
-        [System.Environment]::SetEnvironmentVariable('PATH', $newPath, [System.EnvironmentVariableTarget]::Process)
-        echo $env:Path
 
     - name: Install dependencies
       run: |
-        poetry install
+        $env:APPDATA\Python\Scripts\poetry install
 
     - name: Test with pytest
       run: |
-        poetry run pytest --cov pyneuphonic
+        $env:APPDATA\Python\Scripts\poetry run pytest --cov pyneuphonic
 
     - name: Lint with ruff
       run: |
-        poetry run ruff check .
+        $env:APPDATA\Python\Scripts\poetry run ruff check .
