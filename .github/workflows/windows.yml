@@ -25,7 +25,9 @@ jobs:
     - name: Install Poetry
       run: |
         (Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | py -
-        $env:PATH += ";$env:APPDATA\Python\Scripts"
+        $currentPath = [System.Environment]::GetEnvironmentVariable('PATH', [System.EnvironmentVariableTarget]::Process)
+        $newPath = $currentPath + ";$env:APPDATA\Python\Scripts"
+        [System.Environment]::SetEnvironmentVariable('PATH', $newPath, [System.EnvironmentVariableTarget]::Process)
         echo $env:Path
 
     - name: Install dependencies
