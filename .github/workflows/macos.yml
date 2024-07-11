@@ -1,4 +1,4 @@
-name: Linux tests
+name: macOS tests
 
 # This file is meant for testing across supported Python versions.
 
@@ -9,7 +9,7 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     strategy:
       fail-fast: false
       matrix:
