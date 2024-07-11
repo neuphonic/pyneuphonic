@@ -24,22 +24,7 @@ export NEUPHONIC_API_TOKEN=XXX
 export NEUPHONIC_WEBSOCKET_URL=wss://neuphonic.us/speak/en
 ```
 
-### Interactive Example
-See [`pyneuphonic/snippets/`](pyneuphonic/snippets) for some examples on mini-programs.
-Run the `speak` example, which launches an interactive terminal where anything you type will be converted to text and
-spoken back to you.
-
-Open a python terminal and run the following:
-
-```bash
-from pyneuphonic.snippets import speak
-import asyncio
-
-asyncio.run(speak())
-```
-
 ## Basic Usage
-
 Here is a simple example of how to use the `NeuphonicWebsocketClient`.
 
 ```python
@@ -77,6 +62,10 @@ async def main():
 asyncio.run(main())
 ```
 
+The above example will connect to the websocket server, send the string "Hello, Neuphonic!, and log the length
+of the returned audio bytes.
+Notice that you will receive more than 1 audio message as our incremental TTS engine generates audio in smaller chunks.
+
 The `NeuphonicWebsocketClient` exposes the following callbacks:
 - `on_audio_message` - called after audio data (bytes) are received;
 - `on_non_audio_message` - called after any other non-audio message is received;
@@ -88,15 +77,19 @@ The `NeuphonicWebsocketClient` exposes the following callbacks:
 - `on_pong` - called on every pong;
 
 Which can all be passed into the `NeuphonicWebsocketClient` constructor, as per the above example.
-Alternatively, you can inherit the `NeuphonicWebsocketClient` class for maximal flexibility.
+Alternatively, you can inherit the `NeuphonicWebsocketClient` class to override these methods, it is entirely up to your
+own coding style.
 
 ### Playing Audio
 There is maximal flexibility for you to use the `NeuphonicWebsocketClient` to play audio however you want via the callbacks.
-Default `PyAudio` and `sounddevice` implementations have been provided in [`pyneuphonic/websocket/common`](pyneuphonic/websocket/common),
-both of these packages are python wrappers for [PortAudio](https://www.portaudio.com/); these are available to use or
-implement yourself.
+Two popular python packages to play audio are `pyaudio` and `sounddevice`, and so implementations to play audio through
+your system's speaker with these packages have been provided.
+Both of these packages are wrappers for [PortAudio](https://www.portaudio.com/) and so PortAudio needs to be installed and configured on your system.
+These implementations have been provided in [`pyneuphonic/websocket/common`](pyneuphonic/websocket/common).
 
-Here is an example on how to use `PyAudio` to automatically play any received audio through your speaker.
+Below is an example on how to use `pyaudio` to play the string "Hello, World! My name is Neu." out of your speaker.
+
+First install `pyaudio` (`pip install poetry`) and then try the following code:
 ```python
 import asyncio
 from pyneuphonic.websocket import NeuphonicWebsocketClient
@@ -123,9 +116,21 @@ async def main():
 asyncio.run(main())
 ```
 
-The imported `on_open, on_close` functions handle the set-up and tear-down of `PyAudio` resources,
+The imported `on_open, on_close` functions handle the set-up and tear-down of `pyaudio` resources,
 and `on_audio_message` handles streaming the received audio to the speaker.
-You can switch between `PyAudio` and `sounddevice` by simply un-commenting the respective lines (lines 3 and 4, above).
+You can switch between `pyaudio` and `sounddevice` by simply un-commenting the respective lines (lines 3 and 4, above).
+To use the `sounddevice` implementations you need to install `numpy` and `sounddevice` first (`pip install numpy sounddevice`).
 
-### Documentation
+### Token-by-token LLM to TTS Streaming
+See [`snippets/`](snippets) for some examples on mini-programs.
+A great use case for our incremental TTS engine is streaming output text tokens from LLMs directly into our websocket
+for low-latency audio output.
+To see an example of how to use **llama3:8b** check out the [`snippets/llama3_interactive.py`](snippets/llama3_interactive.py)
+script (you will need to `pip install ollama aioconsole` and install [llama3:8b](https://ollama.com/library/llama3:8b)).
+
+For another example, see the [`snippets/speak.py`](snippets/speak.py), which launches an interactive terminal where anything you type will be converted to text and
+spoken back to you (this example requires `pip install aioconsole`).
+
+
+## Documentation
 See XXX for full documentation.

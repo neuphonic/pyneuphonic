@@ -8,19 +8,21 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-nest-asyncio = "1.6.0"
-pyaudio = "^0.2.14"
 websockets = "^12.0"
-certifi = "^2024.6.2"
-aioconsole = "^0.7.1"
-sounddevice = "^0.4.7"
-numpy = ">=1.18.0,<3.0.0"
+certifi = "^2024.0.0"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.2.2"
 ollama = "0.2.1"
 ruff = "^0.5.0"
 pre-commit = "^3.7.1"
 jupyter = "^1.0.0"
+pytest-asyncio = "^0.23.7"
+pytest-cov = "^5.0.0"
+pyaudio = "^0.2.14"
+sounddevice = "^0.4.7"
+aioconsole = "^0.7.1"
+numpy = ">=1.18.0,<3.0.0"
 
 [build-system]
 requires = ["poetry-core"]

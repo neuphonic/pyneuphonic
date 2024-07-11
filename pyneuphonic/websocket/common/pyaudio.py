@@ -1,5 +1,7 @@
 from pyneuphonic.websocket import NeuphonicWebsocketClient
 from pyneuphonic.websocket.libs import SubscriptableAsyncByteArray
+
+# NOTE this needs to be manually installed
 import pyaudio
 
 

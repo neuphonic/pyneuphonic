@@ -8,7 +8,6 @@ class SubscriptableAsyncByteArray(bytearray):
         A wrapper around the python bytearray object, providing subscription capabilities in an async way.
         """
         super().__init__()
-        # self.byte_data = bytearray()
         self.subscribers = []
         self.notify_lock = asyncio.Lock()
 
@@ -26,6 +25,7 @@ class SubscriptableAsyncByteArray(bytearray):
     async def extend(self, new_bytes):
         super().extend(new_bytes)
 
+        # lock this next part of code so that only 1 coroutine enters this block at a time
         async with self.notify_lock:
             await self._notify_subscribers(new_bytes)
 

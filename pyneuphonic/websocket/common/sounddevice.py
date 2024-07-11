@@ -1,7 +1,9 @@
-import sounddevice as sd
 from pyneuphonic.websocket import NeuphonicWebsocketClient
 from pyneuphonic.websocket.libs import SubscriptableAsyncByteArray
+
+# NOTE - these need to be manually installed
 import numpy as np
+import sounddevice as sd
 
 
 async def on_open(self: NeuphonicWebsocketClient):
