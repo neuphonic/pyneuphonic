@@ -28,12 +28,12 @@ jobs:
 
     - name: Install dependencies
       run: |
-        $env:APPDATA\Python\Scripts\poetry install
+        & "$env:APPDATA\Python\Scripts\poetry" install
 
     - name: Test with pytest
       run: |
-        $env:APPDATA\Python\Scripts\poetry run pytest --cov pyneuphonic
+        & "$env:APPDATA\Python\Scripts\poetry" run pytest --cov pyneuphonic
 
     - name: Lint with ruff
       run: |
-        $env:APPDATA\Python\Scripts\poetry run ruff check .
+        & "$env:APPDATA\Python\Scripts\poetry" run ruff check .
