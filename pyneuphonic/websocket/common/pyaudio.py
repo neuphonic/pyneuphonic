@@ -1,5 +1,6 @@
 from pyneuphonic.websocket import NeuphonicWebsocketClient
 from pyneuphonic.websocket.libs import SubscriptableAsyncByteArray
+from base64 import b64decode
 
 # NOTE this needs to be manually installed
 import pyaudio
@@ -21,9 +22,10 @@ async def on_open(self: NeuphonicWebsocketClient):
     )
 
 
-async def on_audio_message(self: NeuphonicWebsocketClient, message: bytes):
+async def on_message(self: NeuphonicWebsocketClient, message: dict):
     """Append audio byte data to the audio_buffer"""
-    await self.audio_buffer.extend(message)  # type: ignore[attr-defined]
+    audio_bytes = b64decode(message['data']['audio'])
+    await self.audio_buffer.extend(audio_bytes)  # type: ignore[attr-defined]
 
 
 async def on_close(self: NeuphonicWebsocketClient):

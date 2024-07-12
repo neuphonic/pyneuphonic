@@ -1,3 +1,4 @@
+import json
 import logging
 import ssl
 import certifi
@@ -6,7 +7,7 @@ import asyncio
 import websockets
 
 from pyneuphonic.websocket.libs import parse_proxies
-from typing import Optional, Callable, Awaitable, Any
+from typing import Optional, Callable, Awaitable
 from types import MethodType
 
 
@@ -15,11 +16,8 @@ class NeuphonicWebsocketClient:
         self,
         NEUPHONIC_API_TOKEN: str = None,
         NEUPHONIC_WEBSOCKET_URL: str = None,
-        on_audio_message: Optional[
-            Callable[['NeuphonicWebsocketClient', bytes], Awaitable[None]]
-        ] = None,
-        on_non_audio_message: Optional[
-            Callable[['NeuphonicWebsocketClient', Any], Awaitable[None]]
+        on_message: Optional[
+            Callable[['NeuphonicWebsocketClient', dict], Awaitable[None]]
         ] = None,
         on_open: Optional[
             Callable[['NeuphonicWebsocketClient'], Awaitable[None]]
@@ -72,8 +70,7 @@ class NeuphonicWebsocketClient:
 
         self._proxy_params = parse_proxies(proxies) if proxies else {}
         self._initialise_callbacks(
-            on_audio_message,
-            on_non_audio_message,
+            on_message,
             on_open,
             on_close,
             on_error,
@@ -84,8 +81,7 @@ class NeuphonicWebsocketClient:
 
     def _initialise_callbacks(
         self,
-        on_audio_message,
-        on_non_audio_message,
+        on_message,
         on_open,
         on_close,
         on_error,
@@ -95,11 +91,8 @@ class NeuphonicWebsocketClient:
     ):
         self.logger.debug('Initialising callbacks.')
 
-        if on_audio_message:
-            self.on_audio_message = MethodType(on_audio_message, self)
-
-        if on_non_audio_message:
-            self.on_non_audio_message = MethodType(on_non_audio_message, self)
+        if on_message:
+            self.on_message = MethodType(on_message, self)
 
         if on_open:
             self.on_open = MethodType(on_open, self)
@@ -166,13 +159,8 @@ class NeuphonicWebsocketClient:
     async def _handle_message(self):
         try:
             async for message in self.ws:
-                self.logger.debug('Received message.')
-                if isinstance(message, bytes):
-                    self.logger.debug(f'Handling audio message: {len(message)} bytes')
-                    await self.on_audio_message(message)
-                else:
-                    self.logger.debug(f'Handling non-audio message: {message}')
-                    await self.on_non_audio_message(message)
+                message = json.loads(message)
+                await self.on_message(message)
         except websockets.exceptions.ConnectionClosedError as e:
             self.logger.error(f'WebSocket connection closed: {e}')
             await self.on_error(e)
@@ -210,10 +198,7 @@ class NeuphonicWebsocketClient:
             await self.on_close()
             self.logger.debug('Websocket connection closed.')
 
-    async def on_audio_message(self, message: bytes):
-        pass
-
-    async def on_non_audio_message(self, message: Any):
+    async def on_message(self, message: dict):
         pass
 
     async def on_open(self):
