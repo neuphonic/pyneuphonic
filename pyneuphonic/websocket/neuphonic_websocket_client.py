@@ -39,27 +39,12 @@ class NeuphonicWebsocketClient:
         ] = None,
         logger: Optional[logging.Logger] = None,
         timeout: Optional[float] = None,  # TODO
-        proxies: Optional[dict] = None,  # TODO - implement SSL with this
+        proxies: Optional[dict] = None,  # TODO
     ):
         """
-        Sample docstring.
+        Websocket client for the Neuphonic TTS Engine.
 
-        Parameters
-        ----------
-        NEUPHONIC_API_TOKEN : str
-            API token for the Neuphonic websocket API.
-        NEUPHONIC_WEBSOCKET_URL
-        on_audio_message
-        on_non_audio_message
-        on_open
-        on_close
-        on_error
-        on_ping
-        on_pong
-        on_send
-        logger
-        timeout
-        proxies
+        This client is initialised with the provided callbacks.
         """
         if NEUPHONIC_API_TOKEN is None:
             NEUPHONIC_API_TOKEN = os.getenv('NEUPHONIC_API_TOKEN')
@@ -159,7 +144,15 @@ class NeuphonicWebsocketClient:
             f'WebSocket connection has been established: {self._NEUPHONIC_WEBSOCKET_URL}, proxies: {self._proxy_params}',
         )
 
-    async def send(self, message):
+    async def send(self, message: str):
+        """
+        Send a string to the Neuphonic websocket.
+
+        Parameters
+        ----------
+        message : str
+            The string to send to the websocket.
+        """
         self._logger.debug(f'Sending message to Neuphonic WebSocket Server: {message}')
 
         if self._ws:
@@ -191,11 +184,27 @@ class NeuphonicWebsocketClient:
             self._logger.debug('_handle_message.finally block')
             await self.on_close()
 
-    async def open(self, ping_interval=20, ping_timeout=None):
+    async def open(self, ping_interval: int = 20, ping_timeout: int = None):
+        """
+        Open the websocket connection.
+
+        Parameters
+        ----------
+        ping_interval : int
+            The number of seconds to wait between every PING.
+        ping_timeout : int
+            The number of seconds to wait for a PONG from the websocket server before assuming a timeout error.
+        """
         await self.create_ws_connection(ping_interval, ping_timeout)
         await self.on_open()
 
     async def listen(self):
+        """
+        Start listening to the server and handling responses.
+
+        The client must have been opened using NeuphonicWebsocketClient.open. Incoming messages will be forwarded to
+        NeuphonicWebsocketClient.on_message after being converted into a dict object.
+        """
         while self._ws.open:
             try:
                 receive_task = asyncio.create_task(self._handle_message())
@@ -213,30 +222,55 @@ class NeuphonicWebsocketClient:
                     await self._ws.close()
 
     async def close(self):
+        """Close the websocket connection and call the NeuphonicWebsocketClient.on_close function."""
         if self._ws and self._ws.open:
             await self._ws.close()
             await self.on_close()
             self._logger.debug('Websocket connection closed.')
 
     async def on_message(self, message: dict):
+        """
+        This function is called on every incoming message. It receives the message as a python dict object.
+
+        Parameters
+        ----------
+        message : dict
+            The incoming message from the websocket server.
+        """
         pass
 
     async def on_open(self):
+        """Called after the websocket connection opens."""
         pass
 
     async def on_close(self):
+        """Called after the websocket connection closes."""
         pass
 
     async def on_error(self, e: Exception):
+        """
+        Called on error.
+
+        Parameters
+        ----------
+        e : Exception
+            The error raised.
+        """
         raise e
 
     async def on_ping(self, *args, **kwargs):
-        """TODO"""
         pass
 
     async def on_pong(self, *args, **kwargs):
-        """TODO"""
         pass
 
     async def on_send(self, message: str):
+        """
+        Called every time a message is sent to the server.
+
+        Parameters
+        ----------
+        message : str
+            The message sent to the server.
+        """
         pass

@@ -57,7 +57,7 @@ html_theme_options = {
     'repository_url': 'https://github.com/neuphonic/pyneuphonic',
     'use_repository_button': True,
     'home_page_in_toc': True,
-    'show_toc_level': 2,
+    'show_toc_level': 3,
     # 'show_navbar_depth': 2,
     # 'max_navbar_depth': 2,
 }
