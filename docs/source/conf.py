@@ -23,7 +23,25 @@ release = '0.1.0'
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ['myst_parser']
+extensions = [
+    'myst_parser',
+    'sphinx.ext.autodoc',
+    'sphinx.ext.napoleon',
+    'sphinx.ext.viewcode',
+]
+
+myst_enable_extensions = [
+    'colon_fence',
+    'dollarmath',
+    'amsmath',
+    'deflist',
+    'html_admonition',
+    'html_image',
+    'smartquotes',
+    'replacements',
+    'substitution',
+    'tasklist',
+]
 
 templates_path = ['_templates']
 exclude_patterns = []
@@ -38,7 +56,22 @@ html_static_path = ['_static']
 html_theme_options = {
     'repository_url': 'https://github.com/neuphonic/pyneuphonic',
     'use_repository_button': True,
+    'home_page_in_toc': True,
+    'show_toc_level': 2,
+    # 'show_navbar_depth': 2,
+    # 'max_navbar_depth': 2,
 }
+
+# html_sidebars = {
+#     "**": ["sbt-sidebar-nav.html"]
+# }
 
 html_logo = 'logo.png'
 html_title = 'My site title'
+
+# Automatically extract typehints when specified and place them in
+# descriptions of the relevant function/method.
+autodoc_typehints = 'description'
+
+# Don't show class signature with the class' name.
+autodoc_class_signature = 'separated'
