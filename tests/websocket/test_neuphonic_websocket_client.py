@@ -6,7 +6,7 @@ from pyneuphonic.websocket import NeuphonicWebsocketClient
 
 async def close_connection(client, sleep=0.2):
     await asyncio.sleep(sleep)
-    client.ws.open = False
+    client._ws.open = False
 
 
 def test_instantiation(
@@ -48,39 +48,39 @@ def test_instantiation(
 async def test_create_ws_connection(client, unsecure_client):
     with patch('websockets.connect', new_callable=AsyncMock) as mock_connect:
         # assert the connection is created properly
-        assert client.ws is None
+        assert client._ws is None
         await client.create_ws_connection(ping_interval=20, ping_timeout=10)
         ssl_context = mock_connect.call_args.kwargs['ssl']
         mock_connect.assert_called_with(
             'wss://test_url/test_token',
             ssl=ssl_context,
-            timeout=client.timeout,
+            timeout=client._timeout,
             ping_interval=20,
             ping_timeout=10,
         )
-        assert client.ws is not None
+        assert client._ws is not None
 
-        assert unsecure_client.ws is None
+        assert unsecure_client._ws is None
         await unsecure_client.create_ws_connection(ping_interval=25, ping_timeout=15)
         mock_connect.assert_called_with(
             'ws://test_url/test_token',
             ssl=None,
-            timeout=unsecure_client.timeout,
+            timeout=unsecure_client._timeout,
             ping_interval=25,
             ping_timeout=15,
         )
-        assert unsecure_client.ws is not None
+        assert unsecure_client._ws is not None
 
 
 @pytest.mark.asyncio
 async def test_listen(client):
-    client.ws = AsyncMock()
-    client.ws.open = True
+    client._ws = AsyncMock()
+    client._ws.open = True
     client._handle_message = AsyncMock()
 
     async def close_connection():
         await asyncio.sleep(0.1)
-        client.ws.open = False
+        client._ws.open = False
 
     with patch(
         'asyncio.create_task', side_effect=asyncio.create_task
@@ -93,9 +93,9 @@ async def test_listen(client):
 @pytest.mark.asyncio
 async def test_handle_message_audio(client):
     # Mock the WebSocket connection
-    client.ws = AsyncMock()
-    client.ws.__aiter__.return_value = [b'audio message', 'non-audio message']
-    client.ws.open = True
+    client._ws = AsyncMock()
+    client._ws.__aiter__.return_value = [b'audio message', 'non-audio message']
+    client._ws.open = True
 
     # Mock the message handlers
     client.on_audio_message = AsyncMock()
@@ -114,14 +114,14 @@ async def test_handle_message_audio(client):
 
 @pytest.mark.asyncio
 async def test_send(client):
-    client.ws = AsyncMock()
+    client._ws = AsyncMock()
     client.on_send = AsyncMock()
 
     message = 'test message'
 
     await client.send(message)
 
-    client.ws.send.assert_called_once_with(message)
+    client._ws.send.assert_called_once_with(message)
     client.on_send.assert_called_once_with(message)
 
 
@@ -138,18 +138,18 @@ async def test_open(client):
 
 @pytest.mark.asyncio
 async def test_close(client):
-    client.ws = AsyncMock()
-    client.ws.close = AsyncMock()
-    client.ws.open = True
+    client._ws = AsyncMock()
+    client._ws.close = AsyncMock()
+    client._ws.open = True
     client.on_close = AsyncMock()
 
     # Close the client
     await client.close()
 
     # Try to close the client when it is already closed
-    client.ws.open = False
+    client._ws.open = False
     await client.close()
 
     # assert that these were only called once, they weren't called the second time because the client is already closed
-    client.ws.close.assert_called_once()
+    client._ws.close.assert_called_once()
     client.on_close.assert_called_once()
