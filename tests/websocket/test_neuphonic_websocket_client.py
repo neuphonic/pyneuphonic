@@ -2,17 +2,14 @@ import pytest
 import asyncio
 from unittest.mock import AsyncMock, patch
 from pyneuphonic.websocket import NeuphonicWebsocketClient
-
-
-async def close_connection(client, sleep=0.2):
-    await asyncio.sleep(sleep)
-    client._ws.open = False
+import datetime
+import json
+import base64
 
 
 def test_instantiation(
     client,
-    on_audio_message,
-    on_non_audio_message,
+    on_message,
     on_open,
     on_close,
     on_error,
@@ -21,8 +18,7 @@ def test_instantiation(
     on_send,
 ):
     # Check the provided methods are bound
-    assert client.on_audio_message.__func__ == on_audio_message
-    assert client.on_non_audio_message.__func__ == on_non_audio_message
+    assert client.on_message.__func__ == on_message
     assert client.on_open.__func__ == on_open
     assert client.on_close.__func__ == on_close
     assert client.on_error.__func__ == on_error
@@ -35,13 +31,11 @@ def test_instantiation(
         client = NeuphonicWebsocketClient(
             NEUPHONIC_API_TOKEN='test_token',
             NEUPHONIC_WEBSOCKET_URL='wss://test_url',
-            on_audio_message=on_audio_message,
+            on_message=on_message,
             on_send=on_send,
         )
 
-        mock.assert_called_once_with(
-            on_audio_message, None, None, None, None, None, None, on_send
-        )
+        mock.assert_called_once_with(on_message, None, None, None, None, None, on_send)
 
 
 @pytest.mark.asyncio
@@ -91,23 +85,30 @@ async def test_listen(client):
 
 
 @pytest.mark.asyncio
-async def test_handle_message_audio(client):
+async def test_handle_message(client):
+    response = {
+        'version': '1.0.0',
+        'timestamp': datetime.datetime.now(datetime.UTC).isoformat(),
+        'data': {
+            'audio': base64.b64encode(b'Hello, ').decode('utf-8'),
+            'text': 'Hello, ',
+        },
+    }
+
     # Mock the WebSocket connection
     client._ws = AsyncMock()
-    client._ws.__aiter__.return_value = [b'audio message', 'non-audio message']
+    client._ws.__aiter__.return_value = [json.dumps(response)]
     client._ws.open = True
 
     # Mock the message handlers
-    client.on_audio_message = AsyncMock()
-    client.on_non_audio_message = AsyncMock()
+    client.on_message = AsyncMock()
     client.on_close = AsyncMock()
     client.on_error = AsyncMock()
 
     await client._handle_message()
 
     # Check that the correct handlers were called for each message
-    client.on_audio_message.assert_called_once_with(b'audio message')
-    client.on_non_audio_message.assert_called_once_with('non-audio message')
+    client.on_message.assert_called_once_with(response)
     client.on_close.assert_called_once()
     client.on_error.assert_not_called()
 

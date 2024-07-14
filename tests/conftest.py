@@ -11,19 +11,11 @@ import random
 
 
 @pytest.fixture
-def on_audio_message():
-    async def _on_audio_message(self, message):
+def on_message():
+    async def _on_message(self, message):
         pass
 
-    return _on_audio_message
-
-
-@pytest.fixture
-def on_non_audio_message():
-    async def _on_non_audio_message(self, message):
-        pass
-
-    return _on_non_audio_message
+    return _on_message
 
 
 @pytest.fixture
@@ -76,8 +68,7 @@ def on_send():
 
 @pytest.fixture
 def client(
-    on_audio_message,
-    on_non_audio_message,
+    on_message,
     on_open,
     on_close,
     on_error,
@@ -88,8 +79,7 @@ def client(
     return NeuphonicWebsocketClient(
         NEUPHONIC_API_TOKEN='test_token',
         NEUPHONIC_WEBSOCKET_URL='wss://test_url',
-        on_audio_message=on_audio_message,
-        on_non_audio_message=on_non_audio_message,
+        on_message=on_message,
         on_open=on_open,
         on_close=on_close,
         on_error=on_error,
@@ -102,8 +92,7 @@ def client(
 
 @pytest.fixture
 def unsecure_client(
-    on_audio_message,
-    on_non_audio_message,
+    on_message,
     on_open,
     on_close,
     on_error,
@@ -114,8 +103,7 @@ def unsecure_client(
     return NeuphonicWebsocketClient(
         NEUPHONIC_API_TOKEN='test_token',
         NEUPHONIC_WEBSOCKET_URL='ws://test_url',
-        on_audio_message=on_audio_message,
-        on_non_audio_message=on_non_audio_message,
+        on_message=on_message,
         on_open=on_open,
         on_close=on_close,
         on_error=on_error,
