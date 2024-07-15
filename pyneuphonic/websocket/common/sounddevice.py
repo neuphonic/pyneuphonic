@@ -1,3 +1,8 @@
+"""
+This module contains the `sounddevice` specific callbacks for the websocket client. This is a replica of the
+functions in `pyneuphonic.websocket.common.pyaudio`, but for the `sounddevice` library.
+"""
+
 from pyneuphonic.websocket import NeuphonicWebsocketClient
 from pyneuphonic.websocket.libs import SubscriptableAsyncByteArray
 from base64 import b64decode
@@ -10,13 +15,19 @@ import sounddevice as sd
 async def on_open(self: NeuphonicWebsocketClient):
     """Create sounddevice resources when the websocket opens."""
     self.audio_buffer = SubscriptableAsyncByteArray()
-    self.audio_buffer.subscribe(await on_audio_buffer_update(self))
 
     # Start the audio stream
     sd.default.samplerate = 22000
     sd.default.channels = 1
     self.stream = sd.OutputStream(samplerate=22000, channels=1, dtype='int16')
     self.stream.start()
+
+    async def on_audio_buffer_update(audio_bytes: bytes):
+        # Convert bytes to numpy array
+        audio_array = np.frombuffer(audio_bytes, dtype=np.int16)
+        self.stream.write(audio_array)  # type: ignore[attr-defined]
+
+    self.audio_buffer.subscribe(on_audio_buffer_update)
 
 
 async def on_message(self: NeuphonicWebsocketClient, message: dict):
@@ -30,16 +41,3 @@ async def on_close(self: NeuphonicWebsocketClient):
     self.stream.stop()  # type: ignore[attr-defined]
     self.stream.close()  # type: ignore[attr-defined]
     self._logger.debug('Terminated sounddevice resources.')
-
-
-async def on_audio_buffer_update(self: NeuphonicWebsocketClient):
-    """
-    Closure function to generate callback used by the audio_buffer object.
-    """
-
-    async def _on_audio_buffer_update(audio_bytes: bytes):
-        # Convert bytes to numpy array
-        audio_array = np.frombuffer(audio_bytes, dtype=np.int16)
-        self.stream.write(audio_array)  # type: ignore[attr-defined]
-
-    return _on_audio_buffer_update

@@ -5,7 +5,14 @@ from typing import Callable, Awaitable
 class SubscriptableAsyncByteArray(bytearray):
     def __init__(self):
         """
-        A wrapper around the python bytearray object, providing subscription capabilities in an async way.
+        A derived class on the built-in Python `bytearray` object, providing subscription capabilities.
+
+        **Why is this class useful?**
+        Incoming audio can be stored in this object so that one or multiple subscribers can be notified of the new audio
+        data, and process it as required. This class is used by the pyaudio and sounddevice examples in
+        `pyneuphonic.websocket.common` for storing incoming audio data and playing it in real-time.
+
+        The class is provided for usage however required, or can be extended as needed.
         """
         super().__init__()
         self.subscribers = []
@@ -17,14 +24,17 @@ class SubscriptableAsyncByteArray(bytearray):
 
         Parameters
         ----------
-        callback : Callable[[bytes], Awaitable]
-            The callback function. Takes the newly appended bytes and processes them. Must be an async function.
+        callback
+            The callback function. Takes the newly appended bytes and processes them. Must be an async function taking
+            a single argument (the new bytes).
         """
         self.subscribers.append(callback)
 
     async def extend(self, new_bytes: bytes):
         """
-        Extend the bytearray with new bytes.
+        Extend the bytearray with new bytes and notify subscribers.
+
+        Subscribers are called by passing in the new bytes as an argument.
 
         Parameters
         ----------

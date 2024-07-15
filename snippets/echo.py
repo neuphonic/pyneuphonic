@@ -1,6 +1,5 @@
 from pyneuphonic.websocket import NeuphonicWebsocketClient
 from pyneuphonic.websocket.common.pyaudio import on_close, on_open, on_message
-from pyneuphonic.websocket.common.message_senders import send_string
 import asyncio
 import logging
 import aioconsole
@@ -16,7 +15,7 @@ async def user_input_loop(client):
         user_text = await aioconsole.ainput("Enter text to speak (or 'quit' to exit): ")
         if user_text.lower() == 'quit':
             break
-        await send_string(client, user_text)
+        await client.send(user_text)
 
 
 async def speak():
