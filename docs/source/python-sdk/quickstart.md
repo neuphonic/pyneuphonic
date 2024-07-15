@@ -24,7 +24,7 @@ export NEUPHONIC_WEBSOCKET_URL=wss://neuphonic.us/speak/en
 These are found and loaded by the client automatically.
 
 ## Basic Usage
-The `PyNeuphonic` package exposes the `NeuphonicWebsocketClient` package and a variety of other helper functions.
+The `PyNeuphonic` package exposes the `NeuphonicWebsocketClient` class and a variety of other helper functions.
 Here is a simple example of how to use the `NeuphonicWebsocketClient` to send text and print out the length of the
 audio received.
 

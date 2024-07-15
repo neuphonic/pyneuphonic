@@ -72,6 +72,7 @@ class NeuphonicWebsocketClient:
         self._timeout = timeout
 
         self._ws = None
+        self._listen_task = None
 
         self._proxy_params = parse_proxies(proxies) if proxies else {}
         self._initialise_callbacks(
@@ -205,24 +206,37 @@ class NeuphonicWebsocketClient:
         The client must have been opened using NeuphonicWebsocketClient.open. Incoming messages will be forwarded to
         NeuphonicWebsocketClient.on_message after being converted into a dict object.
         """
-        while self._ws.open:
-            try:
-                receive_task = asyncio.create_task(self._handle_message())
 
-                await asyncio.wait([receive_task], return_when=asyncio.FIRST_COMPLETED)
+        async def _listen(client):
+            while client._ws.open:
+                try:
+                    receive_task = asyncio.create_task(client._handle_message())
 
-            except websockets.exceptions.ConnectionClosedError as e:
-                self._logger.error('Lost websocket connection')
-                await self.on_error(e)
-            except Exception as e:
-                self._logger.error(f'Error in WebSocket process: {e}')
-                await self.on_error(e)
-            finally:
-                if self._ws.open:
-                    await self._ws.close()
+                    await asyncio.wait(
+                        [receive_task], return_when=asyncio.FIRST_COMPLETED
+                    )
+
+                except websockets.exceptions.ConnectionClosedError as e:
+                    client._logger.error('Lost websocket connection')
+                    await client.on_error(e)
+                except Exception as e:
+                    client._logger.error(f'Error in WebSocket process: {e}')
+                    await client.on_error(e)
+                finally:
+                    if client._ws.open:
+                        await client._ws.close()
+
+        self._listen_task = asyncio.create_task(_listen(self))
 
     async def close(self):
         """Close the websocket connection and call the NeuphonicWebsocketClient.on_close function."""
+        if self._listen_task:
+            try:
+                self._listen_task.cancel()
+                await self._listen_task
+            except asyncio.CancelledError as e:
+                pass
+
         if self._ws and self._ws.open:
             await self._ws.close()
             await self.on_close()
