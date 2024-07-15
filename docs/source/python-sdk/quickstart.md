@@ -28,39 +28,9 @@ The `PyNeuphonic` package exposes the `NeuphonicWebsocketClient` class and a var
 Here is a simple example of how to use the `NeuphonicWebsocketClient` to send text and print out the length of the
 audio received.
 
-```{code-block} python
+```{literalinclude} ../../../snippets/basic_usage.py
+:language: python
 :caption: Basic Usage
-
-import asyncio
-from pyneuphonic.websocket import NeuphonicWebsocketClient
-from base64 import b64decode
-
-# Define callback functions
-async def on_message(self: NeuphonicWebsocketClient, message: dict):
-    audio_bytes = b64decode(message['data']['audio'])
-    print(f"Received audio data: {len(audio_bytes)} bytes")
-
-async def on_open(self: NeuphonicWebsocketClient):
-    print("WebSocket connection opened")
-    await client.send("Hello, Neuphonic!")
-
-async def on_close(self: NeuphonicWebsocketClient):
-    print("WebSocket connection closed")
-
-# Create the client and pass in our callbacks
-client = NeuphonicWebsocketClient(
-    on_message=on_message,
-    on_open=on_open,
-    on_close=on_close
-)
-
-# Main function to run the client
-async def main():
-    await client.open()
-    await client.listen()
-
-# Run the client
-asyncio.run(main())
 ```
 
 The above example will connect to the websocket server, send the string "Hello, Neuphonic!, and log the length
@@ -85,7 +55,7 @@ All responses from the websocket will look like this:
 :caption: API Response Format
 {
     'version': '1.X.X',
-    'timestamp': '2024-07-14T15:27:19.523584+00:00',
+    'timestamp': '2024-07-15T11:59:27.619054',  # UTC server timestamp
     'data': {
         'audio': 'SGVsbG8h',  # base64 encoded audio byte string
         'text': 'Hello!'  # the text content of the audio data
@@ -112,35 +82,21 @@ and configured on your system.
 Below is an example on how to use `pyaudio` to play the string "Hello, World! My name is Neu." out of your speaker.
 
 First install `pyaudio` (`pip install pyaudio`) and then try the following code:
-```{code-block} python
+```{literalinclude} ../../../snippets/playing_audio.py
+:language: python
 :caption: Playing Audio (Basic Example)
-
-import asyncio
-from pyneuphonic.websocket import NeuphonicWebsocketClient
-from pyneuphonic.websocket.common.pyaudio import on_open, on_close, on_message
-# from pyneuphonic.websocket.common.sounddevice import on_open, on_close, on_message
-
-# Create the client
-client = NeuphonicWebsocketClient(
-    on_message=on_message,
-    on_open=on_open,
-    on_close=on_close
-)
-
-# Main function to run the client
-async def main():
-    await client.open()
-
-    await asyncio.gather(
-        client.listen(),
-        client.send('Hello, World! My name is Neu.'),
-    )
-
-# Run the client
-asyncio.run(main())
 ```
 
-The imported `on_open, on_close` functions handle the set-up and tear-down of `pyaudio` resources,
-and `on_message` handles streaming the received audio to the speaker.
+What is happening here?
+1. We import the provided `pyaudio` callback implementations
+   - `on_open` will set up audio resources when the websocket connection is made.
+   - `on_message` will handle incoming messages and pass them to the audio resources to play.
+   - `on_close` will tear down audio resources when the client is disconnected.
+2. We pass these callbacks into the `client` when instantiating it.
+3. In the main function we open the connection, start listening for incoming messages and then send a message.
+We close the connection, and `client.close` will, by default, wait for all audio to be received before closing the connection.
+You can force close the connection by doing `client.close(force=True)` with no guarantee that all audio will have been
+received at this point in time.
+
 You can switch between `pyaudio` and `sounddevice` by simply un-commenting the respective lines (lines 3 and 4, above).
 To use the `sounddevice` implementations you need to install `numpy` and `sounddevice` first (`pip install numpy sounddevice`).
