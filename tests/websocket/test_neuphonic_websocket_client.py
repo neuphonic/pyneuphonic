@@ -88,7 +88,7 @@ async def test_listen(client):
 async def test_handle_message(client):
     response = {
         'version': '1.0.0',
-        'timestamp': datetime.datetime.now(datetime.UTC).isoformat(),
+        'timestamp': datetime.datetime.now().isoformat(),
         'data': {
             'audio': base64.b64encode(b'Hello, ').decode('utf-8'),
             'text': 'Hello, ',
