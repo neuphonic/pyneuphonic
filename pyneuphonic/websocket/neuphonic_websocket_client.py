@@ -44,7 +44,13 @@ class NeuphonicWebsocketClient:
         """
         Websocket client for the Neuphonic TTS Engine.
 
-        This client is initialised with the provided callbacks.
+        This client is initialised with the provided callbacks. These provided callbacks will be bound to the instance
+        of this client class, and as per the type signatures, each of these callbacks should take an instance of this
+        class as the first argument. The callbacks are free to create as many attributes on the client instance as they
+        desire (see the pyaudio and sounddevice examples in pyneuphonic.websocket.common).
+
+        Alternatively, this class can be inherited by a child class with the callback functions being overridden. Both
+        methods achieve the same goal.
         """
         if NEUPHONIC_API_TOKEN is None:
             NEUPHONIC_API_TOKEN = os.getenv('NEUPHONIC_API_TOKEN')
@@ -156,10 +162,10 @@ class NeuphonicWebsocketClient:
         message : str
             The string to send to the websocket.
         """
-        self._logger.debug(f'Sending message to Neuphonic WebSocket Server: {message}')
-
-        if self._ws:
-            self._last_sent_message = message
+        if self._ws and message:
+            self._logger.debug(
+                f'Sending message to Neuphonic WebSocket Server: {message}'
+            )
             await self._ws.send(message)
             await self.on_send(message)
         else:

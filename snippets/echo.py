@@ -6,7 +6,7 @@ import logging
 import aioconsole
 
 logging.basicConfig(
-    level=logging.DEBUG, format='%(asctime)s :: %(levelname)s :: %(message)s'
+    level=logging.INFO, format='%(asctime)s :: %(levelname)s :: %(message)s'
 )
 
 
@@ -15,7 +15,6 @@ async def user_input_loop(client):
     while True:
         user_text = await aioconsole.ainput("Enter text to speak (or 'quit' to exit): ")
         if user_text.lower() == 'quit':
-            await client.close()
             break
         await send_string(client, user_text)
 
@@ -26,8 +25,9 @@ async def speak():
     )
 
     await client.open()
-
-    await asyncio.gather(client.listen(), user_input_loop(client))
+    await client.listen()
+    await user_input_loop(client)
+    await client.close()
 
 
 if __name__ == '__main__':
