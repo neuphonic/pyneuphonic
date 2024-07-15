@@ -8,4 +8,5 @@ incremental TTS engine.
 
 ```{literalinclude} ../../../../snippets/llama3_interactive.py
 :language: python
+:caption: snippets/llama3_interactive.py
 ``

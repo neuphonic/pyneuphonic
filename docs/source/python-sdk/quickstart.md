@@ -3,28 +3,34 @@
 ## Installation
 Install this package into your environment using your chosen package manager:
 
-**pip**:
-```bash
+
+```{code-block} bash
+:caption: Pip
 pip install git+ssh://git@github.com/neuphonic/pyneuphonic.git
 ```
-**poetry**
-```bash
+
+```{code-block} bash
+:caption: Poetry
 poetry add git+ssh://git@github.com/neuphonic/pyneuphonic.git
 ```
 
 ## Set API Key
 Set the following environment variables:
-```bash
-export NEUPHONIC_API_TOKEN=XXX
+```{code-block} bash
+export NEUPHONIC_API_TOKEN=[API KEY]
 export NEUPHONIC_WEBSOCKET_URL=wss://neuphonic.us/speak/en
 ```
+
+These are found and loaded by the client automatically.
 
 ## Basic Usage
 The `PyNeuphonic` package exposes the `NeuphonicWebsocketClient` package and a variety of other helper functions.
 Here is a simple example of how to use the `NeuphonicWebsocketClient` to send text and print out the length of the
 audio received.
 
-```python
+```{code-block} python
+:caption: Basic Usage
+
 import asyncio
 from pyneuphonic.websocket import NeuphonicWebsocketClient
 from base64 import b64decode
@@ -75,7 +81,8 @@ own coding style.
 ### API Response Format
 All responses from the websocket will look like this:
 
-```python
+```{code-block} python
+:caption: API Response Format
 {
     'version': '1.X.X',
     'timestamp': '2024-07-14T15:27:19.523584+00:00',
@@ -88,7 +95,8 @@ All responses from the websocket will look like this:
 
 Generally, audio is sent back to the user word by word.
 To decode the audio back into bytes you would do the following:
-```python
+```{code-block} python
+:caption: Decoding Incoming Audio Data
 import base64
 base64.b64decode(response['data']['audio'])
 ```
@@ -103,8 +111,10 @@ and configured on your system.
 
 Below is an example on how to use `pyaudio` to play the string "Hello, World! My name is Neu." out of your speaker.
 
-First install `pyaudio` (`pip install poetry`) and then try the following code:
-```python
+First install `pyaudio` (`pip install pyaudio`) and then try the following code:
+```{code-block} python
+:caption: Playing Audio (Basic Example)
+
 import asyncio
 from pyneuphonic.websocket import NeuphonicWebsocketClient
 from pyneuphonic.websocket.common.pyaudio import on_open, on_close, on_message

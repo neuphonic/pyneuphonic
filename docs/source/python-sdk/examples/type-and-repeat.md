@@ -5,4 +5,5 @@ back to the user.
 
 ```{literalinclude} ../../../../snippets/speak.py
 :language: python
+:caption: snippets/speak.py
 ``

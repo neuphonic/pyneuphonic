@@ -28,6 +28,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
+    'sphinx_copybutton',
 ]
 
 myst_enable_extensions = [
@@ -66,7 +67,7 @@ html_theme_options = {
 #     "**": ["sbt-sidebar-nav.html"]
 # }
 
-html_logo = 'logo.png'
+html_logo = '_static/logo.png'
 html_title = 'My site title'
 
 # Automatically extract typehints when specified and place them in
