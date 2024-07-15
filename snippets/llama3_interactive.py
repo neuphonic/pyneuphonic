@@ -3,7 +3,7 @@ import asyncio
 from pyneuphonic.websocket.common.message_senders import send_async_generator
 import logging
 from pyneuphonic.websocket import NeuphonicWebsocketClient
-from pyneuphonic.websocket.common.pyaudio import on_open, on_close, on_audio_message
+from pyneuphonic.websocket.common.pyaudio import on_open, on_close, on_message
 import aioconsole
 
 logging.basicConfig(
@@ -13,12 +13,8 @@ logging.basicConfig(
 
 async def async_llama_chat_stream(user_input):
     PROMPT = """
-    You are a helpful AI assistant named New. Your responses should be conversational, friendly,
-    and natural-sounding, as if you're chatting with a friend. Feel free to use casual language, contractions,
-    and even the occasional bit of humor when appropriate. You have your own thoughts and opinions, but you're
-    also curious to hear what others think. If you're not sure about something, it's okay to say so - you don't
-    have to know everything. Try to keep your responses concise unless asked for more detail. Your goal is to be
-    helpful while maintaining a natural, engaging conversation. Let's begin our chat!
+    You are a helpful AI assistant named Neu. Your responses should be conversational,
+    friendly, and natural-sounding, as if you're chatting with a friend.
 
     Keep your responses to a maximum of 10 words.
     """
@@ -39,11 +35,12 @@ async def user_input_loop(client):
         user_input = await aioconsole.ainput(
             "Enter your question (or 'quit' to exit): "
         )
+
         if user_input.lower() == 'quit':
-            await client.close()
             break
 
         text_generator = async_llama_chat_stream(user_input)
+
         try:
             await asyncio.wait_for(
                 send_async_generator(client, text_generator), timeout=60
@@ -54,12 +51,13 @@ async def user_input_loop(client):
 
 async def llama3_interactive():
     client = NeuphonicWebsocketClient(
-        on_open=on_open, on_audio_message=on_audio_message, on_close=on_close
+        on_open=on_open, on_message=on_message, on_close=on_close
     )
 
     await client.open()
-
-    await asyncio.gather(client.listen(), user_input_loop(client))
+    await client.listen()
+    await user_input_loop(client)
+    await client.close()
 
 
 if __name__ == '__main__':
