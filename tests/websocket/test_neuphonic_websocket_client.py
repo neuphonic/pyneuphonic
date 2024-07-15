@@ -26,8 +26,8 @@ def test_instantiation(
     assert client.on_pong.__func__ == on_pong
     assert client.on_send.__func__ == on_send
 
-    # Check _initialise_callbacks is called properly, which is sort of implicit in the above check
-    with patch.object(NeuphonicWebsocketClient, '_initialise_callbacks') as mock:
+    # Check _bind_callbacks is called properly, which is sort of implicit in the above check
+    with patch.object(NeuphonicWebsocketClient, '_bind_callbacks') as mock:
         client = NeuphonicWebsocketClient(
             NEUPHONIC_API_TOKEN='test_token',
             NEUPHONIC_WEBSOCKET_URL='wss://test_url',
@@ -43,7 +43,7 @@ async def test_create_ws_connection(client, unsecure_client):
     with patch('websockets.connect', new_callable=AsyncMock) as mock_connect:
         # assert the connection is created properly
         assert client._ws is None
-        await client.create_ws_connection(ping_interval=20, ping_timeout=10)
+        await client._create_ws_connection(ping_interval=20, ping_timeout=10)
         ssl_context = mock_connect.call_args.kwargs['ssl']
         mock_connect.assert_called_with(
             'wss://test_url/test_token',
@@ -55,7 +55,7 @@ async def test_create_ws_connection(client, unsecure_client):
         assert client._ws is not None
 
         assert unsecure_client._ws is None
-        await unsecure_client.create_ws_connection(ping_interval=25, ping_timeout=15)
+        await unsecure_client._create_ws_connection(ping_interval=25, ping_timeout=15)
         mock_connect.assert_called_with(
             'ws://test_url/test_token',
             ssl=None,
@@ -128,12 +128,12 @@ async def test_send(client):
 
 @pytest.mark.asyncio
 async def test_open(client):
-    client.create_ws_connection = AsyncMock()
+    client._create_ws_connection = AsyncMock()
     client.on_open = AsyncMock()
 
     await client.open(ping_interval=20, ping_timeout=10)
 
-    client.create_ws_connection.assert_called_with(20, 10)
+    client._create_ws_connection.assert_called_with(20, 10)
     client.on_open.assert_called_once()
 
 

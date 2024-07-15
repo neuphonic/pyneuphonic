@@ -47,10 +47,38 @@ class NeuphonicWebsocketClient:
         This client is initialised with the provided callbacks. These provided callbacks will be bound to the instance
         of this client class, and as per the type signatures, each of these callbacks should take an instance of this
         class as the first argument. The callbacks are free to create as many attributes on the client instance as they
-        desire (see the pyaudio and sounddevice examples in pyneuphonic.websocket.common).
+        desire (see the pyaudio and sounddevice examples in pyneuphonic.websocket.common for examples of on_open,
+        on_message and on_close callbacks that handle audio streaming).
 
         Alternatively, this class can be inherited by a child class with the callback functions being overridden. Both
         methods achieve the same goal.
+
+        Parameters
+        ----------
+        NEUPHONIC_API_TOKEN
+            The API token for the Neuphonic TTS Engine.
+        NEUPHONIC_WEBSOCKET_URL
+            The URL for the Neuphonic TTS Engine websocket.
+        on_message
+            The callback function to be called when a message is received from the websocket server.
+        on_open
+            The callback function to be called when the websocket connection is opened.
+        on_close
+            The callback function to be called when the websocket connection is closed.
+        on_error
+            The callback function to be called when an error occurs.
+        on_ping
+            The callback function to be called when a PING is received from the websocket server. Not yet implemented.
+        on_pong
+            The callback function to be called when a PONG is received from the websocket server. Not yet implemented.
+        on_send
+            The callback function to be called when a message is sent to the websocket server.
+        logger
+            The logger to be used by the client. If not provided, a logger will be created.
+        timeout
+            The timeout for the websocket connection.
+        proxies
+            The proxies to be used by the websocket connection.
         """
         if NEUPHONIC_API_TOKEN is None:
             NEUPHONIC_API_TOKEN = os.getenv('NEUPHONIC_API_TOKEN')
@@ -83,7 +111,7 @@ class NeuphonicWebsocketClient:
         self._last_received_message = None
 
         self._proxy_params = parse_proxies(proxies) if proxies else {}
-        self._initialise_callbacks(
+        self._bind_callbacks(
             on_message,
             on_open,
             on_close,
@@ -93,7 +121,7 @@ class NeuphonicWebsocketClient:
             on_send,
         )
 
-    def _initialise_callbacks(
+    def _bind_callbacks(
         self,
         on_message,
         on_open,
@@ -103,6 +131,9 @@ class NeuphonicWebsocketClient:
         on_pong,
         on_send,
     ):
+        """
+        Initialises the callbacks for the websocket client. Binds callbacks to the class instance.
+        """
         self._logger.debug('Initialising callbacks.')
 
         if on_message:
@@ -128,7 +159,19 @@ class NeuphonicWebsocketClient:
 
         self._logger.debug('Completed initialising callbacks.')
 
-    async def create_ws_connection(self, ping_interval, ping_timeout):
+    async def _create_ws_connection(self, ping_interval, ping_timeout):
+        """
+        Creates the websocket connection and saves it into self._ws
+
+        This function is called by the open function and should not be called directly.
+
+        Parameters
+        ----------
+        ping_interval : int
+            The number of seconds to wait between every PING.
+        ping_timeout : int
+            The number of seconds to wait for a PONG from the websocket server before assuming a timeout error.
+        """
         self._logger.debug(
             f'Creating connection with WebSocket Server: {self._NEUPHONIC_WEBSOCKET_URL}, proxies: {self._proxy_params}',
         )
@@ -180,6 +223,11 @@ class NeuphonicWebsocketClient:
             await self.on_error(e)
 
     async def _handle_message(self):
+        """
+        Handle incoming messages from the websocket server.
+
+        This function is called by the listen function and should not be called directly.
+        """
         try:
             async for message in self._ws:
                 message = json.loads(message)
@@ -206,26 +254,22 @@ class NeuphonicWebsocketClient:
         ping_timeout : int
             The number of seconds to wait for a PONG from the websocket server before assuming a timeout error.
         """
-        await self.create_ws_connection(ping_interval, ping_timeout)
+        await self._create_ws_connection(ping_interval, ping_timeout)
         await self.on_open()
 
     async def listen(self):
         """
         Start listening to the server and handling responses.
 
-        The client must have been opened using NeuphonicWebsocketClient.open. Incoming messages will be forwarded to
-        NeuphonicWebsocketClient.on_message after being converted into a dict object.
+        This function will start the listening task which starts listening for incoming messages and passes them
+        on to the on_message function. If an error occurs, the on_error function will be called.
         """
 
         async def _listen(client):
-            while client._ws.open:
+            if client._ws.open:  # if the client is open
                 try:
                     receive_task = asyncio.create_task(client._handle_message())
-
-                    await asyncio.wait(
-                        [receive_task], return_when=asyncio.FIRST_COMPLETED
-                    )
-
+                    await receive_task
                 except websockets.exceptions.ConnectionClosedError as e:
                     client._logger.error('Lost websocket connection')
                     await client.on_error(e)
