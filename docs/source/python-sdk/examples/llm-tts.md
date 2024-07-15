@@ -6,7 +6,9 @@ chatbot with llama3:8b.
 This example demonstrates how to stream output from an LLM token by token and make effective use of the low-latency
 incremental TTS engine.
 
+Import any missing packages before running the below example.
+
 ```{literalinclude} ../../../../snippets/llama3_interactive.py
 :language: python
-:caption: snippets/llama3_interactive.py
+:caption: Llama3 to TTS Streaming Example
 ``

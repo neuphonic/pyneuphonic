@@ -7,5 +7,5 @@ This section gives a variety of examples on how to use the websocket.
 :caption: Examples
 
 llm-tts.md
-type-and-repeat.md
+echo-input.md
 ```
