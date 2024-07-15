@@ -68,7 +68,8 @@ html_theme_options = {
 # }
 
 html_logo = '_static/logo.png'
-html_title = 'My site title'
+html_title = 'Neuphonic Documentation'
+html_favicon = '_static/favicon.png'
 
 # Automatically extract typehints when specified and place them in
 # descriptions of the relevant function/method.
