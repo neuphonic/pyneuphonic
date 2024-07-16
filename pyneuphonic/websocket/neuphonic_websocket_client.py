@@ -45,14 +45,17 @@ class NeuphonicWebsocketClient:
         """
         Websocket client for the Neuphonic TTS Engine.
 
-        This client is initialised with the provided callbacks. These provided callbacks will be bound to the instance
-        of this client class, and as per the type signatures, each of these callbacks should take an instance of this
-        class as the first argument. The callbacks are free to create as many attributes on the client instance as they
-        desire (see the pyaudio and sounddevice examples in pyneuphonic.websocket.common for examples of on_open,
-        on_message and on_close callbacks that handle audio streaming).
+        This client is initialised with the provided callbacks.
+        By default, the client is set up to use the pyaudio library for audio streaming using the `on_open_pyaudio`,
+        `on_message_pyaudio` and `on_close_pyaudio` functions.
+        These functions are provided in the `pyneuphonic.websocket.common`.
+        If you wish to use a different audio library, you can provide your own callbacks.
 
         Alternatively, this class can be inherited by a child class with the callback functions being overridden. Both
         methods achieve the same goal.
+
+        The callback functions all take the client instance as the first argument.
+        This allows the callback functions to access the client instance and its attributes.
 
         Parameters
         ----------

@@ -1,4 +1,4 @@
-# pyneuphonic
+# PyNeuphonic
 The official Neuphonic Python library providing simple, convenient access to the Neuphonic text-to-speech websocket
 API from any Python 3.9+ application.
 

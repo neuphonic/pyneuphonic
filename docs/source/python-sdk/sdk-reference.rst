@@ -9,11 +9,6 @@ NeuphonicWebsocketClient
     :members:
     :exclude-members: on_close, on_error, on_message, on_ping, on_pong, on_open, on_send
 
-SubscriptableAsyncByteArray
-===========================
-.. autoclass:: pyneuphonic.websocket.libs.SubscriptableAsyncByteArray
-    :members:
-
 Message Senders
 ===============
 
@@ -25,10 +20,4 @@ PyAudio Helper Functions
 ========================
 
 .. automodule:: pyneuphonic.websocket.common.pyaudio
-    :members:
-
-
-Sounddevice Helper Functions
-============================
-.. automodule:: pyneuphonic.websocket.common.sounddevice
     :members:
