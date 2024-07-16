@@ -5,6 +5,7 @@ version = "0.1.0"
 description = "A python SDK for the Neuphonic TTS Engine."
 authors = ["Neuphonic <support@neuphonic.com>"]
 readme = "README.md"
+license = "MIT"
 
 [tool.poetry.dependencies]
 python = "^3.9"
