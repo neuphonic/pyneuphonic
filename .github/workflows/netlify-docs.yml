@@ -30,7 +30,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          poetry install
+          poetry install --with extras
 
       - name: Build Sphinx documentation
         run: |
