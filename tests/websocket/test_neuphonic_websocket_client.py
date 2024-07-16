@@ -67,21 +67,25 @@ async def test_create_ws_connection(client, unsecure_client):
 
 
 @pytest.mark.asyncio
-async def test_listen(client):
+async def test_open(client):
     client._ws = AsyncMock()
     client._ws.open = True
+    client._create_ws_connection = AsyncMock()
     client._handle_message = AsyncMock()
+    client._listen = AsyncMock()
 
     async def close_connection():
-        await asyncio.sleep(0.1)
         client._ws.open = False
 
     with patch(
         'asyncio.create_task', side_effect=asyncio.create_task
     ) as mock_create_task:
         with patch('asyncio.wait', side_effect=asyncio.wait) as mock_wait:
-            await asyncio.gather(client.listen(), close_connection())
-            client._handle_message.assert_called()
+            # pass
+            await client.open(ping_interval=20, ping_timeout=10)
+            await close_connection()
+            client._create_ws_connection.assert_called_with(20, 10)
+            client._listen.assert_called_once()
 
 
 @pytest.mark.asyncio
@@ -124,17 +128,6 @@ async def test_send(client):
 
     client._ws.send.assert_called_once_with(message)
     client.on_send.assert_called_once_with(message)
-
-
-@pytest.mark.asyncio
-async def test_open(client):
-    client._create_ws_connection = AsyncMock()
-    client.on_open = AsyncMock()
-
-    await client.open(ping_interval=20, ping_timeout=10)
-
-    client._create_ws_connection.assert_called_with(20, 10)
-    client.on_open.assert_called_once()
 
 
 @pytest.mark.asyncio
