@@ -2,8 +2,8 @@
 [tool.poetry]
 name = "pyneuphonic"
 version = "0.1.0"
-description = "A python SDK for the Neuphonic TTS product."
-authors = ["Your Name <you@example.com>"]
+description = "A python SDK for the Neuphonic TTS Engine."
+authors = ["Neuphonic <support@neuphonic.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
