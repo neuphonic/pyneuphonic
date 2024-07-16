@@ -19,7 +19,6 @@ Use the copy button to copy the API key and store this safely.
 We do not keep a copy of this API Key. Please save it somewhere safe.
 :::
 
-
 ```{toctree}
 :hidden:
 :maxdepth: 1
@@ -27,5 +26,5 @@ We do not keep a copy of this API Key. Please save it somewhere safe.
 
 python-sdk/quickstart.md
 python-sdk/examples/index.md
-python-sdk/api-reference.rst
+python-sdk/sdk-reference.rst
 ```

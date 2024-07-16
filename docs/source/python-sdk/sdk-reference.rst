@@ -1,5 +1,5 @@
 *****************
-API Reference
+SDK Reference
 *****************
 
 NeuphonicWebsocketClient

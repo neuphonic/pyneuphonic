@@ -38,7 +38,7 @@ of the returned audio bytes.
 Notice that you will receive more than 1 audio message as our incremental TTS engine generates audio in smaller chunks.
 
 The `NeuphonicWebsocketClient` exposes the following callbacks:
-- `on_messae` - called after every response from the websocket,
+- `on_message` - called after every response from the websocket,
 - `on_open` -  called after websocket connection opens;
 - `on_close` - called after the websocket connected closes;
 - `on_error` - called to handle any exceptions;
