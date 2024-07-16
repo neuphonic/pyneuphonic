@@ -209,6 +209,7 @@ class NeuphonicWebsocketClient:
             self._logger.debug(
                 f'Sending message to Neuphonic WebSocket Server: {message}'
             )
+            self._last_sent_message = message
             await self._ws.send(message)
             await self.on_send(message)
         else:
@@ -282,48 +283,20 @@ class NeuphonicWebsocketClient:
 
         self._listen_task = asyncio.create_task(_listen(self))
 
-    async def close(self, force: bool = False):
+    async def close(self):
         """
         Close the websocket connection and call the NeuphonicWebsocketClient.on_close function.
-
-        Parameters
-        ----------
-        force : bool
-            Default is False and function will wait for all audio to be received by the websocket (for any text that has
-            already been sent). If this is set to True, then the websocket will close the connection and you may miss
-            any audio snippets not yet receieved.
-
-        Returns
-        -------
-
         """
 
         async def cancel_listen_task():
+            """Stop listening to the websocket responses"""
             try:
                 self._listen_task.cancel()
                 await self._listen_task
             except asyncio.CancelledError as e:
                 pass
 
-        def check_all_audio_received():
-            if self._last_sent_message is None:
-                return True
-            elif self._last_received_message and self._last_sent_message:
-                received_text = self._last_received_message['data']['text']
-                chars_to_check = min(len(self._last_sent_message), len(received_text))
-
-                if (
-                    received_text[-chars_to_check:]
-                    == self._last_sent_message[-chars_to_check:]
-                ):
-                    return True
-
-            return False
-
         if self._listen_task:
-            while not check_all_audio_received() and not force:
-                await asyncio.sleep(0.1)
-
             await cancel_listen_task()
 
         if self._ws and self._ws.open:
