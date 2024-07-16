@@ -6,12 +6,12 @@ Install this package into your environment using your chosen package manager:
 
 ```{code-block} bash
 :caption: Pip
-pip install git+ssh://git@github.com/neuphonic/pyneuphonic.git
+pip install pyneuphonic
 ```
 
 ```{code-block} bash
 :caption: Poetry
-poetry add git+ssh://git@github.com/neuphonic/pyneuphonic.git
+poetry add pyneuphonic
 ```
 
 ## Set API Key
