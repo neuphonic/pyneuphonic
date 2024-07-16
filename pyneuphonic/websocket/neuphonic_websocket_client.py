@@ -6,7 +6,8 @@ import os
 import asyncio
 import websockets
 
-from pyneuphonic.websocket.libs import parse_proxies
+from .libs import parse_proxies
+from .common import on_open_pyaudio, on_close_pyaudio, on_message_pyaudio
 from typing import Optional, Callable, Awaitable
 from types import MethodType
 
@@ -111,6 +112,12 @@ class NeuphonicWebsocketClient:
         self._last_received_message = None
 
         self._proxy_params = parse_proxies(proxies) if proxies else {}
+
+        if on_open is None and on_message is None and on_close is None:
+            on_open = on_open_pyaudio
+            on_message = on_message_pyaudio
+            on_close = on_close_pyaudio
+
         self._bind_callbacks(
             on_message,
             on_open,
@@ -257,8 +264,9 @@ class NeuphonicWebsocketClient:
         """
         await self._create_ws_connection(ping_interval, ping_timeout)
         await self.on_open()
+        await self._listen()
 
-    async def listen(self):
+    async def _listen(self):
         """
         Start listening to the server and handling responses.
 
@@ -266,7 +274,7 @@ class NeuphonicWebsocketClient:
         on to the on_message function. If an error occurs, the on_error function will be called.
         """
 
-        async def _listen(client):
+        async def _listening_task(client):
             if client._ws.open:  # if the client is open
                 try:
                     receive_task = asyncio.create_task(client._handle_message())
@@ -281,7 +289,7 @@ class NeuphonicWebsocketClient:
                     if client._ws.open:
                         await client._ws.close()
 
-        self._listen_task = asyncio.create_task(_listen(self))
+        self._listen_task = asyncio.create_task(_listening_task(self))
 
     async def close(self):
         """
