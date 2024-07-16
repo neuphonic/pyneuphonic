@@ -1,13 +1,8 @@
 import ollama
 import asyncio
 from pyneuphonic.websocket.common.message_senders import send_async_generator
-import logging
 from pyneuphonic.websocket import NeuphonicWebsocketClient
 import aioconsole
-
-logging.basicConfig(
-    level=logging.INFO, format='%(asctime)s :: %(levelname)s :: %(message)s'
-)
 
 
 async def async_llama_chat_stream(user_input):

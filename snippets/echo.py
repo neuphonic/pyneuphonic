@@ -1,11 +1,6 @@
 from pyneuphonic.websocket import NeuphonicWebsocketClient
 import asyncio
-import logging
 import aioconsole
-
-logging.basicConfig(
-    level=logging.INFO, format='%(asctime)s :: %(levelname)s :: %(message)s'
-)
 
 
 async def user_input_loop(client):
