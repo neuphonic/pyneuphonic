@@ -33,6 +33,13 @@ audio.
 ```
 This snippet auto-detects `pyaudio` and uses the pre-defined callbacks, see source [here](https://github.com/neuphonic/pyneuphonic/blob/main/pyneuphonic/websocket/common/pyaudio.py).
 
+:::{note}
+If `pyaudio` is **not** installed, and you run the above snippet without any callbacks, the client will receive the audio
+data and do nothing with it.
+No audio will be played.
+The default `pyaudio` callbacks are only used if `pyaudio` is installed.
+:::
+
 ### NeuphonicWebsocketClient
 The `PyNeuphonic` package exposes the `NeuphonicWebsocketClient` class and a variety of other helper functions.
 Here is a more verbose example of how to use the `NeuphonicWebsocketClient` and it's callback functionality.
