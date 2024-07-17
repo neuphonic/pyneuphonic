@@ -1,7 +1,6 @@
 import asyncio
 from pyneuphonic.websocket import NeuphonicWebsocketClient
 from pyneuphonic.websocket.common.pyaudio import on_open, on_close, on_message
-# from pyneuphonic.websocket.common.sounddevice import on_open, on_close, on_message
 
 # Create the client
 client = NeuphonicWebsocketClient(
