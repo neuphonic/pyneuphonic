@@ -25,13 +25,10 @@ myst-parser = "^3.0.1"
 sphinx-copybutton = "^0.5.2"
 
 [tool.poetry.group.extras]
-# the below dependencies are required for things in snippets/ and pyneuphonic/websocket/common/[pyaduio.py|sounddevice.py]
 optional = true
 
 [tool.poetry.group.extras.dependencies]
 pyaudio = "^0.2.14"
-numpy = ">=1.18.0,<3.0.0"
-sounddevice = "^0.4.7"
 aioconsole = "^0.7.1"
 ollama = "0.2.1"
 
