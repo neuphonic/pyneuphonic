@@ -14,7 +14,7 @@ async def async_llama_chat_stream(user_input):
     Keep your responses to a maximum of 10 words.
     """
     stream = ollama.chat(
-        model='llama3:8b',
+        model='llama3',
         messages=[
             {'role': 'system', 'content': PROMPT},
             {'role': 'user', 'content': user_input},
