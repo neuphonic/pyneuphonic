@@ -44,14 +44,10 @@ class NeuphonicWebsocketClient:
         """
         Websocket client for the Neuphonic TTS Engine.
 
-        This client is initialised with the provided callbacks. These provided callbacks will be bound to the instance
-        of this client class, and as per the type signatures, each of these callbacks should take an instance of this
-        class as the first argument. The callbacks are free to create as many attributes on the client instance as they
-        desire (see the pyaudio and sounddevice examples in pyneuphonic.websocket.common for examples of on_open,
-        on_message and on_close callbacks that handle audio streaming).
-
-        Alternatively, this class can be inherited by a child class with the callback functions being overridden. Both
-        methods achieve the same goal.
+        This client is initialised with the provided callbacks.
+        If no callbacks are provided, the client will not do anything when messages are received.
+        The callbacks should all take the instance of this class as the first argument, and the type signatures should
+        be as per the provided type hints. The callbacks are called when the corresponding event occurs.
 
         Parameters
         ----------
@@ -246,7 +242,7 @@ class NeuphonicWebsocketClient:
 
     async def open(self, ping_interval: int = 20, ping_timeout: int = None):
         """
-        Open the websocket connection.
+        Open the websocket connection and start listening to incoming messages.
 
         Parameters
         ----------
@@ -257,16 +253,16 @@ class NeuphonicWebsocketClient:
         """
         await self._create_ws_connection(ping_interval, ping_timeout)
         await self.on_open()
+        await self._listen()
 
-    async def listen(self):
+    async def _listen(self):
         """
         Start listening to the server and handling responses.
 
-        This function will start the listening task which starts listening for incoming messages and passes them
-        on to the on_message function. If an error occurs, the on_error function will be called.
+        This function is called by the open function and should not be called directly.
         """
 
-        async def _listen(client):
+        async def _listen_task(client):
             if client._ws.open:  # if the client is open
                 try:
                     receive_task = asyncio.create_task(client._handle_message())
@@ -281,7 +277,7 @@ class NeuphonicWebsocketClient:
                     if client._ws.open:
                         await client._ws.close()
 
-        self._listen_task = asyncio.create_task(_listen(self))
+        self._listen_task = asyncio.create_task(_listen_task(self))
 
     async def close(self):
         """

@@ -19,7 +19,6 @@ async def speak():
     )
 
     await client.open()
-    await client.listen()
     await user_input_loop(client)
     await client.close()
 
