@@ -9,11 +9,10 @@ to bind the callbacks to. These are treated as if they are methods of the Neupho
 You can see examples of these in use in the `snippets/` folder.
 """
 
-from pyneuphonic.websocket import NeuphonicWebsocketClient
 from base64 import b64decode
 
 
-async def on_open(self: NeuphonicWebsocketClient):
+async def on_open(self) -> None:
     """
     Create PyAudio resources when the websocket opens.
 
@@ -42,7 +41,7 @@ async def on_open(self: NeuphonicWebsocketClient):
     )
 
 
-async def on_message(self: NeuphonicWebsocketClient, message: dict):
+async def on_message(self, message: dict):
     """
     Callback to handle incoming audio messages.
 
@@ -60,7 +59,7 @@ async def on_message(self: NeuphonicWebsocketClient, message: dict):
     self.stream.write(audio_bytes)  # type: ignore[attr-defined]
 
 
-async def on_close(self: NeuphonicWebsocketClient):
+async def on_close(self):
     """
     Close the PyAudio resources opened up by on_open.
 

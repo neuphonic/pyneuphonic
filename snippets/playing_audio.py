@@ -1,13 +1,7 @@
 import asyncio
 from pyneuphonic.websocket import NeuphonicWebsocketClient
-from pyneuphonic.websocket.common.pyaudio import on_open, on_close, on_message
 
-# Create the client
-client = NeuphonicWebsocketClient(
-    on_open=on_open,  # set up audio resources
-    on_message=on_message,  # play audio when received
-    on_close=on_close,  # tear down audio resources
-)
+client = NeuphonicWebsocketClient()  # create the client
 
 
 async def main():

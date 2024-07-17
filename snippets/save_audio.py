@@ -24,7 +24,7 @@ async def on_close(self: NeuphonicWebsocketClient):
 async def main(text: str):
     client = NeuphonicWebsocketClient(
         on_open=on_open, on_message=on_message, on_close=on_close
-    )  # Create the client
+    )  # create the client
     await client.open()  # open websocket connection
     await client.send(text)  # send text to server
     await asyncio.sleep(3)  # wait for callbacks to finish

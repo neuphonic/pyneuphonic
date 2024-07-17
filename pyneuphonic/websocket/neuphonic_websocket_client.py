@@ -5,8 +5,14 @@ import certifi
 import os
 import asyncio
 import websockets
+import importlib.util
 
 from pyneuphonic.websocket.libs import parse_proxies
+from pyneuphonic.websocket.common.pyaudio import (
+    on_open as on_open_pyaudio,
+    on_message as on_message_pyaudio,
+    on_close as on_close_pyaudio,
+)
 from typing import Optional, Callable, Awaitable
 from types import MethodType
 
@@ -153,7 +159,16 @@ class NeuphonicWebsocketClient:
         if on_send:
             self.on_send = MethodType(on_send, self)
 
-        self._logger.debug('Completed initialising callbacks.')
+        if importlib.util.find_spec('pyaudio') is not None and (
+            on_message is None and on_open is None and on_close is None
+        ):
+            self._logger.debug('Using PyAudio to play audio.')
+            # if pyaudio is installed, and no callbacks are provided, use the pyaudio callbacks to play audio
+            self.on_open = MethodType(on_open_pyaudio, self)
+            self.on_close = MethodType(on_close_pyaudio, self)
+            self.on_message = MethodType(on_message_pyaudio, self)
+
+        self._logger.debug('Callbacks initialised.')
 
     async def _create_ws_connection(self, ping_interval, ping_timeout):
         """
