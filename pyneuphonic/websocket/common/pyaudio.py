@@ -9,15 +9,10 @@ to bind the callbacks to. These are treated as if they are methods of the Neupho
 You can see examples of these in use in the `snippets/` folder.
 """
 
-from pyneuphonic.websocket import NeuphonicWebsocketClient
-from pyneuphonic.websocket.libs import SubscriptableAsyncByteArray
 from base64 import b64decode
 
-# NOTE this needs to be manually installed
-import pyaudio
 
-
-async def on_open(self: NeuphonicWebsocketClient):
+async def on_open(self) -> None:
     """
     Create PyAudio resources when the websocket opens.
 
@@ -29,24 +24,24 @@ async def on_open(self: NeuphonicWebsocketClient):
     self
         A NeuphonicWebsocketClient instance.
     """
+    try:
+        import pyaudio
+    except ModuleNotFoundError:
+        message = (
+            '`pip install pyaudio` required to play audio using functions in '
+            '`pyneuphonic.websocket.common.pyaudio`.'
+        )
+        raise ModuleNotFoundError(message)
+
     self.audio_player = pyaudio.PyAudio()  # create the PyAudio player
-    self.audio_buffer = (
-        SubscriptableAsyncByteArray()
-    )  # create a container to store all the incoming audio bytes
 
     # start the audio stream, which will play audio as and when required
     self.stream = self.audio_player.open(
         format=pyaudio.paInt16, channels=1, rate=22000, output=True
     )
 
-    async def on_audio_buffer_update(audio_bytes: bytes):
-        self.stream.write(audio_bytes)  # type: ignore[attr-defined]
 
-    # subscribe to updates, so that we can play the audio as and when it arrives
-    self.audio_buffer.subscribe(on_audio_buffer_update)
-
-
-async def on_message(self: NeuphonicWebsocketClient, message: dict):
+async def on_message(self, message: dict):
     """
     Callback to handle incoming audio messages.
 
@@ -61,10 +56,10 @@ async def on_message(self: NeuphonicWebsocketClient, message: dict):
         The message received from the websocket, as a dict object.
     """
     audio_bytes = b64decode(message['data']['audio'])
-    await self.audio_buffer.extend(audio_bytes)  # type: ignore[attr-defined]
+    self.stream.write(audio_bytes)  # type: ignore[attr-defined]
 
 
-async def on_close(self: NeuphonicWebsocketClient):
+async def on_close(self):
     """
     Close the PyAudio resources opened up by on_open.
 

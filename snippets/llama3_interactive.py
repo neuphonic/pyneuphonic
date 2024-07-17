@@ -1,14 +1,8 @@
 import ollama
 import asyncio
 from pyneuphonic.websocket.common.message_senders import send_async_generator
-import logging
 from pyneuphonic.websocket import NeuphonicWebsocketClient
-from pyneuphonic.websocket.common.pyaudio import on_open, on_close, on_message
 import aioconsole
-
-logging.basicConfig(
-    level=logging.INFO, format='%(asctime)s :: %(levelname)s :: %(message)s'
-)
 
 
 async def async_llama_chat_stream(user_input):
@@ -19,7 +13,7 @@ async def async_llama_chat_stream(user_input):
     Keep your responses to a maximum of 10 words.
     """
     stream = ollama.chat(
-        model='llama3:8b',
+        model='llama3',
         messages=[
             {'role': 'system', 'content': PROMPT},
             {'role': 'user', 'content': user_input},
@@ -50,12 +44,9 @@ async def user_input_loop(client):
 
 
 async def llama3_interactive():
-    client = NeuphonicWebsocketClient(
-        on_open=on_open, on_message=on_message, on_close=on_close
-    )
+    client = NeuphonicWebsocketClient()
 
     await client.open()
-    await client.listen()
     await user_input_loop(client)
     await client.close()
 

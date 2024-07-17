@@ -1,12 +1,6 @@
 from pyneuphonic.websocket import NeuphonicWebsocketClient
-from pyneuphonic.websocket.common.pyaudio import on_close, on_open, on_message
 import asyncio
-import logging
 import aioconsole
-
-logging.basicConfig(
-    level=logging.INFO, format='%(asctime)s :: %(levelname)s :: %(message)s'
-)
 
 
 async def user_input_loop(client):
@@ -19,12 +13,9 @@ async def user_input_loop(client):
 
 
 async def speak():
-    client = NeuphonicWebsocketClient(
-        on_open=on_open, on_message=on_message, on_close=on_close
-    )
+    client = NeuphonicWebsocketClient()
 
     await client.open()
-    await client.listen()
     await user_input_loop(client)
     await client.close()
 
