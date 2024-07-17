@@ -1,7 +1,8 @@
 import asyncio
 from pyneuphonic.websocket import NeuphonicWebsocketClient
 
-client = NeuphonicWebsocketClient()  # create the client
+# create client, uses PyAudio by default if no callbacks are provided and PyAudio is installed
+client = NeuphonicWebsocketClient()
 
 
 async def main():

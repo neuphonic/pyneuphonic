@@ -51,9 +51,11 @@ class NeuphonicWebsocketClient:
         Websocket client for the Neuphonic TTS Engine.
 
         This client is initialised with the provided callbacks.
-        If no callbacks are provided, the client will not do anything when messages are received.
+        If no callbacks are provided and PyAudio is installed, the client will automatically detect PyAudio and use it
+        to play audio.
         The callbacks should all take the instance of this class as the first argument, and the type signatures should
-        be as per the provided type hints. The callbacks are called when the corresponding event occurs.
+        be as per the provided type hints.
+        The callbacks are called when the corresponding event occurs.
 
         Parameters
         ----------

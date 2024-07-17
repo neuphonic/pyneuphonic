@@ -4,13 +4,15 @@ from base64 import b64decode
 
 
 # Define callback functions
-async def on_message(self: NeuphonicWebsocketClient, message: dict):
-    audio_bytes = b64decode(message['data']['audio'])
-    print(f'Received audio data: {len(audio_bytes)} bytes')
-
-
 async def on_open(self: NeuphonicWebsocketClient):
+    self.audio_buffer = bytearray()  # create a buffer to store audio data
     print('WebSocket connection opened')
+
+
+async def on_message(self: NeuphonicWebsocketClient, message: dict):
+    audio_bytes = b64decode(message['data']['audio'])  # decode base64 audio data
+    self.audio_buffer += audio_bytes  # append audio data to buffer
+    print(f'Received audio data: {len(audio_bytes)} bytes')
 
 
 async def on_close(self: NeuphonicWebsocketClient):
