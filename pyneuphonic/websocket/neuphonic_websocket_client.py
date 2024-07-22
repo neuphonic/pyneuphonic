@@ -228,7 +228,12 @@ class NeuphonicWebsocketClient:
                 f'Sending message to Neuphonic WebSocket Server: {message}'
             )
             self._last_sent_message = message
-            await self._ws.send(message)
+
+            if isinstance(message, str):
+                await self._ws.send(message)
+            elif isinstance(message, dict):
+                await self._ws.send(json.dumps(message))
+
             await self.on_send(message)
         else:
             self._logger.debug('Failed to send message, no WebSocket Server available')
