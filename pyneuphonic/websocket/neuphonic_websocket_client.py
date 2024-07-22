@@ -9,9 +9,9 @@ import importlib.util
 
 from pyneuphonic.websocket.libs import parse_proxies
 from pyneuphonic.websocket.common.pyaudio import (
-    on_open as on_open_pyaudio,
-    on_message as on_message_pyaudio,
-    on_close as on_close_pyaudio,
+    setup_pyaudio,
+    play_audio,
+    teardown_pyaudio,
 )
 from typing import Optional, Callable, Awaitable
 from types import MethodType
@@ -166,9 +166,9 @@ class NeuphonicWebsocketClient:
         ):
             self._logger.debug('Using PyAudio to play audio.')
             # if pyaudio is installed, and no callbacks are provided, use the pyaudio callbacks to play audio
-            self.on_open = MethodType(on_open_pyaudio, self)
-            self.on_close = MethodType(on_close_pyaudio, self)
-            self.on_message = MethodType(on_message_pyaudio, self)
+            self.on_open = MethodType(setup_pyaudio, self)
+            self.on_close = MethodType(teardown_pyaudio, self)
+            self.on_message = MethodType(play_audio, self)
 
         self._logger.debug('Callbacks initialised.')
 

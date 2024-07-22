@@ -12,7 +12,7 @@ You can see examples of these in use in the `snippets/` folder.
 from base64 import b64decode
 
 
-async def on_open(self) -> None:
+async def setup_pyaudio(self) -> None:
     """
     Create PyAudio resources when the websocket opens.
 
@@ -41,7 +41,7 @@ async def on_open(self) -> None:
     )
 
 
-async def on_message(self, message: dict):
+async def play_audio(self, message: dict):
     """
     Callback to handle incoming audio messages.
 
@@ -59,7 +59,7 @@ async def on_message(self, message: dict):
     self.stream.write(audio_bytes)  # type: ignore[attr-defined]
 
 
-async def on_close(self):
+async def teardown_pyaudio(self):
     """
     Close the PyAudio resources opened up by on_open.
 
