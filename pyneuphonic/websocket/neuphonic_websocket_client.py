@@ -268,9 +268,13 @@ class NeuphonicWebsocketClient:
         ping_timeout : int
             The number of seconds to wait for a PONG from the websocket server before assuming a timeout error.
         """
-        await self._create_ws_connection(ping_interval, ping_timeout)
-        await self.on_open()
-        await self._listen()
+        try:
+            await self._create_ws_connection(ping_interval, ping_timeout)
+            await self.on_open()
+            await self._listen()
+        except Exception as e:
+            self._logger.error(f'Error opening WebSocket connection: {e}')
+            await self.on_error(e)
 
     async def _listen(self):
         """
