@@ -201,8 +201,14 @@ class NeuphonicWebsocketClient:
             ssl_context = None
             self._logger.debug('Creating Unencrypted Connection.')
 
+        uri = (
+            f'{self._NEUPHONIC_WEBSOCKET_URL}/{self._NEUPHONIC_API_TOKEN}'
+            if self._NEUPHONIC_API_TOKEN
+            else self._NEUPHONIC_WEBSOCKET_URL
+        )
+
         self._ws = await websockets.connect(
-            f'{self._NEUPHONIC_WEBSOCKET_URL}/{self._NEUPHONIC_API_TOKEN}',
+            uri,
             ssl=ssl_context,
             timeout=self._timeout,
             ping_interval=ping_interval,
@@ -337,7 +343,7 @@ class NeuphonicWebsocketClient:
             await self.on_close()
 
         if self._play_audio:
-            self.teardown_pyaudio()
+            await self.teardown_pyaudio()
 
         self._logger.debug('Websocket connection closed.')
 

@@ -107,6 +107,8 @@ async def test_handle_message(client):
     client.on_message = AsyncMock()
     client.on_close = AsyncMock()
     client.on_error = AsyncMock()
+    client.teardown_pyaudio = AsyncMock()
+    client.play_audio = AsyncMock()
 
     await client._handle_message()
 
@@ -114,6 +116,7 @@ async def test_handle_message(client):
     client.on_message.assert_called_once_with(response)
     client.on_close.assert_called_once()
     client.on_error.assert_not_called()
+    client.play_audio.assert_called()
 
 
 @pytest.mark.asyncio
@@ -135,6 +138,7 @@ async def test_close(client):
     client._ws.close = AsyncMock()
     client._ws.open = True
     client.on_close = AsyncMock()
+    client.teardown_pyaudio = AsyncMock()
 
     # Close the client
     await client.close()
@@ -146,3 +150,4 @@ async def test_close(client):
     # assert that these were only called once, they weren't called the second time because the client is already closed
     client._ws.close.assert_called_once()
     client.on_close.assert_called_once()
+    client.teardown_pyaudio.assert_called()
