@@ -1,5 +1,5 @@
 import pytest
-from pyneuphonic.websocket.common.message_senders import send_async_generator
+from pyneuphonic.websocket import send_async_generator
 from unittest.mock import AsyncMock, call
 
 

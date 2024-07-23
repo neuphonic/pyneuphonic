@@ -10,15 +10,15 @@ NeuphonicWebsocketClient
     :exclude-members: on_close, on_error, on_message, on_ping, on_pong, on_open, on_send
 
 
-Message Senders
-===============
-
-.. automodule:: pyneuphonic.websocket.common.message_senders
-    :members:
-
-
 PyAudio Helper Functions
 ========================
 
-.. automodule:: pyneuphonic.websocket.common.pyaudio
+.. automodule:: pyneuphonic.websocket.libs.pyaudio
+    :members:
+
+
+Message Senders
+===============
+
+.. automodule:: pyneuphonic.websocket.libs.message_senders
     :members:

@@ -1,21 +1,19 @@
 """
-This module contains helper functions for sending messages to a NeuphonicWebsocketClient instance. Use these
+This module contains helper functions for sending messages with a NeuphonicWebsocketClient instance. Use these
 functions however you need them.
 """
 
 from typing import AsyncGenerator
-from pyneuphonic.websocket import NeuphonicWebsocketClient
 
 
-async def send_async_generator(
-    client: NeuphonicWebsocketClient, text_generator: AsyncGenerator
-):
+async def send_async_generator(client, text_generator: AsyncGenerator):
     """
-    Helper function to send text from an async generator to a websocket client.
+    Helper function to send text from an async generator to a websocket client. See an example of this in
+    `snippets/llama3_interactive.py`.
 
     Parameters
     ----------
-    client
+    client : pyneuphonic.websocket.NeuphonicWebsocketClient
         The NeuphonicWebsocketClient instance to send text to.
     text_generator
         An async generator that yields text to be sent to the client. For example, this may be the output of an LLM

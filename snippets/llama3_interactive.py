@@ -1,7 +1,6 @@
 import ollama
 import asyncio
-from pyneuphonic.websocket.common.message_senders import send_async_generator
-from pyneuphonic.websocket import NeuphonicWebsocketClient
+from pyneuphonic.websocket import NeuphonicWebsocketClient, send_async_generator
 import aioconsole
 
 

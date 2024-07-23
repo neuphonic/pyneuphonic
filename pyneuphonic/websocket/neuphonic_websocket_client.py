@@ -6,12 +6,13 @@ import os
 import asyncio
 import websockets
 import importlib.util
+import warnings
 
 from pyneuphonic.websocket.libs import parse_proxies
-from pyneuphonic.websocket.common.pyaudio import (
-    on_open as on_open_pyaudio,
-    on_message as on_message_pyaudio,
-    on_close as on_close_pyaudio,
+from pyneuphonic.websocket import (
+    setup_pyaudio,
+    play_audio,
+    teardown_pyaudio,
 )
 from typing import Optional, Callable, Awaitable
 from types import MethodType
@@ -43,6 +44,7 @@ class NeuphonicWebsocketClient:
         on_send: Optional[
             Callable[['NeuphonicWebsocketClient', str], Awaitable[None]]
         ] = None,
+        play_audio: bool = True,
         logger: Optional[logging.Logger] = None,
         timeout: Optional[float] = None,  # TODO
         proxies: Optional[dict] = None,  # TODO
@@ -51,7 +53,7 @@ class NeuphonicWebsocketClient:
         Websocket client for the Neuphonic TTS Engine.
 
         This client is initialised with the provided callbacks.
-        If no callbacks are provided and PyAudio is installed, the client will automatically detect PyAudio and use it
+        If `play_audio` is set to `True` and PyAudio is installed, the client will automatically detect PyAudio and use it
         to play audio.
         The callbacks should all take the instance of this class as the first argument, and the type signatures should
         be as per the provided type hints.
@@ -77,6 +79,9 @@ class NeuphonicWebsocketClient:
             The callback function to be called when a PONG is received from the websocket server. Not yet implemented.
         on_send
             The callback function to be called when a message is sent to the websocket server.
+        play_audio
+            Whether to play audio from the websocket server automatically. This is true by default and will use pyaudio
+            to play the audio. This will not affect any other callbacks passed in and will run alongside them.
         logger
             The logger to be used by the client. If not provided, a logger will be created.
         timeout
@@ -113,6 +118,7 @@ class NeuphonicWebsocketClient:
         self._listen_task = None
         self._last_sent_message = None
         self._last_received_message = None
+        self._play_audio = play_audio
 
         self._proxy_params = parse_proxies(proxies) if proxies else {}
         self._bind_callbacks(
@@ -161,14 +167,20 @@ class NeuphonicWebsocketClient:
         if on_send:
             self.on_send = MethodType(on_send, self)
 
-        if importlib.util.find_spec('pyaudio') is not None and (
-            on_message is None and on_open is None and on_close is None
-        ):
+        if importlib.util.find_spec('pyaudio') is not None and self._play_audio:
             self._logger.debug('Using PyAudio to play audio.')
             # if pyaudio is installed, and no callbacks are provided, use the pyaudio callbacks to play audio
-            self.on_open = MethodType(on_open_pyaudio, self)
-            self.on_close = MethodType(on_close_pyaudio, self)
-            self.on_message = MethodType(on_message_pyaudio, self)
+            self.setup_pyaudio = MethodType(setup_pyaudio, self)
+            self.teardown_pyaudio = MethodType(teardown_pyaudio, self)
+            self.play_audio = MethodType(play_audio, self)
+        elif importlib.util.find_spec('pyaudio') is None and self._play_audio:
+            warnings.warn(
+                'Parameter `play_audio` is True but PyAudio is not installed. No audio will be played.',
+                UserWarning,
+            )
+            self._play_audio = False
+        else:
+            self._play_audio = False
 
         self._logger.debug('Callbacks initialised.')
 
@@ -196,8 +208,14 @@ class NeuphonicWebsocketClient:
             ssl_context = None
             self._logger.debug('Creating Unencrypted Connection.')
 
+        uri = (
+            f'{self._NEUPHONIC_WEBSOCKET_URL}/{self._NEUPHONIC_API_TOKEN}'
+            if self._NEUPHONIC_API_TOKEN
+            else self._NEUPHONIC_WEBSOCKET_URL
+        )
+
         self._ws = await websockets.connect(
-            f'{self._NEUPHONIC_WEBSOCKET_URL}/{self._NEUPHONIC_API_TOKEN}',
+            uri,
             ssl=ssl_context,
             timeout=self._timeout,
             ping_interval=ping_interval,
@@ -223,7 +241,12 @@ class NeuphonicWebsocketClient:
                 f'Sending message to Neuphonic WebSocket Server: {message}'
             )
             self._last_sent_message = message
-            await self._ws.send(message)
+
+            if isinstance(message, dict):
+                await self._ws.send(json.dumps(message))
+            else:
+                await self._ws.send(message)
+
             await self.on_send(message)
         else:
             self._logger.debug('Failed to send message, no WebSocket Server available')
@@ -244,9 +267,14 @@ class NeuphonicWebsocketClient:
         """
         try:
             async for message in self._ws:
-                message = json.loads(message)
+                if isinstance(message, str):
+                    message = json.loads(message)
+
                 self._last_received_message = message
                 await self.on_message(message)
+
+                if self._play_audio:
+                    await self.play_audio(message)
         except websockets.exceptions.ConnectionClosedError as e:
             self._logger.error(f'WebSocket connection closed: {e}')
             await self.on_error(e)
@@ -268,9 +296,16 @@ class NeuphonicWebsocketClient:
         ping_timeout : int
             The number of seconds to wait for a PONG from the websocket server before assuming a timeout error.
         """
-        await self._create_ws_connection(ping_interval, ping_timeout)
-        await self.on_open()
-        await self._listen()
+        try:
+            await self._create_ws_connection(ping_interval, ping_timeout)
+            await self.on_open()
+            await self._listen()
+
+            if self._play_audio:
+                await self.setup_pyaudio()
+        except Exception as e:
+            self._logger.error(f'Error opening WebSocket connection: {e}')
+            await self.on_error(e)
 
     async def _listen(self):
         """
@@ -316,6 +351,9 @@ class NeuphonicWebsocketClient:
             await self._ws.close()
             await self.on_close()
 
+        if self._play_audio:
+            await self.teardown_pyaudio()
+
         self._logger.debug('Websocket connection closed.')
 
     async def on_message(self, message: dict):
@@ -354,13 +392,13 @@ class NeuphonicWebsocketClient:
     async def on_pong(self, *args, **kwargs):
         pass
 
-    async def on_send(self, message: str):
+    async def on_send(self, message):
         """
         Called every time a message is sent to the server.
 
         Parameters
         ----------
-        message : str
+        message
             The message sent to the server.
         """
         pass

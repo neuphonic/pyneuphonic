@@ -31,13 +31,10 @@ audio.
 :language: python
 :caption: Playing Audio Using PyAudio
 ```
-This snippet auto-detects `pyaudio` and uses the pre-defined callbacks, see source [here](https://github.com/neuphonic/pyneuphonic/blob/main/pyneuphonic/websocket/common/pyaudio.py).
+This snippet auto-detects `pyaudio` and uses it to play audio.
 
 :::{note}
-If `pyaudio` is **not** installed, and you run the above snippet without any callbacks, the client will receive the audio
-data and do nothing with it.
-No audio will be played.
-The default `pyaudio` callbacks are only used if `pyaudio` is installed.
+If `pyaudio` is **not** installed, and you run the above snippet no audio will be played.
 :::
 
 ### NeuphonicWebsocketClient
@@ -49,7 +46,7 @@ Here is a more verbose example of how to use the `NeuphonicWebsocketClient` and 
 :caption: Verbose Example to Illustrate Callback Functionality
 ```
 
-Notice that you will receive more than 2 audio messages even though you only sent 1 string.
+Notice that you will receive more than 1 audio messages even though you only sent 1 string.
 This is because the audio is sent incrementally, word by word.
 
 The `NeuphonicWebsocketClient` exposes the following callbacks:
