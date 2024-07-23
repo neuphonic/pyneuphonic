@@ -8,6 +8,7 @@ of these fixtures.
 import pytest
 from pyneuphonic.websocket import NeuphonicWebsocketClient
 import random
+from unittest.mock import patch, MagicMock, AsyncMock
 
 
 @pytest.fixture
@@ -66,6 +67,12 @@ def on_send():
     return _on_send
 
 
+@pytest.fixture(scope='session', autouse=True)
+def patch_find_spec():
+    with patch('importlib.util.find_spec', return_value=MagicMock()):
+        yield
+
+
 @pytest.fixture
 def client(
     on_message,
@@ -76,7 +83,7 @@ def client(
     on_pong,
     on_send,
 ):
-    return NeuphonicWebsocketClient(
+    client = NeuphonicWebsocketClient(
         NEUPHONIC_API_TOKEN='test_token',
         NEUPHONIC_WEBSOCKET_URL='wss://test_url',
         on_message=on_message,
@@ -89,6 +96,13 @@ def client(
         timeout=random.randint(5, 20),
     )
 
+    # Ensure PyAudio-related methods are mocked
+    client.setup_pyaudio = AsyncMock()
+    client.teardown_pyaudio = AsyncMock()
+    client.play_audio = AsyncMock()
+
+    return client
+
 
 @pytest.fixture
 def unsecure_client(
@@ -100,7 +114,7 @@ def unsecure_client(
     on_pong,
     on_send,
 ):
-    return NeuphonicWebsocketClient(
+    client = NeuphonicWebsocketClient(
         NEUPHONIC_API_TOKEN='test_token',
         NEUPHONIC_WEBSOCKET_URL='ws://test_url',
         on_message=on_message,
@@ -112,3 +126,10 @@ def unsecure_client(
         on_send=on_send,
         timeout=random.randint(5, 20),
     )
+
+    # Ensure PyAudio-related methods are mocked
+    client.setup_pyaudio = AsyncMock()
+    client.teardown_pyaudio = AsyncMock()
+    client.play_audio = AsyncMock()
+
+    return client
