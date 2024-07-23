@@ -1,12 +1,12 @@
 """
-This module contains the `PyAudio` specific callbacks for the websocket client. The callbacks are used to play audio
-received from the websocket in real-time using `PyAudio`. This module implements the `on_open`, `on_message`, and `on_close`
-callbacks.
+This module contains the `PyAudio` specific callbacks for the websocket client.
 
-All of these callbacks take the `self` parameter as the first argument, which is the NeuphonicWebsocketClient instance
-to bind the callbacks to. These are treated as if they are methods of the NeuphonicWebsocketClient class.
-
-You can see examples of these in use in the `snippets/` folder.
+These are automatically used when the `play_audio` parameter on the `NeuphonicWebsocketClient` is set to `True` which
+is the default value.
+These functions are called on open (`setup_pyaudio`), on message (`play_audio`) and on close (`teardown_pyaudio`) of the
+websocket client.
+PyAudio must be installed to use these functions, otherwise if `play_audio` is set to `True` and PyAudio is not installed
+then a warning will be raised.
 """
 
 from base64 import b64decode
@@ -14,10 +14,7 @@ from base64 import b64decode
 
 async def setup_pyaudio(self) -> None:
     """
-    Create PyAudio resources when the websocket opens.
-
-    This function will create the PyAudio player and the audio buffer (`SubscriptableAsyncByteArray`) to store incoming
-    audio bytes. It will also start the audio stream, which will play audio in real-time when it is received.
+    Create PyAudio resources needed to play audio, when the websocket opens.
 
     Parameters
     ----------
@@ -45,8 +42,7 @@ async def play_audio(self, message: dict):
     """
     Callback to handle incoming audio messages.
 
-    Appends audio byte data to the audio_buffer (`SubscriptableAsyncByteArray`). This audio data is then played in
-    real-time by the PyAudio stream.
+    Appends audio byte data to the open PyAudio stream to play the audio in real-time.
 
     Parameters
     ----------

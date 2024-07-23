@@ -6,6 +6,7 @@ import os
 import asyncio
 import websockets
 import importlib.util
+import warnings
 
 from pyneuphonic.websocket.libs import parse_proxies
 from pyneuphonic.websocket import (
@@ -52,7 +53,7 @@ class NeuphonicWebsocketClient:
         Websocket client for the Neuphonic TTS Engine.
 
         This client is initialised with the provided callbacks.
-        If no callbacks are provided and PyAudio is installed, the client will automatically detect PyAudio and use it
+        If `play_audio` is set to `True` and PyAudio is installed, the client will automatically detect PyAudio and use it
         to play audio.
         The callbacks should all take the instance of this class as the first argument, and the type signatures should
         be as per the provided type hints.
@@ -172,6 +173,12 @@ class NeuphonicWebsocketClient:
             self.setup_pyaudio = MethodType(setup_pyaudio, self)
             self.teardown_pyaudio = MethodType(teardown_pyaudio, self)
             self.play_audio = MethodType(play_audio, self)
+        elif importlib.util.find_spec('pyaudio') is None and self._play_audio:
+            warnings.warn(
+                'Parameter `play_audio` is True but PyAudio is not installed. No audio will be played.',
+                UserWarning,
+            )
+            self._play_audio = False
         else:
             self._play_audio = False
 
@@ -235,10 +242,10 @@ class NeuphonicWebsocketClient:
             )
             self._last_sent_message = message
 
-            if isinstance(message, str):
-                await self._ws.send(message)
-            elif isinstance(message, dict):
+            if isinstance(message, dict):
                 await self._ws.send(json.dumps(message))
+            else:
+                await self._ws.send(message)
 
             await self.on_send(message)
         else:
@@ -383,13 +390,13 @@ class NeuphonicWebsocketClient:
     async def on_pong(self, *args, **kwargs):
         pass
 
-    async def on_send(self, message: str):
+    async def on_send(self, message):
         """
         Called every time a message is sent to the server.
 
         Parameters
         ----------
-        message : str
+        message
             The message sent to the server.
         """
         pass

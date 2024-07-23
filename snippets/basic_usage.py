@@ -21,7 +21,7 @@ async def on_close(self: NeuphonicWebsocketClient):
 
 # Create the client and pass in our callbacks
 client = NeuphonicWebsocketClient(
-    on_message=on_message, on_open=on_open, on_close=on_close
+    on_message=on_message, on_open=on_open, on_close=on_close, play_audio=False
 )
 
 
