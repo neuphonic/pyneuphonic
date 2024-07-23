@@ -1,5 +1,6 @@
 **/.DS_Store
-**/*sandbox.ipynb
+**/*sandbox*.ipynb
+**/*sandbox*.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

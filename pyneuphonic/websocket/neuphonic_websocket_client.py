@@ -267,7 +267,9 @@ class NeuphonicWebsocketClient:
         """
         try:
             async for message in self._ws:
-                message = json.loads(message)
+                if isinstance(message, str):
+                    message = json.loads(message)
+
                 self._last_received_message = message
                 await self.on_message(message)
 
