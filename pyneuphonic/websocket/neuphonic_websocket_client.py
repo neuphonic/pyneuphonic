@@ -8,7 +8,7 @@ import websockets
 import importlib.util
 
 from pyneuphonic.websocket.libs import parse_proxies
-from pyneuphonic.websocket.common.pyaudio import (
+from pyneuphonic.websocket import (
     setup_pyaudio,
     play_audio,
     teardown_pyaudio,

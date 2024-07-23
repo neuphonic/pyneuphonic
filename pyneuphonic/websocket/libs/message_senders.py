@@ -4,18 +4,15 @@ functions however you need them.
 """
 
 from typing import AsyncGenerator
-from pyneuphonic.websocket import NeuphonicWebsocketClient
 
 
-async def send_async_generator(
-    client: NeuphonicWebsocketClient, text_generator: AsyncGenerator
-):
+async def send_async_generator(client, text_generator: AsyncGenerator):
     """
     Helper function to send text from an async generator to a websocket client.
 
     Parameters
     ----------
-    client
+    client : pyneuphonic.websocket.NeuphonicWebsocketClient
         The NeuphonicWebsocketClient instance to send text to.
     text_generator
         An async generator that yields text to be sent to the client. For example, this may be the output of an LLM
