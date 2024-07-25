@@ -46,7 +46,7 @@ Here is a more verbose example of how to use the `NeuphonicWebsocketClient` and 
 :caption: Verbose Example to Illustrate Callback Functionality
 ```
 
-Notice that you will receive more than 1 audio messages even though you only sent 1 string.
+Notice that you will receive more than 2 audio messages even though you only sent 1 string.
 This is because the audio is sent incrementally, word by word.
 
 The `NeuphonicWebsocketClient` exposes the following callbacks:
@@ -59,7 +59,29 @@ The `NeuphonicWebsocketClient` exposes the following callbacks:
 See the [SDK Reference](sdk-reference.rst) for the complete API reference on the `NeuphonicWebsocketClient`.
 
 ## API Format
-Messages to the websocket are sent as strings.
+### Message Format
+Messages to the websocket are sent as strings or dicts.
+The websocket will accept either
+```python
+await client.send('Hello, World!')
+```
+or
+```python
+await client.send({'text': 'Hello, World!'})
+```
+
+Text can be sent in chunks of any arbitrary size, as demonstrated below:
+```python
+await client.send('Hel')
+await client.send('lo, ')
+await client.send('Wor')
+await client.send('ld!')
+```
+
+All 3 examples above will produce the same audio output.
+
+### Response Format
+
 All responses from the websocket will be a dict with the following structure:
 
 ```{code-block} python
@@ -86,17 +108,17 @@ base64.b64decode(response['data']['audio'])
 Audio is produced incrementally, with a 1-word delay.
 This means that
 ```python
-client.send('Hello, how are ')
+await client.send('Hello, how are ')
 ```
 will not produce audio for the word "are " until the next word is sent with
 ```python
-client.send('you ')
+await client.send('you ')
 ```
 The server will always wait for the next word unless a message ends in one of: `['.', '!', '?']`, indicating the end of a
 sentence.
 This will trigger the server to produce audio for the last word.
 So, in this case, to end the sentence you may send
 ```python
-client.send('doing today?')
+await client.send('doing today?')
 ```
 which will produce audio all the way to end of the sentence.
