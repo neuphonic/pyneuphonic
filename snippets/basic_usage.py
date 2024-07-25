@@ -16,12 +16,15 @@ async def on_message(self: NeuphonicWebsocketClient, message: dict):
 
 
 async def on_close(self: NeuphonicWebsocketClient):
-    print('WebSocket connection closed')
+    print('WebSocket connection closed.')
 
 
 # Create the client and pass in our callbacks
 client = NeuphonicWebsocketClient(
-    on_message=on_message, on_open=on_open, on_close=on_close, play_audio=False
+    on_open=on_open,
+    on_message=on_message,
+    on_close=on_close,
+    play_audio=False,  # turn off the default audio playback
 )
 
 

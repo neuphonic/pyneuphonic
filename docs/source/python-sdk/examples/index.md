@@ -9,4 +9,5 @@ This section gives a variety of examples on how to use the websocket.
 simple-tts.md
 llm-tts.md
 save-audio.md
+forwarding-audio.md
 ```
