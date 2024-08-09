@@ -260,9 +260,8 @@ class NeuphonicWebsocketClient:
     async def complete(self):
         """Function to complete generation of a segment of audio.
 
-        When generating audio for a segment of text, e.g., a paragraph. To generate the audio for
-        the last word (or the last few syllables), you need to send a special symbol `<STOP>` to
-        signal to the server to complete generation.
+        This function sends the completion token '<STOP>' to the server. This gets the server to
+        generate audio up to the end of all the text sent over so far.
         """
         await self.send({'text': '<STOP>'}, autocomplete=False)
 
