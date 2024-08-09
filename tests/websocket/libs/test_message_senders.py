@@ -25,7 +25,7 @@ async def test_send_async_generator(client):
 
     await send_async_generator(client, text_generator())
 
-    assert client.send.call_count == 5
+    assert client.send.call_count == 6
 
     client.send.assert_has_calls(
         [call('Hello, '), call('World! '), call('This '), call('is '), call('Neu.')]
