@@ -263,7 +263,7 @@ class NeuphonicWebsocketClient:
         This function sends the completion token '<STOP>' to the server. This gets the server to
         generate audio up to the end of all the text sent over so far.
         """
-        await self.send({'text': '<STOP>'}, autocomplete=False)
+        await self.send({'text': ' <STOP>'}, autocomplete=False)
 
     async def ping(self):
         try:

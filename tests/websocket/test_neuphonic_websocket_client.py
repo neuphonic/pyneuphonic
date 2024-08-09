@@ -131,10 +131,12 @@ async def test_send(client):
     await client.send(message, autocomplete=True)
 
     assert client._ws.send.call_count == 2
-    client._ws.send.assert_has_calls([call('test message'), call('{"text": "<STOP>"}')])
+    client._ws.send.assert_has_calls(
+        [call('test message'), call('{"text": " <STOP>"}')]
+    )
 
     client.on_send.call_count == 2
-    client.on_send.assert_has_calls([call('test message'), call({'text': '<STOP>'})])
+    client.on_send.assert_has_calls([call('test message'), call({'text': ' <STOP>'})])
 
     client.complete.assert_called_once()
 
