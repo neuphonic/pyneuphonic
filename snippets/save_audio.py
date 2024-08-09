@@ -17,7 +17,7 @@ async def on_close(self: NeuphonicWebsocketClient):
     with wave.open('output.wav', 'wb') as wav_file:
         wav_file.setnchannels(1)
         wav_file.setsampwidth(2)  # 2 bytes per sample
-        wav_file.setframerate(22000)  # 22 kHz sample rate
+        wav_file.setframerate(44100)  # 44.1 kHz sample rate
         wav_file.writeframes(bytes(self.audio_buffer))
 
 
@@ -26,7 +26,7 @@ async def main(text: str):
         on_open=on_open, on_message=on_message, on_close=on_close
     )  # create the client
     await client.open()  # open websocket connection
-    await client.send(text)  # send text to server
+    await client.send(text, autocomplete=True)  # send text to server
     await asyncio.sleep(3)  # wait for callbacks to finish
     await client.close()  # close the connection
 

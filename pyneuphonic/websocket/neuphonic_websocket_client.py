@@ -227,7 +227,7 @@ class NeuphonicWebsocketClient:
             f'WebSocket connection has been established: {self._NEUPHONIC_WEBSOCKET_URL}, proxies: {self._proxy_params}',
         )
 
-    async def send(self, message: str):
+    async def send(self, message: str, autocomplete=False):
         """
         Send a string to the Neuphonic websocket.
 
@@ -235,6 +235,8 @@ class NeuphonicWebsocketClient:
         ----------
         message : str
             The string to send to the websocket.
+        autocomplete : bool
+            Whether or not to autocomplete the message.
         """
         if self._ws and message:
             self._logger.debug(
@@ -248,8 +250,20 @@ class NeuphonicWebsocketClient:
                 await self._ws.send(message)
 
             await self.on_send(message)
+
+            if autocomplete:
+                await self.complete()
+
         else:
             self._logger.debug('Failed to send message, no WebSocket Server available')
+
+    async def complete(self):
+        """Function to complete generation of a segment of audio.
+
+        This function sends the completion token '<STOP>' to the server. This gets the server to
+        generate audio up to the end of all the text sent over so far.
+        """
+        await self.send({'text': ' <STOP>'}, autocomplete=False)
 
     async def ping(self):
         try:

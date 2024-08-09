@@ -30,7 +30,7 @@ client = NeuphonicWebsocketClient(
 
 async def main():
     await client.open()  # open the connection
-    await client.send('Hello, Neuphonic!')  # send a message
+    await client.send('Hello, Neuphonic!', autocomplete=True)  # send a message
     await asyncio.sleep(1)  # wait for callbacks to finish
     await client.close()  # close the connection
 

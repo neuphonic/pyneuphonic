@@ -21,3 +21,5 @@ async def send_async_generator(client, text_generator: AsyncGenerator):
     """
     async for text in text_generator:
         await client.send(text)
+
+    await client.complete()
