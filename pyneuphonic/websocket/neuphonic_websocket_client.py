@@ -208,18 +208,15 @@ class NeuphonicWebsocketClient:
             ssl_context = None
             self._logger.debug('Creating Unencrypted Connection.')
 
-        uri = (
-            f'{self._NEUPHONIC_WEBSOCKET_URL}/{self._NEUPHONIC_API_TOKEN}'
-            if self._NEUPHONIC_API_TOKEN
-            else self._NEUPHONIC_WEBSOCKET_URL
-        )
-
         self._ws = await websockets.connect(
-            uri,
+            self._NEUPHONIC_WEBSOCKET_URL,
             ssl=ssl_context,
             timeout=self._timeout,
             ping_interval=ping_interval,
             ping_timeout=ping_timeout,
+            extra_headers={
+                'X-API-KEY': self._NEUPHONIC_API_TOKEN,
+            },
             **self._proxy_params,
         )
 
