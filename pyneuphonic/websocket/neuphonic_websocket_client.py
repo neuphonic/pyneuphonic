@@ -281,25 +281,15 @@ class NeuphonicWebsocketClient:
 
         This function is called by the listen function and should not be called directly.
         """
-        try:
-            async for message in self._ws:
-                if isinstance(message, str):
-                    message = json.loads(message)
+        async for message in self._ws:
+            if isinstance(message, str):
+                message = json.loads(message)
 
-                self._last_received_message = message
-                await self.on_message(message)
+            self._last_received_message = message
+            await self.on_message(message)
 
-                if self._play_audio:
-                    await self.play_audio(message)
-        except websockets.exceptions.ConnectionClosedError as e:
-            self._logger.error(f'WebSocket connection closed: {e}')
-            await self.on_error(e)
-        except Exception as e:
-            self._logger.error(f'Exception in message_handler: {e}')
-            await self.on_error(e)
-        finally:
-            self._logger.debug('_handle_message.finally block')
-            await self.on_close()
+            if self._play_audio:
+                await self.play_audio(message)
 
     async def open(self, ping_interval: int = 20, ping_timeout: int = None):
         """
@@ -333,17 +323,17 @@ class NeuphonicWebsocketClient:
         async def _listen_task(client):
             if client._ws.open:  # if the client is open
                 try:
+                    exception = None
                     receive_task = asyncio.create_task(client._handle_message())
                     await receive_task
-                except websockets.exceptions.ConnectionClosedError as e:
-                    client._logger.error('Lost websocket connection')
-                    await client.on_error(e)
                 except Exception as e:
-                    client._logger.error(f'Error in WebSocket process: {e}')
-                    await client.on_error(e)
+                    client._logger.debug(f'Error in WebSocket process: {e}')
+                    exception = e
                 finally:
-                    if client._ws.open:
-                        await client._ws.close()
+                    await client.close()
+
+                    if exception:
+                        await self.on_error(exception)
 
         self._listen_task = asyncio.create_task(_listen_task(self))
 
