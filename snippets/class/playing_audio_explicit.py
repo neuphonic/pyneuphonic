@@ -18,12 +18,12 @@ class AudioPlayer(NeuphonicWebsocketClient):
 
     async def on_message(self, message: dict):
         audio_bytes = b64decode(message['data']['audio'])
-        self.stream.write(audio_bytes)  # type: ignore[attr-defined]
+        self.stream.write(audio_bytes)
 
     async def on_close(self):
-        self.stream.stop_stream()  # type: ignore[attr-defined]
-        self.stream.close()  # type: ignore[attr-defined]
-        self.audio_player.terminate()  # type: ignore[attr-defined]
+        self.stream.stop_stream()
+        self.stream.close()
+        self.audio_player.terminate()
 
 
 async def main():
