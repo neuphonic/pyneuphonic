@@ -34,12 +34,6 @@ class NeuphonicWebsocketClient:
         on_error: Optional[
             Callable[['NeuphonicWebsocketClient', Exception], Awaitable[None]]
         ] = None,
-        on_ping: Optional[
-            Callable[['NeuphonicWebsocketClient'], Awaitable[None]]
-        ] = None,
-        on_pong: Optional[
-            Callable[['NeuphonicWebsocketClient'], Awaitable[None]]
-        ] = None,
         on_send: Optional[
             Callable[['NeuphonicWebsocketClient', str], Awaitable[None]]
         ] = None,
@@ -72,10 +66,6 @@ class NeuphonicWebsocketClient:
             The callback function to be called when the websocket connection is closed.
         on_error
             The callback function to be called when an error occurs.
-        on_ping
-            The callback function to be called when a PING is received from the websocket server. Not yet implemented.
-        on_pong
-            The callback function to be called when a PONG is received from the websocket server. Not yet implemented.
         on_send
             The callback function to be called when a message is sent to the websocket server.
         play_audio
@@ -125,8 +115,6 @@ class NeuphonicWebsocketClient:
             on_open,
             on_close,
             on_error,
-            on_ping,
-            on_pong,
             on_send,
         )
 
@@ -138,8 +126,6 @@ class NeuphonicWebsocketClient:
         on_open,
         on_close,
         on_error,
-        on_ping,
-        on_pong,
         on_send,
     ):
         """
@@ -158,12 +144,6 @@ class NeuphonicWebsocketClient:
 
         if on_error:
             self.on_error = MethodType(on_error, self)
-
-        if on_ping:
-            self.on_ping = MethodType(on_ping, self)
-
-        if on_pong:
-            self.on_pong = MethodType(on_pong, self)
 
         if on_send:
             self.on_send = MethodType(on_send, self)
@@ -391,12 +371,6 @@ class NeuphonicWebsocketClient:
             The error raised.
         """
         raise e
-
-    async def on_ping(self, *args, **kwargs):
-        pass
-
-    async def on_pong(self, *args, **kwargs):
-        pass
 
     async def on_send(self, message):
         """

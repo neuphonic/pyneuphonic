@@ -44,22 +44,6 @@ def on_error():
 
 
 @pytest.fixture
-def on_ping():
-    async def _on_ping(self):
-        pass
-
-    return _on_ping
-
-
-@pytest.fixture
-def on_pong():
-    async def _on_pong(self):
-        pass
-
-    return _on_pong
-
-
-@pytest.fixture
 def on_send():
     async def _on_send(self, message):
         pass
@@ -79,8 +63,6 @@ def client(
     on_open,
     on_close,
     on_error,
-    on_ping,
-    on_pong,
     on_send,
 ):
     client = NeuphonicWebsocketClient(
@@ -90,8 +72,6 @@ def client(
         on_open=on_open,
         on_close=on_close,
         on_error=on_error,
-        on_ping=on_ping,
-        on_pong=on_pong,
         on_send=on_send,
         timeout=random.randint(5, 20),
     )
@@ -110,8 +90,6 @@ def unsecure_client(
     on_open,
     on_close,
     on_error,
-    on_ping,
-    on_pong,
     on_send,
 ):
     client = NeuphonicWebsocketClient(
@@ -121,8 +99,6 @@ def unsecure_client(
         on_open=on_open,
         on_close=on_close,
         on_error=on_error,
-        on_ping=on_ping,
-        on_pong=on_pong,
         on_send=on_send,
         timeout=random.randint(5, 20),
     )
