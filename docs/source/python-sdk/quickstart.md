@@ -102,7 +102,6 @@ All responses from the websocket will be a dict with the following structure:
     'timestamp': '2024-07-15T11:59:27.619054',  # UTC server timestamp
     'data': {
         'audio': 'SGVsbG8h',  # base64 encoded audio byte string
-        'text': 'Hello!'  # the text content of the audio data
     }
 }
 ```
