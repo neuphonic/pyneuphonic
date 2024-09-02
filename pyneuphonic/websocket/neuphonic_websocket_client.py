@@ -48,6 +48,7 @@ class NeuphonicWebsocketClient:
         logger: Optional[logging.Logger] = None,
         timeout: Optional[float] = None,  # TODO
         proxies: Optional[dict] = None,  # TODO
+        params: dict = None,
     ):
         """
         Websocket client for the Neuphonic TTS Engine.
@@ -88,6 +89,9 @@ class NeuphonicWebsocketClient:
             The timeout for the websocket connection.
         proxies
             The proxies to be used by the websocket connection.
+        params
+            Additional model parameters to be passed to the websocket connection. These will be added as
+            query parameters to the websocket URL.
         """
         if NEUPHONIC_API_TOKEN is None:
             NEUPHONIC_API_TOKEN = os.getenv('NEUPHONIC_API_TOKEN')
@@ -130,6 +134,8 @@ class NeuphonicWebsocketClient:
             on_pong,
             on_send,
         )
+
+        self.params = params
 
     def _bind_callbacks(
         self,
@@ -198,7 +204,7 @@ class NeuphonicWebsocketClient:
             The number of seconds to wait for a PONG from the websocket server before assuming a timeout error.
         """
         self._logger.debug(
-            f'Creating connection with WebSocket Server: {self._NEUPHONIC_WEBSOCKET_URL}, proxies: {self._proxy_params}',
+            f'Creating connection with WebSocket Server: {self._NEUPHONIC_WEBSOCKET_URL}, proxies: {self._proxy_params}, params: {self.params}',
         )
 
         if 'wss' in self._NEUPHONIC_WEBSOCKET_URL[:3]:
@@ -208,19 +214,21 @@ class NeuphonicWebsocketClient:
             ssl_context = None
             self._logger.debug('Creating Unencrypted Connection.')
 
-        uri = (
-            f'{self._NEUPHONIC_WEBSOCKET_URL}/{self._NEUPHONIC_API_TOKEN}'
-            if self._NEUPHONIC_API_TOKEN
-            else self._NEUPHONIC_WEBSOCKET_URL
-        )
+        # Construct the URL with query parameters
+        url = f'{self._NEUPHONIC_WEBSOCKET_URL}'
+
+        if self.params:
+            query_string = '&'.join([f'{k}={v}' for k, v in self.params.items()])
+            url += f'?{query_string}'
 
         self._ws = await websockets.connect(
-            uri,
+            url,
             ssl=ssl_context,
             timeout=self._timeout,
             ping_interval=ping_interval,
             ping_timeout=ping_timeout,
             **self._proxy_params,
+            extra_headers={'x-api-key': self._NEUPHONIC_API_TOKEN},
         )
 
         self._logger.debug(
