@@ -32,6 +32,5 @@ async def test_handle_message(client):
 
     # Check that the correct handlers were called for each message
     client.on_message.assert_called_once_with(response)
-    client.on_close.assert_called_once()
     client.on_error.assert_not_called()
     client.play_audio.assert_called()

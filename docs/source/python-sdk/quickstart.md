@@ -134,3 +134,13 @@ To decode the audio back into bytes you would do the following:
 import base64
 base64.b64decode(response['data']['audio'])
 ```
+
+### Timeout
+
+The server will automatically disconnect any client that has been connected for longer than 90
+seconds without sending any messages.
+Below is an example of how to gracefully re-connect when this occurs.
+```{literalinclude} ../../../snippets/class/timeout.py
+:language: python
+:caption: Handling Timeout
+```

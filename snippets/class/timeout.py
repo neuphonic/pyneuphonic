@@ -1,6 +1,16 @@
 from pyneuphonic.websocket import NeuphonicWebsocketClient
 import asyncio
 import aioconsole
+import websockets
+
+
+class CustomClient(NeuphonicWebsocketClient):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    async def on_error(self, e: Exception):
+        if isinstance(e, websockets.exceptions.ConnectionClosedError):
+            await self.open()
 
 
 async def user_input_loop(client: NeuphonicWebsocketClient):
@@ -13,7 +23,7 @@ async def user_input_loop(client: NeuphonicWebsocketClient):
 
 
 async def main():
-    client = NeuphonicWebsocketClient()
+    client = CustomClient()
 
     await client.open()
     await user_input_loop(client)
