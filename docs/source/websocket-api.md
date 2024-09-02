@@ -20,6 +20,11 @@ Note the syntax for our TTS websocket endpoints is `wss://{aws_region}.api.neuph
 Connect to the region closest to you for the lowest latency. Contact us if your region is unavailable.
 :::
 
+The Websocket API has two query parameters that can be passed in:
+ - `temperature` - ranges from 0 to 1.0. A larger number means that more randomness will be
+ introduced to the generated audio. **Default is 0.5**.
+ - `speed` - ranges from 0.7 to 1.5. This is the speed of the return audio. **Default is 1.05**.
+
 ## Sending Messages
 Messages can be sent to the server either word by word, sentence by sentence, or however is appropriate
 for your use case.
