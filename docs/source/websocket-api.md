@@ -8,15 +8,13 @@ server and pass your API key in the `x-api-key` header.
 ```{code-block} python
 :caption: Authentication (Python Example)
 import websockets
-import ssl
 
 ws = await websockets.connect(
     'wss://eu-west-1.api.neuphonic.com/speak/en',
-    ssl=ssl.create_default_context(cafile=certifi.where()),
     extra_headers={'x-api-key': '<API_TOKEN>'},
 )
 ```
-Note the syntax for our websocket endpoints is `wss://{aws_region}.api.neuphonic.com/speak/{language_id}`.
+Note the syntax for our TTS websocket endpoints is `wss://{aws_region}.api.neuphonic.com/speak/{language_id}`.
 
 :::{note}
 Connect to the region closest to you for the lowest latency. Contact us if your region is unavailable.
@@ -38,15 +36,16 @@ await ws.send({'text': 'Hello, World!<STOP>'})
 ```
 We require a special end-of-sequence token `<STOP>` to be sent at the end of every passage of audio
 to ensure that the server returns all the audio chunks up to that point. This may be
- - at the end of every sentence;
  - after your LLM has generated a passage of text;
  - just before you request user input;
+ - or at any point you will not be sending any more text for some time, and require all the audio
+ to be processed.
 
 Our dynamic incremental TTS generates audio with a small lookahead, so it requires the `<STOP>` to
 indicate that there is no more text, and it should generate the last snippet of audio.
 
 ## Response Format
-All responses from the server be JSON and look like this:
+All responses from the server will be JSON and look like this:
 ```{code-block} python
 :caption: API Response Format
 {

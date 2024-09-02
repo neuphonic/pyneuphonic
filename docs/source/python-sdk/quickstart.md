@@ -22,6 +22,7 @@ export NEUPHONIC_WEBSOCKET_URL=wss://eu-west-1.api.neuphonic.com/speak/en
 ```
 
 These are found and loaded by the client automatically.
+Ensure to change the `NEUPHONIC_WEBSOCKET_URL` to point to the appropriate region.
 
 ## Basic Usage
 
