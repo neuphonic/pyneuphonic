@@ -10,11 +10,11 @@ class AudioExporter(NeuphonicWebsocketClient):
 
         self.audio_buffer = bytearray()
 
-    async def on_message(self: NeuphonicWebsocketClient, message: dict):
+    async def on_message(self, message: dict):
         audio_bytes = b64decode(message['data']['audio'])
         self.audio_buffer += audio_bytes
 
-    async def on_close(self: NeuphonicWebsocketClient):
+    async def on_close(self):
         with wave.open('output.wav', 'wb') as wav_file:
             wav_file.setnchannels(1)
             wav_file.setsampwidth(2)  # 2 bytes per sample

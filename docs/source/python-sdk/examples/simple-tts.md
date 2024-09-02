@@ -4,7 +4,7 @@ We take the user's input, send it to the websocket, and then the audio is played
 
 `pip install pyaudio aioconsole` before running the example.
 
-```{literalinclude} ../../../../snippets/functional/simple_tts.py
+```{literalinclude} ../../../../snippets/simple_tts.py
 :language: python
 :caption: Echo Input Example
 ``

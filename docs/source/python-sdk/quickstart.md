@@ -27,7 +27,7 @@ These are found and loaded by the client automatically.
 
 `pip install pyaudio` and then try the following code, the client will auto-detect `pyaudio` and use it to output incoming
 audio.
-```{literalinclude} ../../../snippets/functional/playing_audio.py
+```{literalinclude} ../../../snippets/playing_audio.py
 :language: python
 :caption: Playing Audio Using PyAudio
 ```
@@ -39,17 +39,28 @@ If `pyaudio` is **not** installed, and you run the above snippet no audio will b
 
 ### NeuphonicWebsocketClient
 The `PyNeuphonic` package exposes the `NeuphonicWebsocketClient` class and a variety of other helper functions.
-Here is a more verbose example of how to use the `NeuphonicWebsocketClient` and it's callback functionality.
+This class can be inherited or used via callbacks.
 
-```{literalinclude} ../../../snippets/functional/basic_usage.py
+
+#### Class-Based Implementation
+Here is a **class-based** example of playing of how to play audio.
+Note that this is roughly what `NeuphonicWebsocketClient` does under the hood when you set
+`play_audio=True` with `pyaudio` is installed.
+```{literalinclude} ../../../snippets/class/playing_audio_explicit.py
+:language: python
+:caption: Verbose Class-Based Example
+```
+
+#### Callback Implementation
+Here is the exact same example as above, but in **callback** form.
+
+```{literalinclude} ../../../snippets/callback/playing_audio_explicit.py
 :language: python
 :caption: Verbose Example to Illustrate Callback Functionality
 ```
 
-Notice that you will receive more than 2 audio messages even though you only sent 1 string.
-This is because the audio is sent incrementally, word by word.
-
-The `NeuphonicWebsocketClient` exposes the following callbacks:
+#### Exposed Methods
+The `NeuphonicWebsocketClient` exposes the following callbacks / methods that can be overriden:
 - `on_message` - called after every response from the websocket,
 - `on_open` -  called after websocket connection opens;
 - `on_close` - called after the websocket connected closes;

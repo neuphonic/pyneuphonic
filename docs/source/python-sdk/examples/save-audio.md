@@ -9,7 +9,7 @@ Run the below code snippet and then try playing the saved `output.wav` file!
 :caption: Saving Audio Example (Class)
 ```
 
-```{literalinclude} ../../../../snippets/functional/save_audio.py
+```{literalinclude} ../../../../snippets/callback/save_audio.py
 :language: python
-:caption: Saving Audio Example (Functional)
+:caption: Saving Audio Example (Callback)
 ```
