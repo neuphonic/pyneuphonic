@@ -49,6 +49,10 @@ to ensure that the server returns all the audio chunks up to that point. This ma
 Our dynamic incremental TTS generates audio with a small lookahead, so it requires the `<STOP>` to
 indicate that there is no more text, and it should generate the last snippet of audio.
 
+:::{note}
+If no messages are sent for 90 seconds, then the server will automatically disconnect.
+:::
+
 ## Response Format
 All responses from the server will be JSON and look like this:
 ```{code-block} python
