@@ -27,7 +27,7 @@ These are found and loaded by the client automatically.
 
 `pip install pyaudio` and then try the following code, the client will auto-detect `pyaudio` and use it to output incoming
 audio.
-```{literalinclude} ../../../snippets/playing_audio.py
+```{literalinclude} ../../../snippets/functional/playing_audio.py
 :language: python
 :caption: Playing Audio Using PyAudio
 ```
@@ -41,7 +41,7 @@ If `pyaudio` is **not** installed, and you run the above snippet no audio will b
 The `PyNeuphonic` package exposes the `NeuphonicWebsocketClient` class and a variety of other helper functions.
 Here is a more verbose example of how to use the `NeuphonicWebsocketClient` and it's callback functionality.
 
-```{literalinclude} ../../../snippets/basic_usage.py
+```{literalinclude} ../../../snippets/functional/basic_usage.py
 :language: python
 :caption: Verbose Example to Illustrate Callback Functionality
 ```

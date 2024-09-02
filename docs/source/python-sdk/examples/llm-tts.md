@@ -8,7 +8,7 @@ incremental TTS engine.
 
 `pip install pyaudio ollama aioconsole` before running the example.
 
-```{literalinclude} ../../../../snippets/llama3_interactive.py
+```{literalinclude} ../../../../snippets/functional/llama3_interactive.py
 :language: python
 :caption: Llama3 to TTS Streaming Example
 ``

@@ -5,7 +5,7 @@ The example below builds on the [Simple Text to Speech](./simple-tts.md) example
 
 `pip install aioconsole` before running the example.
 
-```{literalinclude} ../../../../snippets/forwarding_audio.py
+```{literalinclude} ../../../../snippets/functional/forwarding_audio.py
 :language: python
 :caption: Realtime Forwarding Audio Example
 ``
