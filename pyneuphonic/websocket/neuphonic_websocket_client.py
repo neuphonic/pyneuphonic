@@ -8,7 +8,6 @@ import websockets
 import importlib.util
 import warnings
 
-from pyneuphonic.websocket.libs import parse_proxies
 from pyneuphonic.websocket import (
     setup_pyaudio,
     play_audio,
@@ -46,8 +45,7 @@ class NeuphonicWebsocketClient:
         ] = None,
         play_audio: bool = True,
         logger: Optional[logging.Logger] = None,
-        timeout: Optional[float] = None,  # TODO
-        proxies: Optional[dict] = None,  # TODO
+        timeout: Optional[float] = None,
         params: dict = None,
     ):
         """
@@ -87,8 +85,6 @@ class NeuphonicWebsocketClient:
             The logger to be used by the client. If not provided, a logger will be created.
         timeout
             The timeout for the websocket connection.
-        proxies
-            The proxies to be used by the websocket connection.
         params
             Additional model parameters to be passed to the websocket connection. These will be added as
             query parameters to the websocket URL.
@@ -124,7 +120,6 @@ class NeuphonicWebsocketClient:
         self._last_received_message = None
         self._play_audio = play_audio
 
-        self._proxy_params = parse_proxies(proxies) if proxies else {}
         self._bind_callbacks(
             on_message,
             on_open,
@@ -204,7 +199,7 @@ class NeuphonicWebsocketClient:
             The number of seconds to wait for a PONG from the websocket server before assuming a timeout error.
         """
         self._logger.debug(
-            f'Creating connection with WebSocket Server: {self._NEUPHONIC_WEBSOCKET_URL}, proxies: {self._proxy_params}, params: {self.params}',
+            f'Creating connection with WebSocket Server: {self._NEUPHONIC_WEBSOCKET_URL}, params: {self.params}',
         )
 
         if 'wss' in self._NEUPHONIC_WEBSOCKET_URL[:3]:
@@ -227,12 +222,11 @@ class NeuphonicWebsocketClient:
             timeout=self._timeout,
             ping_interval=ping_interval,
             ping_timeout=ping_timeout,
-            **self._proxy_params,
             extra_headers={'x-api-key': self._NEUPHONIC_API_TOKEN},
         )
 
         self._logger.debug(
-            f'WebSocket connection has been established: {self._NEUPHONIC_WEBSOCKET_URL}, proxies: {self._proxy_params}',
+            f'WebSocket connection has been established: {self._NEUPHONIC_WEBSOCKET_URL}',
         )
 
     async def send(self, message: str, autocomplete=False):
