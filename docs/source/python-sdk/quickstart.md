@@ -18,7 +18,7 @@ poetry add pyneuphonic
 Set the following environment variables:
 ```{code-block} bash
 export NEUPHONIC_API_TOKEN=[API KEY]
-export NEUPHONIC_WEBSOCKET_URL=wss://neuphonic.us/speak/en
+export NEUPHONIC_WEBSOCKET_URL=wss://eu-west-1.api.neuphonic.com/speak/en
 ```
 
 These are found and loaded by the client automatically.
@@ -39,17 +39,28 @@ If `pyaudio` is **not** installed, and you run the above snippet no audio will b
 
 ### NeuphonicWebsocketClient
 The `PyNeuphonic` package exposes the `NeuphonicWebsocketClient` class and a variety of other helper functions.
-Here is a more verbose example of how to use the `NeuphonicWebsocketClient` and it's callback functionality.
+This class can be inherited or used via callbacks.
 
-```{literalinclude} ../../../snippets/basic_usage.py
+
+#### Class-Based Implementation
+Here is a **class-based** example of playing of how to play audio.
+Note that this is roughly what `NeuphonicWebsocketClient` does under the hood when you set
+`play_audio=True` with `pyaudio` is installed.
+```{literalinclude} ../../../snippets/class/playing_audio_explicit.py
+:language: python
+:caption: Verbose Class-Based Example
+```
+
+#### Callback Implementation
+Here is the exact same example as above, but in **callback** form.
+
+```{literalinclude} ../../../snippets/callback/playing_audio_explicit.py
 :language: python
 :caption: Verbose Example to Illustrate Callback Functionality
 ```
 
-Notice that you will receive more than 2 audio messages even though you only sent 1 string.
-This is because the audio is sent incrementally, word by word.
-
-The `NeuphonicWebsocketClient` exposes the following callbacks:
+#### Exposed Methods
+The `NeuphonicWebsocketClient` exposes the following callbacks / methods that can be overriden:
 - `on_message` - called after every response from the websocket,
 - `on_open` -  called after websocket connection opens;
 - `on_close` - called after the websocket connected closes;
@@ -80,6 +91,17 @@ await client.send('ld!')
 
 All 3 examples above will produce the same audio output.
 
+As per the [WebSocket API](../websocket-api.md#sending-messages) section, passages of text must
+be terminated with the end-of-sequence token `<STOP>`. This can be done with either of the following:
+
+```python
+await client.send('Hello, World!', autocomplete=True)
+```
+```python
+await client.send('Hello, World!')
+await client.send('<STOP>')
+```
+
 ### Response Format
 
 All responses from the websocket will be a dict with the following structure:
@@ -91,7 +113,6 @@ All responses from the websocket will be a dict with the following structure:
     'timestamp': '2024-07-15T11:59:27.619054',  # UTC server timestamp
     'data': {
         'audio': 'SGVsbG8h',  # base64 encoded audio byte string
-        'text': 'Hello!'  # the text content of the audio data
     }
 }
 ```
@@ -103,37 +124,3 @@ To decode the audio back into bytes you would do the following:
 import base64
 base64.b64decode(response['data']['audio'])
 ```
-
-### Terminating Sentences
-Audio is produced incrementally.
-This means that
-```python
-await client.send('Hello, how are ')
-```
-will return audio for only part of the above text.
-Exactly how much audio is produced is slightly nuanced, but by rule of thumb it will generally
-generate audio for everything except the last word.
-If you send
-```python
-await client.send('you ')
-```
-then the server will continue to produce more audio.
-To generate all of the audio up to the end of everything you have sent so far, you need to do
-any one of the following 3.
-```python
-await client.send('doing today?', autocomplete=True)
-```
-```python
-await client.send('doing today?')
-await client.complete()
-```
-```python
-await client.send('doing today?')
-await client.send('<STOP>')
-```
-The `<STOP>` text is a special token which signals to the server that this is the end of a specific
-segment of audio generation.
-
-When should you send this token? This is dependent on your use case, for example, if you are
-using an LLM to generate text, then you would send this token at the end of every response generation
-from the LLM.

@@ -22,6 +22,13 @@ We do not keep a copy of this API Key. Please save it somewhere safe.
 ```{toctree}
 :hidden:
 :maxdepth: 1
+
+websocket-api.md
+```
+
+```{toctree}
+:hidden:
+:maxdepth: 1
 :caption: Python SDK
 
 python-sdk/quickstart.md

@@ -1,11 +1,11 @@
 import asyncio
 from pyneuphonic.websocket import NeuphonicWebsocketClient
 
-# create client, uses PyAudio by default as `play_audio=True` by default
-client = NeuphonicWebsocketClient()
-
 
 async def main():
+    # create client, uses PyAudio by default as `play_audio=True` by default
+    client = NeuphonicWebsocketClient()
+
     await client.open()  # open websocket connection
     await client.send('Nice to meet you!', autocomplete=True)  # send text to server
     await asyncio.sleep(3)  # wait for callbacks to finish
