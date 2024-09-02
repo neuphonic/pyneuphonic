@@ -41,6 +41,7 @@ If `pyaudio` is **not** installed, and you run the above snippet no audio will b
 ### NeuphonicWebsocketClient
 The `PyNeuphonic` package exposes the `NeuphonicWebsocketClient` class and a variety of other helper functions.
 This class can be inherited or used via callbacks.
+See the [SDK Reference](sdk-reference.rst) for the complete API reference on the `NeuphonicWebsocketClient`.
 
 
 #### Class-Based Implementation
@@ -68,7 +69,15 @@ The `NeuphonicWebsocketClient` exposes the following callbacks / methods that ca
 - `on_error` - called to handle any exceptions;
 - `on_send` - hooks into `NeuphonicWebsocketClient.send` and is called after every send;
 
-See the [SDK Reference](sdk-reference.rst) for the complete API reference on the `NeuphonicWebsocketClient`.
+#### Model Settings
+See [WebSocket API - Authentication](../websocket-api.md#authentication) for a list of all model
+settings which can be passed in as query parameters when connecting to the websocket.
+Below is an example of how to change the audio playback speed.
+
+```{literalinclude} ../../../snippets/playing_audio_speed.py
+:language: python
+:caption: Playing Audio Using PyAudio
+```
 
 ## API Format
 ### Message Format
@@ -92,7 +101,7 @@ await client.send('ld!')
 
 All 3 examples above will produce the same audio output.
 
-As per the [WebSocket API](../websocket-api.md#sending-messages) section, passages of text must
+As per the [WebSocket API - Sending Messages](../websocket-api.md#sending-messages) section, passages of text must
 be terminated with the end-of-sequence token `<STOP>`. This can be done with either of the following:
 
 ```python
