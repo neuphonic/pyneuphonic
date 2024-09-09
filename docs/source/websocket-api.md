@@ -39,7 +39,7 @@ await ws.send({'text': '<STOP>'})
 :caption: Sending Messages (Python Example 2)
 await ws.send({'text': 'Hello, World!<STOP>'})
 ```
-We require a special end-of-sequence token `<STOP>` to be sent at the end of every passage of audio
+We require a special end-of-sequence token `<STOP>` to be sent at the end of every passage of text
 to ensure that the server returns all the audio chunks up to that point. This may be
  - after your LLM has generated a passage of text;
  - just before you request user input;
