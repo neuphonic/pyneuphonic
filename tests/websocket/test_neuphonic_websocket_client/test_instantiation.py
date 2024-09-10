@@ -21,7 +21,7 @@ def test_instantiation(
     with patch.object(NeuphonicWebsocketClient, '_bind_callbacks') as mock:
         client = NeuphonicWebsocketClient(
             NEUPHONIC_API_TOKEN='test_token',
-            NEUPHONIC_WEBSOCKET_URL='wss://test_url',
+            NEUPHONIC_API_URL='wss://test_url',
             on_message=on_message,
             on_send=on_send,
         )

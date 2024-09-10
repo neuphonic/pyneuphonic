@@ -21,7 +21,7 @@ class NeuphonicWebsocketClient:
     def __init__(
         self,
         NEUPHONIC_API_TOKEN: str = None,
-        NEUPHONIC_WEBSOCKET_URL: str = None,
+        NEUPHONIC_API_URL: str = None,
         on_message: Optional[
             Callable[['NeuphonicWebsocketClient', dict], Awaitable[None]]
         ] = None,
@@ -57,8 +57,8 @@ class NeuphonicWebsocketClient:
         ----------
         NEUPHONIC_API_TOKEN
             The API token for the Neuphonic TTS Engine.
-        NEUPHONIC_WEBSOCKET_URL
-            The URL for the Neuphonic TTS Engine websocket.
+        NEUPHONIC_API_URL
+            The URL for the Neuphonic TTS Engine websocket. This should be of the form `{aws-region}.api.neuphonic.com`
         on_message
             The callback function to be called when a message is received from the websocket server.
         on_open
@@ -91,12 +91,12 @@ class NeuphonicWebsocketClient:
                     'NEUPHONIC_API_TOKEN has not been passed in and is not set in the environment.'
                 )
 
-        if NEUPHONIC_WEBSOCKET_URL is None:
-            NEUPHONIC_WEBSOCKET_URL = os.getenv('NEUPHONIC_WEBSOCKET_URL')
+        if NEUPHONIC_API_URL is None:
+            NEUPHONIC_API_URL = os.getenv('NEUPHONIC_API_URL')
 
-            if NEUPHONIC_WEBSOCKET_URL is None:
+            if NEUPHONIC_API_URL is None:
                 raise EnvironmentError(
-                    'NEUPHONIC_WEBSOCKET_URL has not been passed in and is not set in the environment.'
+                    'NEUPHONIC_API_URL has not been passed in and is not set in the environment.'
                 )
 
         if not logger:
@@ -105,7 +105,7 @@ class NeuphonicWebsocketClient:
         self._logger = logger
 
         self._NEUPHONIC_API_TOKEN = NEUPHONIC_API_TOKEN
-        self._NEUPHONIC_WEBSOCKET_URL = NEUPHONIC_WEBSOCKET_URL
+        self._NEUPHONIC_API_URL = NEUPHONIC_API_URL
         self._timeout = timeout
 
         self._ws = None
@@ -184,18 +184,13 @@ class NeuphonicWebsocketClient:
             The number of seconds to wait for a PONG from the websocket server before assuming a timeout error.
         """
         self._logger.debug(
-            f'Creating connection with WebSocket Server: {self._NEUPHONIC_WEBSOCKET_URL}, params: {self.params}',
+            f'Creating connection with WebSocket Server: {self._NEUPHONIC_API_URL}, params: {self.params}',
         )
 
-        if 'wss' in self._NEUPHONIC_WEBSOCKET_URL[:3]:
-            ssl_context = ssl.create_default_context(cafile=certifi.where())
-            self._logger.debug('Creating Encrypted SLL Connection.')
-        else:
-            ssl_context = None
-            self._logger.debug('Creating Unencrypted Connection.')
-
         # Construct the URL with query parameters
-        url = f'{self._NEUPHONIC_WEBSOCKET_URL}'
+        url = f'wss://{self._NEUPHONIC_API_URL}'
+        ssl_context = ssl.create_default_context(cafile=certifi.where())
+        self._logger.debug('Creating Encrypted SLL Connection.')
 
         if self.params:
             query_string = '&'.join([f'{k}={v}' for k, v in self.params.items()])
@@ -211,7 +206,7 @@ class NeuphonicWebsocketClient:
         )
 
         self._logger.debug(
-            f'WebSocket connection has been established: {self._NEUPHONIC_WEBSOCKET_URL}',
+            f'WebSocket connection has been established: {self._NEUPHONIC_API_URL}',
         )
 
     async def send(self, message: str, autocomplete=False):
