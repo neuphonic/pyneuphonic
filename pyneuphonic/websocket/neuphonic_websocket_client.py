@@ -37,6 +37,7 @@ class NeuphonicWebsocketClient:
         on_send: Optional[
             Callable[['NeuphonicWebsocketClient', str], Awaitable[None]]
         ] = None,
+        language_id: str = 'en',
         play_audio: bool = True,
         sampling_rate: int = 22050,
         logger: Optional[logging.Logger] = None,
@@ -69,6 +70,9 @@ class NeuphonicWebsocketClient:
             The callback function to be called when an error occurs.
         on_send
             The callback function to be called when a message is sent to the websocket server.
+        language_id
+            The language id for the language to generate audio in. Currently only english ('en') is
+            available. Default is 'en'.
         play_audio
             Whether to play audio from the websocket server automatically. This is true by default and will use pyaudio
             to play the audio. This will not affect any other callbacks passed in and will run alongside them.
@@ -112,6 +116,7 @@ class NeuphonicWebsocketClient:
         self._listen_task = None
         self._last_sent_message = None
         self._last_received_message = None
+        self._language_id = language_id
         self._play_audio = play_audio
         self._sampling_rate = sampling_rate
 
@@ -188,7 +193,7 @@ class NeuphonicWebsocketClient:
         )
 
         # Construct the URL with query parameters
-        url = f'wss://{self._NEUPHONIC_API_URL}'
+        url = f'wss://{self._NEUPHONIC_API_URL}/speak/{self._language_id}'
         ssl_context = ssl.create_default_context(cafile=certifi.where())
         self._logger.debug('Creating Encrypted SLL Connection.')
 

@@ -11,7 +11,7 @@ async def test_create_ws_connection(client):
         await client._create_ws_connection(ping_interval=20, ping_timeout=10)
         ssl_context = mock_connect.call_args.kwargs['ssl']
         mock_connect.assert_called_with(
-            'wss://eu-west-1.api.test.com',
+            'wss://eu-west-1.api.test.com/speak/en',
             ssl=ssl_context,
             timeout=client._timeout,
             ping_interval=20,
@@ -46,7 +46,7 @@ async def test_query_params():
         ssl_context = mock_connect.call_args.kwargs['ssl']
 
         mock_connect.assert_called_with(
-            'wss://eu-west-1.api.test.com?temperature=1.0&speed=1.2',
+            'wss://eu-west-1.api.test.com/speak/en?temperature=1.0&speed=1.2',
             ssl=ssl_context,
             timeout=client._timeout,
             ping_interval=20,
