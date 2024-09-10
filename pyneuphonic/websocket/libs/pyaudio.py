@@ -12,7 +12,7 @@ then a warning will be raised.
 from base64 import b64decode
 
 
-async def setup_pyaudio(self, frequency=44100) -> None:
+async def setup_pyaudio(self, sampling_rate=22050) -> None:
     """
     Create PyAudio resources needed to play audio, when the websocket opens.
 
@@ -34,7 +34,7 @@ async def setup_pyaudio(self, frequency=44100) -> None:
 
     # start the audio stream, which will play audio as and when required
     self.stream = self.audio_player.open(
-        format=pyaudio.paInt16, channels=1, rate=frequency, output=True
+        format=pyaudio.paInt16, channels=1, rate=sampling_rate, output=True
     )
 
 
