@@ -38,6 +38,7 @@ class NeuphonicWebsocketClient:
             Callable[['NeuphonicWebsocketClient', str], Awaitable[None]]
         ] = None,
         play_audio: bool = True,
+        sampling_rate: int = 22050,
         logger: Optional[logging.Logger] = None,
         timeout: Optional[float] = None,
         params: dict = None,
@@ -71,6 +72,9 @@ class NeuphonicWebsocketClient:
         play_audio
             Whether to play audio from the websocket server automatically. This is true by default and will use pyaudio
             to play the audio. This will not affect any other callbacks passed in and will run alongside them.
+        sampling_rate
+            If play_audio is True, this is the sampling_rate to use for the default pyaudio player. Default
+            is 22050 Hz.
         logger
             The logger to be used by the client. If not provided, a logger will be created.
         timeout
@@ -109,6 +113,7 @@ class NeuphonicWebsocketClient:
         self._last_sent_message = None
         self._last_received_message = None
         self._play_audio = play_audio
+        self._sampling_rate = sampling_rate
 
         self._bind_callbacks(
             on_message,
@@ -288,7 +293,7 @@ class NeuphonicWebsocketClient:
             await self._listen()
 
             if self._play_audio:
-                await self.setup_pyaudio()
+                await self.setup_pyaudio(sampling_rate=self._sampling_rate)
         except Exception as e:
             self._logger.error(f'Error opening WebSocket connection: {e}')
             await self.on_error(e)
