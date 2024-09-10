@@ -67,7 +67,7 @@ def client(
 ):
     client = NeuphonicWebsocketClient(
         NEUPHONIC_API_TOKEN='test_token',
-        NEUPHONIC_WEBSOCKET_URL='wss://test_url',
+        NEUPHONIC_API_URL='eu-west-1.api.test.com',
         on_message=on_message,
         on_open=on_open,
         on_close=on_close,
@@ -84,28 +84,28 @@ def client(
     return client
 
 
-@pytest.fixture
-def unsecure_client(
-    on_message,
-    on_open,
-    on_close,
-    on_error,
-    on_send,
-):
-    client = NeuphonicWebsocketClient(
-        NEUPHONIC_API_TOKEN='test_token',
-        NEUPHONIC_WEBSOCKET_URL='ws://test_url',
-        on_message=on_message,
-        on_open=on_open,
-        on_close=on_close,
-        on_error=on_error,
-        on_send=on_send,
-        timeout=random.randint(5, 20),
-    )
+# @pytest.fixture
+# def unsecure_client(
+#     on_message,
+#     on_open,
+#     on_close,
+#     on_error,
+#     on_send,
+# ):
+#     client = NeuphonicWebsocketClient(
+#         NEUPHONIC_API_TOKEN='test_token',
+#         NEUPHONIC_API_URL='ws://test_url',
+#         on_message=on_message,
+#         on_open=on_open,
+#         on_close=on_close,
+#         on_error=on_error,
+#         on_send=on_send,
+#         timeout=random.randint(5, 20),
+#     )
 
-    # Ensure PyAudio-related methods are mocked
-    client.setup_pyaudio = AsyncMock()
-    client.teardown_pyaudio = AsyncMock()
-    client.play_audio = AsyncMock()
+#     # Ensure PyAudio-related methods are mocked
+#     client.setup_pyaudio = AsyncMock()
+#     client.teardown_pyaudio = AsyncMock()
+#     client.play_audio = AsyncMock()
 
-    return client
+#     return client

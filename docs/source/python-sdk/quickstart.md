@@ -18,11 +18,11 @@ poetry add pyneuphonic
 Set the following environment variables:
 ```{code-block} bash
 export NEUPHONIC_API_TOKEN=[API KEY]
-export NEUPHONIC_WEBSOCKET_URL=wss://eu-west-1.api.neuphonic.com/speak/en
+export NEUPHONIC_API_URL=eu-west-1.api.neuphonic.com
 ```
 
 These are found and loaded by the client automatically.
-Ensure to change the `NEUPHONIC_WEBSOCKET_URL` to point to the appropriate region.
+Ensure to change the `NEUPHONIC_API_URL` to point to the appropriate region.
 
 ## Basic Usage
 
