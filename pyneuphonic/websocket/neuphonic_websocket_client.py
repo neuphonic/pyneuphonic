@@ -57,9 +57,11 @@ class NeuphonicWebsocketClient:
         Parameters
         ----------
         NEUPHONIC_API_TOKEN
-            The API token for the Neuphonic TTS Engine.
+            The API token for the Neuphonic TTS Engine. If this is not provided the it is loaded from the
+            environment.
         NEUPHONIC_API_URL
             The URL for the Neuphonic TTS Engine websocket. This should be of the form `{aws-region}.api.neuphonic.com`
+            Default is `eu-west-1.api.neuphonic.com`
         on_message
             The callback function to be called when a message is received from the websocket server.
         on_open
@@ -99,9 +101,7 @@ class NeuphonicWebsocketClient:
             NEUPHONIC_API_URL = os.getenv('NEUPHONIC_API_URL')
 
             if NEUPHONIC_API_URL is None:
-                raise EnvironmentError(
-                    'NEUPHONIC_API_URL has not been passed in and is not set in the environment.'
-                )
+                NEUPHONIC_API_URL = 'eu-west-1.api.neuphonic.com'
 
         if not logger:
             logger = logging.getLogger(__name__)
