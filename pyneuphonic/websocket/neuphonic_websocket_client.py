@@ -193,7 +193,8 @@ class NeuphonicWebsocketClient:
         )
 
         # Construct the URL with query parameters
-        url = f'wss://{self._NEUPHONIC_API_URL}/speak/{self._language_id}'
+        protocol = 'wss' if 'localhost' not in self._NEUPHONIC_API_URL else 'ws'
+        url = f'{protocol}://{self._NEUPHONIC_API_URL}/speak/{self._language_id}'
         ssl_context = ssl.create_default_context(cafile=certifi.where())
         self._logger.debug('Creating Encrypted SLL Connection.')
 
@@ -203,7 +204,7 @@ class NeuphonicWebsocketClient:
 
         self._ws = await websockets.connect(
             url,
-            ssl=ssl_context,
+            ssl=ssl_context if protocol == 'wss' else None,
             timeout=self._timeout,
             ping_interval=ping_interval,
             ping_timeout=ping_timeout,
