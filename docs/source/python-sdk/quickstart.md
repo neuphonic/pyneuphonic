@@ -45,7 +45,7 @@ See the [SDK Reference](sdk-reference.rst) for the complete API reference on the
 
 
 #### Class-Based Implementation
-Here is a **class-based** example of playing of how to play audio.
+Here is a **class-based inheritance** example of playing of how to play audio.
 Note that this is roughly what `NeuphonicWebsocketClient` does under the hood when you set
 `play_audio=True` with `pyaudio` is installed.
 ```{literalinclude} ../../../snippets/class/playing_audio_explicit.py
@@ -61,17 +61,19 @@ Here is the exact same example as above, but in **callback** form.
 :caption: Verbose Example to Illustrate Callback Functionality
 ```
 
+Both implementations work perfectly fine, choose whichever works best for your use case!
+
 #### Exposed Methods
-The `NeuphonicWebsocketClient` exposes the following callbacks / methods that can be overriden:
-- `on_message` - called after every response from the websocket,
-- `on_open` -  called after websocket connection opens;
-- `on_close` - called after the websocket connected closes;
-- `on_error` - called to handle any exceptions;
-- `on_send` - hooks into `NeuphonicWebsocketClient.send` and is called after every send;
+The `NeuphonicWebsocketClient` exposes the following callbacks / methods that can be overriden or passed in during initialization:
+- `on_message` - called after receiving each response from the websocket
+- `on_error` - invoked to handle any exceptions that occur
+- `on_open` - triggered when the websocket connection is established, following a call to `NeuphonicWebsocketClient.open`
+- `on_close` - executed when the websocket connection terminates, after calling `NeuphonicWebsocketClient.close`
+- `on_send` - called after each message is sent via `NeuphonicWebsocketClient.send`
 
 #### Model Settings
 See [WebSocket API - Authentication](../websocket-api.md#authentication) for a list of all model
-settings which can be passed in as query parameters when connecting to the websocket.
+settings which can be passed in when connecting to the websocket.
 Below is an example of how to change the audio playback speed.
 
 ```{literalinclude} ../../../snippets/playing_audio_speed.py
@@ -114,32 +116,16 @@ await client.send('<STOP>')
 
 ### Response Format
 
-All responses from the websocket will be a dict with the following structure:
-
-```{code-block} python
-:caption: API Response Format
-{
-    'version': '1.X.X',
-    'timestamp': '2024-07-15T11:59:27.619054',  # UTC server timestamp
-    'data': {
-        'audio': 'SGVsbG8h',  # base64 encoded audio byte string
-    }
-}
-```
-
-Audio is sent back to the user word by word.
-To decode the audio back into bytes you would do the following:
-```{code-block} python
-:caption: Decoding Incoming Audio Data
-import base64
-base64.b64decode(response['data']['audio'])
-```
+For details on the API response structure, including audio data format and decoding,
+see [WebSocket API - Response Format](../websocket-api.md#response-format).
+Responses are JSON objects containing the base64-encoded audio chunks.
 
 ### Timeout
 
 The server will automatically disconnect any client that has been connected for longer than 90
 seconds without sending any messages.
-Below is an example of how to gracefully re-connect when this occurs.
+Below is an example of how to gracefully re-connect when this occurs, in case longer lasting connections
+are required.
 ```{literalinclude} ../../../snippets/class/timeout.py
 :language: python
 :caption: Handling Timeout

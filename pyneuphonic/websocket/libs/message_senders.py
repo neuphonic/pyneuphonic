@@ -4,6 +4,7 @@ functions however you need them.
 """
 
 from typing import AsyncGenerator
+import asyncio
 
 
 async def send_async_generator(client, text_generator: AsyncGenerator):
@@ -21,5 +22,6 @@ async def send_async_generator(client, text_generator: AsyncGenerator):
     """
     async for text in text_generator:
         await client.send(text)
+        await asyncio.sleep(0.005)
 
     await client.complete()

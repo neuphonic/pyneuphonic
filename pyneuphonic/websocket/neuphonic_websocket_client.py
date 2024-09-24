@@ -84,7 +84,7 @@ class NeuphonicWebsocketClient:
         logger
             The logger to be used by the client. If not provided, a logger will be created.
         timeout
-            The timeout for the websocket connection.
+            The timeout for the websocket client.
         params
             Additional model parameters to be passed to the websocket connection. These will be added as
             query parameters to the websocket URL.
