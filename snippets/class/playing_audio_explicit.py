@@ -13,7 +13,7 @@ class AudioPlayer(NeuphonicWebsocketClient):
 
         # start the audio stream, which will play audio as and when required
         self.stream = self.audio_player.open(
-            format=pyaudio.paInt16, channels=1, rate=44100, output=True
+            format=pyaudio.paInt16, channels=1, rate=22050, output=True
         )
 
     async def on_message(self, message: dict):
