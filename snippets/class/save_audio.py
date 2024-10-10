@@ -18,7 +18,7 @@ class AudioExporter(NeuphonicWebsocketClient):
         with wave.open('output.wav', 'wb') as wav_file:
             wav_file.setnchannels(1)
             wav_file.setsampwidth(2)  # 2 bytes per sample
-            wav_file.setframerate(44100)  # 44.1 kHz sample rate
+            wav_file.setframerate(22050)  # 22 kHz sample rate
             wav_file.writeframes(bytes(self.audio_buffer))
 
 
