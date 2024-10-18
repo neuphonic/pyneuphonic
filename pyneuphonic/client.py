@@ -2,7 +2,7 @@ from typing import Optional
 import os
 
 from pyneuphonic._voices import Voices
-from pyneuphonic._sse import SSEClient
+from pyneuphonic._sse import SSEClient, AsyncSSEClient
 from pyneuphonic._endpoint import Endpoint
 
 
@@ -52,5 +52,10 @@ class Neuphonic:
 class TTS(Endpoint):
     def SSEClient(self, timeout: Optional[int] = 10):
         return SSEClient(
+            api_key=self._api_key, base_url=self._base_url, timeout=timeout
+        )
+
+    def AsyncSSEClient(self, timeout: Optional[int] = 10):
+        return AsyncSSEClient(
             api_key=self._api_key, base_url=self._base_url, timeout=timeout
         )

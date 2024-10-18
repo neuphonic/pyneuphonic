@@ -18,7 +18,7 @@ class TTSConfig(BaseModel):
     speed: float = 1.0
     temperature: float = 0.5
     model: Literal['neu_fast', 'neu_hq'] = 'neu_fast'
-    voice: str | None = None
+    voice: str | None = None  # the voice id for the desired voice
     sampling_rate: Literal[22050, 8000] = 22050
     encoding: Literal['pcm_linear', 'pcm_mulaw'] = 'pcm_linear'
     language_id: Literal['en'] = 'en'

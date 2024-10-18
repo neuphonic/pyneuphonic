@@ -1,12 +1,38 @@
 import httpx
 import json
-from typing import Generator
+from typing import Generator, AsyncGenerator, Optional
 
 from pyneuphonic._endpoint import Endpoint
 from pyneuphonic.models import TTSConfig, SSEResponse, to_dict
 
 
-class SSEClient(Endpoint):
+class SSEClientBase(Endpoint):
+    """Contains shared functions used by both the SSEClient and the AsyncSSE Client."""
+
+    def _parse_message(self, message: str) -> Optional[SSEResponse]:
+        """Parse each response from the server. Return as an SSEResponse object."""
+        lines = message.split('\n')
+        data = {}
+
+        for line in lines:
+            if not line.strip():
+                continue
+
+            try:
+                key, value = line.split(': ', 1)
+            except Exception as e:
+                raise ValueError(f'Client request was malformed or incorrect: {line}')
+
+            if key == 'data':
+                data[key] = value
+
+        if 'data' in data:
+            return SSEResponse(**json.loads(data['data']))
+
+        return None
+
+
+class SSEClient(SSEClientBase):
     def jwt_auth(self) -> None:
         """
         Authenticate with the server to obtain a JWT token.
@@ -39,29 +65,6 @@ class SSEClient(Endpoint):
 
         self.headers['Authorization'] = f'Bearer: {jwt_token}'
 
-    @staticmethod
-    def _parse_sse_message(message: str) -> SSEResponse:
-        # Split the message into lines
-        lines = message.split('\n')
-        data = {}
-
-        for line in lines:
-            # Ignore empty lines
-            if not line.strip():
-                continue
-
-            # Split the line into key and value
-            key, value = line.split(': ', 1)
-
-            # Store the value in the data dictionary
-            if key == 'data':
-                data[key] = value
-
-        if 'data' in data:
-            return SSEResponse(**json.loads(data['data']))
-
-        return None
-
     def send(
         self, text: str, tts_config: TTSConfig | dict = TTSConfig()
     ) -> Generator[SSEResponse, None, None]:
@@ -93,7 +96,46 @@ class SSEClient(Endpoint):
             json={'text': text, 'model': to_dict(tts_config)},
         ) as response:
             for message in response.iter_lines():
-                parsed_message = self._parse_sse_message(message)
+                parsed_message = self._parse_message(message)
 
                 if parsed_message is not None:
                     yield parsed_message
+
+
+class AsyncSSEClient(SSEClientBase):
+    async def jwt_auth(self) -> None:
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                f'{self.http_url}/sse/auth', headers=self.headers, timeout=self.timeout
+            )
+
+            if not response.is_success:
+                raise httpx.HTTPStatusError(
+                    f'Failed to authenticate for a JWT. Status code: {response.status_code}. Error: {response.text}',
+                    request=response.request,
+                    response=response,
+                )
+
+            jwt_token = response.json()['data']['jwt_token']
+            self.headers['Authorization'] = f'Bearer: {jwt_token}'
+
+    async def send(
+        self, text: str, tts_config: TTSConfig | dict = TTSConfig()
+    ) -> AsyncGenerator[SSEResponse, None]:
+        if not isinstance(tts_config, TTSConfig):
+            tts_config = TTSConfig(**tts_config)
+
+        assert isinstance(text, str), '`text` should be an instance of type `str`.'
+
+        async with httpx.AsyncClient() as client:
+            async with client.stream(
+                method='POST',
+                url=f'{self.http_url}/sse/speak/{tts_config.language_id}',
+                headers=self.headers,
+                json={'text': text, 'model': to_dict(tts_config)},
+            ) as response:
+                async for message in response.aiter_lines():
+                    parsed_message = self._parse_message(message)
+
+                    if parsed_message is not None:
+                        yield parsed_message
