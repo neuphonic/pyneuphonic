@@ -21,7 +21,6 @@ class SSEClient(Endpoint):
         jwt_token = response.json()['data']['jwt_token']
 
         self.headers['Authorization'] = f'Bearer: {jwt_token}'
-        del self.headers['X-API-Key']
 
     @staticmethod
     def _parse_sse_message(message: str) -> SSERequest:

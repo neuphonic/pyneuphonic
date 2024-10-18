@@ -25,7 +25,7 @@ class TTSConfig(BaseModel):
 
 
 class SSEResponse(BaseModel):
-    class Data(BaseModel):
+    class SSEResponseData(BaseModel):
         audio: bytes
         text: str
         sampling_rate: Optional[int] = None
@@ -40,7 +40,7 @@ class SSEResponse(BaseModel):
             raise ValueError('`audio` must be a base64 encoded string or bytes.')
 
     status_code: int
-    data: Data
+    data: SSEResponseData
 
 
 class SSERequest(BaseModel):
