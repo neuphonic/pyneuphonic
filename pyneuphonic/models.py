@@ -1,5 +1,5 @@
 from pydantic import BaseModel as BaseModel, field_validator
-from typing import List, Literal, Optional
+from typing import List, Literal, Optional, Callable, Awaitable
 import base64
 
 
@@ -24,25 +24,33 @@ class TTSConfig(BaseModel):
     language_id: Literal['en'] = 'en'
 
 
+class AudioData(BaseModel):
+    audio: bytes
+    text: str
+    sampling_rate: Optional[int] = None
+
+    @field_validator('audio', mode='before')
+    def validate(cls, v: str | bytes) -> bytes:
+        if isinstance(v, str):
+            return base64.b64decode(v)
+        elif isinstance(v, bytes):
+            return v
+
+        raise ValueError('`audio` must be a base64 encoded string or bytes.')
+
+
 class SSEResponse(BaseModel):
-    class SSEResponseData(BaseModel):
-        audio: bytes
-        text: str
-        sampling_rate: Optional[int] = None
-
-        @field_validator('audio', mode='before')
-        def validate(cls, v: str | bytes) -> bytes:
-            if isinstance(v, str):
-                return base64.b64decode(v)
-            elif isinstance(v, bytes):
-                return v
-
-            raise ValueError('`audio` must be a base64 encoded string or bytes.')
-
     status_code: int
-    data: SSEResponseData
+    data: AudioData
 
 
 class SSERequest(BaseModel):
     text: str
     model: TTSConfig
+
+
+class AsyncWebsocketEventHandlers(BaseModel):
+    open: Optional[Callable[[], Awaitable[None]]] = None
+    message: Optional[Callable[[AudioData], Awaitable[None]]] = None
+    close: Optional[Callable[[], Awaitable[None]]] = None
+    error: Optional[Callable[[Exception], Awaitable[None]]] = None
