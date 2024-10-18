@@ -4,7 +4,7 @@ class AudioPlayer:
         self.audio_player = None
         self.stream = None
 
-    def start(self):
+    def open(self):
         try:
             import pyaudio
         except ModuleNotFoundError:
@@ -32,7 +32,7 @@ class AudioPlayer:
             self.audio_player = None
 
     def __enter__(self):
-        self.start()
+        self.open()
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
