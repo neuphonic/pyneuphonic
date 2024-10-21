@@ -1,3 +1,7 @@
+import ssl
+import certifi
+
+
 class Endpoint:
     def __init__(
         self,
@@ -10,7 +14,7 @@ class Endpoint:
         self.timeout = timeout
 
         self.headers = {
-            'X-API-Key': self._api_key,
+            'x-api-key': self._api_key,
         }
 
     @property
@@ -29,3 +33,13 @@ class Endpoint:
     def ws_url(self):
         prefix = 'ws' if self._is_localhost() else 'wss'
         return f'{prefix}://{self.base_url}'
+
+    @property
+    def ssl_context(self):
+        ssl_context = (
+            None
+            if self._is_localhost()
+            else ssl.create_default_context(cafile=certifi.where())
+        )
+
+        return ssl_context
