@@ -87,7 +87,7 @@ class SSERequest(BaseModel):
     model: TTSConfig
 
 
-class AsyncWebsocketEventHandlers(BaseModel):
+class WebsocketEventHandlers(BaseModel):
     open: Optional[Callable[[], Awaitable[None]]] = None
     message: Optional[Callable[[AudioData], Awaitable[None]]] = None
     close: Optional[Callable[[], Awaitable[None]]] = None

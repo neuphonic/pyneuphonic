@@ -5,7 +5,7 @@ import json
 
 from pyneuphonic._endpoint import Endpoint
 from pyneuphonic.models import (
-    AsyncWebsocketEventHandlers,
+    WebsocketEventHandlers,
     TTSConfig,
     WebsocketResponse,
     WebsocketEvents,
@@ -21,7 +21,7 @@ class AsyncWebsocketClient(Endpoint):
     ):
         super().__init__(api_key=api_key, base_url=base_url, timeout=timeout)
 
-        self.event_handlers = AsyncWebsocketEventHandlers()
+        self.event_handlers = WebsocketEventHandlers()
         self.message_queue = asyncio.Queue()
 
         self._ws = None
