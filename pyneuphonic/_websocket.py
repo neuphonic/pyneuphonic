@@ -17,9 +17,8 @@ class AsyncWebsocketClient(Endpoint):
         self,
         api_key: str,
         base_url: str,
-        timeout: int = 20,
     ):
-        super().__init__(api_key=api_key, base_url=base_url, timeout=timeout)
+        super().__init__(api_key=api_key, base_url=base_url)
 
         self.event_handlers = WebsocketEventHandlers()
         self.message_queue = asyncio.Queue()
@@ -39,7 +38,6 @@ class AsyncWebsocketClient(Endpoint):
         self._ws = await websockets.connect(
             url,
             ssl=self.ssl_context,
-            timeout=self.timeout,
             extra_headers=self.headers,
         )
 

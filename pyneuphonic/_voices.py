@@ -3,11 +3,11 @@ from typing import List
 import httpx
 
 from ._endpoint import Endpoint
-from .models import VoiceData
+from .models import VoicesResponse, VoiceItem
 
 
 class Voices(Endpoint):
-    def get(self) -> List[VoiceData]:
+    def get(self) -> List[VoiceItem]:
         """List all the voices."""
         response = httpx.get(
             f'{self.http_url}/voices',
@@ -22,6 +22,6 @@ class Voices(Endpoint):
                 response=response,
             )
 
-        voices = response.json()['data']['voices']
+        voice_response = VoicesResponse(**response.json())
 
-        return voices
+        return voice_response.data.voices

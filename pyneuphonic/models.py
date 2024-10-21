@@ -33,12 +33,23 @@ def to_dict(model: BaseModel):
     return {k: v for k, v in model.model_dump().items() if v is not None}
 
 
-class VoiceData(BaseModel):
+class VoiceItem(BaseModel):
     model_config = ConfigDict(extra='allow')
 
     id: str
     name: str
-    tags: List[str]
+    tags: List[str] = None
+
+
+class VoicesResponse(BaseModel):
+    """Response from /voices endpoint."""
+
+    model_config = ConfigDict(extra='allow')
+
+    class VoicesData(BaseModel):
+        voices: List[VoiceItem]
+
+    data: VoicesData
 
 
 class AudioData(BaseModel):
