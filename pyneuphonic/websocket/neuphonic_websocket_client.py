@@ -45,6 +45,8 @@ class NeuphonicWebsocketClient:
         params: dict = None,
     ):
         """
+        This websocket implementation has been DEPRECATED.
+
         Websocket client for the Neuphonic TTS Engine.
 
         This client is initialised with the provided callbacks.
