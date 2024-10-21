@@ -38,6 +38,7 @@ print(voices)
 ```python
 from pyneuphonic import Neuphonic, AudioPlayer, TTSConfig
 import os
+import time
 
 client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_TOKEN'))
 
@@ -52,6 +53,8 @@ with AudioPlayer() as player:
 
     for item in response:
         player.play(item.data.audio)
+
+    time.sleep(1)  # ensure all audio has played
 ```
 
 #### Asynchronous SSE
@@ -71,6 +74,8 @@ async def main():
 
         async for item in response:
             player.play(item.data.audio)
+
+        await asyncio.sleep(1)
 
 asyncio.run(main())
 ```
@@ -108,7 +113,7 @@ async def main():
     await ws.send('Hello, world!', autocomplete=True)
     await ws.send('Hello, world! <STOP>')  # Both the above line, and this line, are equivalent
 
-    await asyncio.sleep(4)  # let the audio play
+    await asyncio.sleep(3)  # let the audio play
     await ws.close()  # close the websocket and terminate the audio resources
 
 asyncio.run(main())
