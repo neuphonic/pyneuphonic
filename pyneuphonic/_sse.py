@@ -1,6 +1,6 @@
 import httpx
 import json
-from typing import Generator, AsyncGenerator, Optional
+from typing import Generator, AsyncGenerator, Optional, Union
 
 from pyneuphonic._endpoint import Endpoint
 from pyneuphonic.models import TTSConfig, SSEResponse, to_dict
@@ -66,7 +66,7 @@ class SSEClient(SSEClientBase):
         self.headers['Authorization'] = f'Bearer: {jwt_token}'
 
     def send(
-        self, text: str, tts_config: TTSConfig | dict = TTSConfig()
+        self, text: str, tts_config: Union[TTSConfig, dict] = TTSConfig()
     ) -> Generator[SSEResponse, None, None]:
         """
         Send a text to the TTS (text-to-speech) service and receive a stream of SSEResponse messages.
@@ -75,7 +75,7 @@ class SSEClient(SSEClientBase):
         ----------
         text : str
             The text to be converted to speech.
-        tts_config : TTSConfig | dict, optional
+        tts_config : Union[TTSConfig, dict], optional
             The TTS configuration settings. Can be an instance of TTSConfig or a dictionary which
             will be parsed into a TTSConfig.
 
@@ -120,7 +120,7 @@ class AsyncSSEClient(SSEClientBase):
             self.headers['Authorization'] = f'Bearer: {jwt_token}'
 
     async def send(
-        self, text: str, tts_config: TTSConfig | dict = TTSConfig()
+        self, text: str, tts_config: Union[TTSConfig, dict] = TTSConfig()
     ) -> AsyncGenerator[SSEResponse, None]:
         if not isinstance(tts_config, TTSConfig):
             tts_config = TTSConfig(**tts_config)

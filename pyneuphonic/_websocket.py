@@ -1,6 +1,6 @@
 import asyncio
 import websockets
-from typing import Callable
+from typing import Callable, Union
 import json
 
 from pyneuphonic._endpoint import Endpoint
@@ -32,7 +32,7 @@ class AsyncWebsocketClient(Endpoint):
 
         setattr(self.event_handlers, event.value, handler)
 
-    async def open(self, tts_config: TTSConfig | dict = TTSConfig()):
+    async def open(self, tts_config: Union[TTSConfig, dict] = TTSConfig()):
         url = f'{self.ws_url}/speak/{tts_config.language_id}?{tts_config.to_query_params()}'
 
         self._ws = await websockets.connect(
@@ -66,7 +66,7 @@ class AsyncWebsocketClient(Endpoint):
 
             await self.close()
 
-    async def send(self, message: str | dict, autocomplete=False):
+    async def send(self, message: Union[str, dict], autocomplete=False):
         assert isinstance(
             message, (str, dict)
         ), 'Message must be an instance of str or dict'

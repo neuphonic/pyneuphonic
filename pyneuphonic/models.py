@@ -1,5 +1,5 @@
 from pydantic import BaseModel as BaseModel, field_validator, ConfigDict
-from typing import List, Literal, Optional, Callable, Awaitable
+from typing import List, Literal, Optional, Callable, Awaitable, Union
 import base64
 from enum import Enum
 
@@ -8,9 +8,9 @@ class TTSConfig(BaseModel):
     speed: float = 1.0
     temperature: float = 0.5
     model: Literal['neu_fast', 'neu_hq'] = 'neu_fast'
-    voice: str | None = (
-        None  # the voice id for the desired voice, if None, default will be used
-    )
+    voice: Optional[
+        str
+    ] = None  # the voice id for the desired voice, if None, default will be used
     sampling_rate: Literal[22050, 8000] = 22050
     encoding: Literal['pcm_linear', 'pcm_mulaw'] = 'pcm_linear'
     language_id: Literal['en'] = 'en'
@@ -62,7 +62,7 @@ class AudioData(BaseModel):
     sampling_rate: Optional[int] = None
 
     @field_validator('audio', mode='before')
-    def validate(cls, v: str | bytes) -> bytes:
+    def validate(cls, v: Union[str, bytes]) -> bytes:
         """Convert the received audio from the server into bytes that can be played."""
         if isinstance(v, str):
             return base64.b64decode(v)
