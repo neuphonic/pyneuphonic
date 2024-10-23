@@ -12,6 +12,7 @@ For support or to get involved, join our [Discord](https://discord.gg/G258vva7gZ
              - [SSE (Server Side Events)](#sse-server-side-events)
              - [Asynchronous SSE](#asynchronous-sse)
              - [Asynchronous Websocket](#asynchronous-websocket)
+         - [Example Applications](#example-applications)
 
 ## Documentation
 See [https://docs.neuphonic.com](https://docs.neuphonic.com) for the complete API documentation.
@@ -67,7 +68,7 @@ async def main():
     client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_TOKEN'))
 
     sse = client.tts.AsyncSSEClient()
-    tts_config = TTSConfig(speed=1.05, voice='ebf2c88e-e69d-4eeb-9b9b-9f3a648787a5')
+    tts_config = TTSConfig(speed=1.05)
 
     with AudioPlayer() as player:
         response = sse.send('Hello, world!', tts_config=tts_config)
@@ -118,3 +119,6 @@ async def main():
 
 asyncio.run(main())
 ```
+
+## Example Applications
+Check out the [snippets](./snippets/) folder for some example applications.
