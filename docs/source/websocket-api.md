@@ -1,4 +1,7 @@
 # Websocket API
+:::{note}
+Deprecated.
+:::
 The websocket API allows you to stream text to our server, and our server will stream audio
 chunks back to you in base64 encoded format.
 This page explains the data structures the websocket API expects, and the response format.

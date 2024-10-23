@@ -24,7 +24,7 @@ pip install pyneuphonic
 ```
 
 ### List Voices
-```
+```python
 from pyneuphonic import Neuphonic
 import os
 
@@ -45,7 +45,7 @@ client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_TOKEN'))
 sse = client.tts.SSEClient()
 
 # TTSConfig is a pydantic model so check out the source code for all valid options
-tts_config = TTSConfig(speed=1.05, voice='ebf2c88e-e69d-4eeb-9b9b-9f3a648787a5')
+tts_config = TTSConfig(speed=1.05)
 
 # Create an audio player with `pyaudio`
 with AudioPlayer() as player:
@@ -67,7 +67,7 @@ async def main():
     client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_TOKEN'))
 
     sse = client.tts.AsyncSSEClient()
-    tts_config = TTSConfig(speed=1.05)
+    tts_config = TTSConfig(speed=1.05, voice='ebf2c88e-e69d-4eeb-9b9b-9f3a648787a5')
 
     with AudioPlayer() as player:
         response = sse.send('Hello, world!', tts_config=tts_config)

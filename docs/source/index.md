@@ -2,10 +2,10 @@
 
 This guide will walk you through:
 1. Getting your API key;
-2. Understanding the websocket API;
-3. Using the Python SDK.
+2. Familiarising yourself with the API;
+3. Getting started with the Python SDK.
 
-If you need support, reach out at support@neuphonic.com.
+If you need support, reach out at support@neuphonic.com or join our [Discord](https://discord.gg/G258vva7gZ).
 
 ## Generating your API Key
 The API key can be obtained through the Account page on the [Beta](https://beta.neuphonic.com/) website.
@@ -23,15 +23,12 @@ We do not keep a copy of this API Key. Please save it somewhere safe.
 :hidden:
 :maxdepth: 1
 
-websocket-api.md
+api-reference.md
 ```
 
 ```{toctree}
 :hidden:
 :maxdepth: 1
 :caption: Python SDK
-
-python-sdk/quickstart.md
-python-sdk/examples/index.md
-python-sdk/sdk-reference.rst
+Github <https://github.com/neuphonic/pyneuphonic>
 ```
