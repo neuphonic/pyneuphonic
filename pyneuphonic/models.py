@@ -11,15 +11,13 @@ class TTSConfig(BaseModel):
 
     model_config = ConfigDict(extra='allow')
 
-    speed: float = 1.0
-    temperature: float = 0.5
-    model: str = 'neu_fast'
-    voice: Optional[
-        str
-    ] = None  # the voice id for the desired voice, if None, default will be used
-    sampling_rate: int = 22050
-    encoding: str = 'pcm_linear'
-    language_id: str = 'en'
+    speed: Optional[float] = 1.0
+    temperature: Optional[float] = 0.5
+    model: Optional[str] = 'neu_fast'
+    voice: Optional[str] = None  # if None, default is used.
+    sampling_rate: Optional[int] = 22050
+    encoding: Optional[str] = 'pcm_linear'
+    language_id: Optional[str] = 'en'
 
     def to_query_params(self) -> str:
         """Generate a query params string from the TTSConfig object, dropping None values."""
