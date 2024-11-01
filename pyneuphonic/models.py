@@ -1,19 +1,25 @@
 from pydantic import BaseModel as BaseModel, field_validator, ConfigDict
-from typing import List, Literal, Optional, Callable, Awaitable, Union
+from typing import List, Optional, Callable, Awaitable, Union
 import base64
 from enum import Enum
 
 
 class TTSConfig(BaseModel):
+    """
+    See https://docs.neuphonic.com/api-reference#options for all available options
+    """
+
+    model_config = ConfigDict(extra='allow')
+
     speed: float = 1.0
     temperature: float = 0.5
-    model: Literal['neu_fast', 'neu_hq'] = 'neu_fast'
+    model: str = 'neu_fast'
     voice: Optional[
         str
     ] = None  # the voice id for the desired voice, if None, default will be used
-    sampling_rate: Literal[22050, 8000] = 22050
-    encoding: Literal['pcm_linear', 'pcm_mulaw'] = 'pcm_linear'
-    language_id: Literal['en'] = 'en'
+    sampling_rate: int = 22050
+    encoding: str = 'pcm_linear'
+    language_id: str = 'en'
 
     def to_query_params(self) -> str:
         """Generate a query params string from the TTSConfig object, dropping None values."""
@@ -35,10 +41,12 @@ def to_dict(model: BaseModel):
 
 class VoiceItem(BaseModel):
     model_config = ConfigDict(extra='allow')
+    model_config['protected_namespaces'] = ()
 
     id: str
     name: str
-    tags: List[str] = None
+    tags: List[str] = []
+    model_availability: List[str] = []
 
 
 class VoicesResponse(BaseModel):
