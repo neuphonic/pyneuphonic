@@ -34,6 +34,21 @@ voices = client.voices.get()  # get's all available voices
 print(voices)
 ```
 
+
+### Voice Cloning
+```python
+from pyneuphonic import Neuphonic
+import os
+
+client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_TOKEN'))
+
+voice_file_path = 'XXX.wav'
+
+result = client.clone_voice.post(voice_name='NewNeuphonic', voice_tags=['Male', 'American'], voice_file_path = voice_file_path)
+
+print(result['text'])
+```
+
 ### Audio Generation
 #### SSE (Server Side Events)
 ```python
