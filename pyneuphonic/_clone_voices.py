@@ -30,7 +30,7 @@ class CloneVoices(Endpoint):
 
         # Send the POST request with voice_name as a query parameter
         response = httpx.post(
-            f'{self.http_url}/clone_voice?voice_name={voice_name}',
+            f'{self.http_url}/voices/clone?voice_name={voice_name}',
             data=data,
             files=files,
             headers=self.headers,
