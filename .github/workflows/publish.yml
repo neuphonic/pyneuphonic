@@ -28,11 +28,10 @@ jobs:
         poetry config repositories.pypi https://upload.pypi.org/legacy/
 
     - name: Set up PyPi token
-      env:
-        PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
+    #   env:
+    #     PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
       run: |
-        echo "${PYPI_TOKEN}"
-        poetry config pypi-token.pypi "${PYPI_TOKEN}"
+        poetry config http-basic.pypi __token__ ${{ secrets.PYPI_TOKEN }}
 
     - name: Publish package
       run: |
