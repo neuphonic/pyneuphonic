@@ -23,16 +23,11 @@ jobs:
       run: |
         poetry install
 
-    - name: Setup PyPi repo
+    - name: Set up PyPi repo and token
       run: |
-        poetry config repositories.pyneuphonic https://upload.pypi.org/legacy/
-
-    - name: Set up PyPi token
-      env:
-        PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
-      run: |
-        poetry config pypi-token.pypi $PYPI_TOKEN
+        poetry config repositories.pypi https://upload.pypi.org/legacy/
+        poetry config http-basic.pypi __token__ ${{ secrets.PYPI_TOKEN }}
 
     - name: Publish package
       run: |
-        poetry publish --build --repository pyneuphonic
+        poetry publish --build --repository pypi
