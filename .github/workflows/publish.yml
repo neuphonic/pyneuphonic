@@ -31,8 +31,8 @@ jobs:
       env:
         PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
       run: |
-        echo $PYPI_TOKEN
-        poetry config pypi-token.pypi $PYPI_TOKEN
+        echo "${PYPI_TOKEN}"
+        poetry config pypi-token.pypi "${PYPI_TOKEN}"
 
     - name: Publish package
       run: |
