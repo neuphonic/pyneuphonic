@@ -2,7 +2,6 @@ from typing import Optional
 import os
 
 from pyneuphonic._voices import Voices
-from pyneuphonic._clone_voices import CloneVoices
 from pyneuphonic._sse import SSEClient, AsyncSSEClient
 from pyneuphonic._endpoint import Endpoint
 from pyneuphonic._websocket import AsyncWebsocketClient
@@ -49,7 +48,6 @@ class Neuphonic:
 
         self.voices = Voices(api_key=self._api_key, base_url=self._base_url)
         self.tts = TTS(api_key=self._api_key, base_url=self._base_url)
-        self.clone_voice = CloneVoices(api_key=self._api_key, base_url=self._base_url)
 
 
 class TTS(Endpoint):
