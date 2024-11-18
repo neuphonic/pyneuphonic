@@ -5,7 +5,9 @@ from pyneuphonic.models import (
     WebsocketEvents,
     VoiceItem,
 )
+from pyneuphonic import save_audio
 import asyncio
+import os
 
 
 def test_sse_sync(client):
@@ -90,3 +92,24 @@ def test_get_voices(client):
 
     for voice in voices:
         assert isinstance(voice, VoiceItem)
+
+
+@pytest.mark.asyncio
+async def test_sse_save_audio(client):
+    sse_client = client.tts.AsyncSSEClient()
+
+    response = sse_client.send(
+        'Hello, world! This is an example of saving audio to a file.'
+    )
+
+    audio_bytes = bytearray()
+
+    async for item in response:
+        audio_bytes += item.data.audio
+
+    save_audio(audio_bytes=audio_bytes, file_path='output.wav')
+
+    assert os.path.exists('output.wav')
+    assert os.path.getsize('output.wav') > 100
+
+    os.remove('output.wav')

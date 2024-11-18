@@ -5,14 +5,15 @@ API from any Python 3.9+ application.
 For support or to get involved, join our [Discord](https://discord.gg/G258vva7gZ)!
 
 - [PyNeuphonic](#pyneuphonic)
-     - [Documentation](#documentation)
-         - [Installation](#installation)
-         - [List Voices](#list-voices)
-         - [Audio Generation](#audio-generation)
-             - [SSE (Server Side Events)](#sse-server-side-events)
-             - [Asynchronous SSE](#asynchronous-sse)
-             - [Asynchronous Websocket](#asynchronous-websocket)
-         - [Example Applications](#example-applications)
+  - [Documentation](#documentation)
+    - [Installation](#installation)
+    - [List Voices](#list-voices)
+    - [Audio Generation](#audio-generation)
+      - [SSE (Server Side Events)](#sse-server-side-events)
+      - [Asynchronous SSE](#asynchronous-sse)
+      - [Asynchronous Websocket](#asynchronous-websocket)
+    - [Saving Audio](#saving-audio)
+  - [Example Applications](#example-applications)
 
 ## Documentation
 See [https://docs.neuphonic.com](https://docs.neuphonic.com) for the complete API documentation.
@@ -55,7 +56,8 @@ with AudioPlayer() as player:
     for item in response:
         player.play(item.data.audio)
 
-    time.sleep(1)  # ensure all audio has played
+    player.save_audio()  # save the audio to a .wav file
+    time.sleep(1)  # ensure all the audio has played before the python program terminates
 ```
 
 #### Asynchronous SSE
@@ -76,7 +78,8 @@ async def main():
         async for item in response:
             player.play(item.data.audio)
 
-        await asyncio.sleep(1)
+        player.save_audio()  # save the audio to a .wav file
+        await asyncio.sleep(1)  # ensure all the audio has played before the python program terminates
 
 asyncio.run(main())
 ```
@@ -115,10 +118,21 @@ async def main():
     await ws.send('Hello, world! <STOP>')  # Both the above line, and this line, are equivalent
 
     await asyncio.sleep(3)  # let the audio play
+    player.save_audio()  # save the audio to a .wav file
     await ws.close()  # close the websocket and terminate the audio resources
 
 asyncio.run(main())
 ```
+
+### Saving Audio
+As per the examples above, you can use the `AudioPlayer` object to save audio.
+```python
+player.save_audio()
+```
+However, if you do not want to play audio and simply want to save it, check out the examples
+in [snippets/sse/save_audio.py](./snippets/sse/save_audio.py) and
+[snippets/websocket/save_audio.py](./snippets/websocket/save_audio.py) for examples on how to
+do this.
 
 ## Example Applications
 Check out the [snippets](./snippets/) folder for some example applications.
