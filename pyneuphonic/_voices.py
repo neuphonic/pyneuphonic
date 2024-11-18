@@ -64,7 +64,6 @@ class Voices(Endpoint):
 
         # Handle response errors
         if not response.is_success:
-            print(response)
             raise httpx.HTTPStatusError(
                 f'Failed to clone voice. Status code: {response.status_code}. Error: {response.text}',
                 request=response.request,
