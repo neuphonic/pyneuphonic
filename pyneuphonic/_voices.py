@@ -27,7 +27,7 @@ class Voices(Endpoint):
         return voice_response.data.voices
 
     def clone(
-        self, voice_name: str, voice_tags: List[str], voice_file_path: str
+        self, voice_name: str, voice_file_path: str, voice_tags: List[str] = []
     ) -> dict:
         """
         Clone a voice by uploading a file with the specified name and tags.
@@ -36,8 +36,8 @@ class Voices(Endpoint):
         ----------
         voice_name : str
             The name of the new cloned voice.
-        voice_tags : list of str
-            Tags associated with the voice.
+        voice_tags : List[str]
+            Tags associated with the voice. Default is an empty list.
         voice_file_path : str
             Path to the voice file (e.g., a .wav file) to be uploaded.
 
