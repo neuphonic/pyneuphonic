@@ -36,10 +36,10 @@ class Voices(Endpoint):
         ----------
         voice_name : str
             The name of the new cloned voice.
-        voice_tags : List[str]
-            Tags associated with the voice. Default is an empty list.
         voice_file_path : str
             Path to the voice file (e.g., a .wav file) to be uploaded.
+        voice_tags : List[str]
+            Tags associated with the voice. Default is an empty list.
 
         Returns
         -------
