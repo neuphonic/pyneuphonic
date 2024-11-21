@@ -2,6 +2,7 @@ import pytest
 from pytest_mock import MockerFixture
 from pyneuphonic import Neuphonic, TTSConfig
 from pyneuphonic.models import VoiceItem, SSEResponse, to_dict
+from pydantic import BaseModel
 
 
 def test_tts_config():
@@ -117,3 +118,29 @@ def test_get_voices(client: Neuphonic, mocker: MockerFixture):
 
     for voice in voices:
         assert isinstance(voice, VoiceItem)
+
+
+def test_delete_voice(client: Neuphonic, mocker: MockerFixture):
+    mock_response = mocker.Mock()
+    mock_response.is_success = True
+
+    voice_id = 'ec8722cf-a44f-492e-90a6-0412658a64df'
+    return_value = {
+        'data': {
+            'message': f'Voice has successfully been cloned with id {voice_id}',
+            'voice_id': voice_id,
+        }
+    }
+
+    mock_response.json.return_value = return_value
+    mock_delete = mocker.patch('httpx.delete', return_value=mock_response)
+    delete_response = client.voices.delete(voice_id)
+
+    class DeleteVoiceResponse(BaseModel):
+        class Data(BaseModel):
+            message: str
+            voice_id: str
+
+        data: Data
+
+    delete_voice_response = DeleteVoiceResponse(**delete_response)

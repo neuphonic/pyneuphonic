@@ -45,6 +45,11 @@ class Voices(Endpoint):
         -------
         dict
             A dictionary with the response data from the API.
+
+        Raises
+        ------
+        httpx.HTTPStatusError
+            If the request to clone the voice fails.
         """
 
         # Prepare the multipart form-data payload
@@ -66,6 +71,43 @@ class Voices(Endpoint):
         if not response.is_success:
             raise httpx.HTTPStatusError(
                 f'Failed to clone voice. Status code: {response.status_code}. Error: {response.text}',
+                request=response.request,
+                response=response,
+            )
+
+        # Return the JSON response content as a dictionary
+        return response.json()
+
+    def delete(self, voice_id: str) -> dict:
+        """
+        Delete a voice by its ID.
+
+        Parameters
+        ----------
+        voice_id : str
+            The ID of the voice to be deleted.
+
+        Returns
+        -------
+        dict
+            A dictionary with the response data from the API.
+
+        Raises
+        ------
+        httpx.HTTPStatusError
+            If the request to delete the voice fails. This will usually trigger if you do not have
+            permissions to delete the voice.
+        """
+        response = httpx.delete(
+            f'{self.http_url}/voices/clone?voice_id={voice_id}',
+            headers=self.headers,
+            timeout=self.timeout,
+        )
+
+        # Handle response errors
+        if not response.is_success:
+            raise httpx.HTTPStatusError(
+                f'Failed to delete voice. Status code: {response.status_code}. Error: {response.text}',
                 request=response.request,
                 response=response,
             )
