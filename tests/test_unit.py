@@ -1,4 +1,7 @@
+import os
 import pytest
+import tempfile
+import wave
 from pytest_mock import MockerFixture
 from pyneuphonic import Neuphonic, TTSConfig
 from pyneuphonic.models import VoiceItem, SSEResponse, to_dict
@@ -83,6 +86,7 @@ async def test_websocket_async(client: Neuphonic, mocker: MockerFixture):
     await ws.close()
 
 
+@pytest.mark.asyncio
 def test_get_voices(client: Neuphonic, mocker: MockerFixture):
     mock_response = mocker.Mock()
     mock_response.is_success = True
@@ -120,27 +124,101 @@ def test_get_voices(client: Neuphonic, mocker: MockerFixture):
         assert isinstance(voice, VoiceItem)
 
 
+class CloneVoiceResponse(BaseModel):
+    class Data(BaseModel):
+        message: str
+        voice_id: str
+
+    data: Data
+
+
+@pytest.mark.asyncio
+def test_clone_voice(client: Neuphonic, mocker: MockerFixture):
+    # Set up inputs
+    voice_name = 'TestVoice-SDK'
+    voice_tags = ['tag1', 'tag2']
+
+    # Mock the file content
+    with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as temp_file:
+        voice_file_path = temp_file.name
+
+    try:
+        # Create a valid .wav file
+        with wave.open(voice_file_path, 'wb') as wav_file:
+            wav_file.setnchannels(1)  # Mono audio
+            wav_file.setsampwidth(2)  # 16-bit samples
+            wav_file.setframerate(44100)  # 44.1 kHz sample rate
+            wav_file.writeframes(b'\x00\x00' * 44100)  # 1 second of silence
+
+        # Mock the httpx.post response
+        mock_post = mocker.patch('httpx.post')
+
+        # Configure the mock response
+        mock_response = mocker.Mock()
+        mock_response.json.return_value = {
+            'data': {
+                'message': 'Voice has successfully been cloned.',
+                'voice_id': '12345',
+            }
+        }
+        mock_post.return_value = mock_response
+
+        # Call the clone method
+        response = client.voices.clone(voice_name, voice_file_path, voice_tags)
+        clone_voice_response = CloneVoiceResponse(**response)
+
+        # Assertions
+        assert (
+            'Voice has successfully been cloned.' in clone_voice_response.data.message
+        )
+        assert clone_voice_response.data.voice_id == '12345'
+
+        # Ensure httpx.post was called with correct parameters
+        base_url = os.getenv('NEUPHONIC_API_URL', 'default-api-url')
+        mock_post.assert_called_once_with(
+            f'https://{base_url}/voices/clone?voice_name={voice_name}',
+            data={'voice_tags': voice_tags},
+            files={'voice_file': mocker.ANY},  # Matches the file object
+            headers={'x-api-key': mocker.ANY},  # Ensure the API key is present
+            timeout=10,
+        )
+    finally:
+        # Clean up the temporary file
+        os.remove(voice_file_path)
+
+
 def test_delete_voice(client: Neuphonic, mocker: MockerFixture):
+    # Initialise mocker
     mock_response = mocker.Mock()
-    mock_response.is_success = True
+    mock_response.is_success = True  # Simulate a successful deletion
 
     voice_id = 'ec8722cf-a44f-492e-90a6-0412658a64df'
     return_value = {
         'data': {
-            'message': f'Voice has successfully been cloned with id {voice_id}',
+            'message': 'Voice was successfully deleted',  # Correct message
             'voice_id': voice_id,
         }
     }
 
     mock_response.json.return_value = return_value
+
+    # Initialise Patcher
     mock_delete = mocker.patch('httpx.delete', return_value=mock_response)
+
+    # Delete Voice
     delete_response = client.voices.delete(voice_id)
 
-    class DeleteVoiceResponse(BaseModel):
-        class Data(BaseModel):
-            message: str
-            voice_id: str
+    # Assert the HTTP method and endpoint were called correctly
+    base_url = os.getenv('NEUPHONIC_API_URL')
+    mock_delete.assert_called_once_with(
+        f'https://{base_url}/voices/clone?voice_id={voice_id}',
+        headers={'x-api-key': mocker.ANY},  # Ensures api key was present
+        timeout=10,
+    )
 
-        data: Data
+    # Deserialize response into the correct response model
+    delete_voice_response = CloneVoiceResponse(**delete_response)
 
-    delete_voice_response = DeleteVoiceResponse(**delete_response)
+    # Check the response message
+    assert 'Voice was successfully deleted' in delete_voice_response.data.message
+    assert delete_voice_response.data.voice_id == voice_id
