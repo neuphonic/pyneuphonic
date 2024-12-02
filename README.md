@@ -25,6 +25,13 @@ Install this package into your environment using your chosen package manager:
 pip install pyneuphonic
 ```
 
+In most cases, you will be playing the audio returned from our servers directly on your device.
+We offer utilities to play audio through your device's speakers using `pyaudio`.
+To use these utilities, please also `pip install pyaudio`.
+
+> :warning: Mac users encountering a `'portaudio.h' file not found` error can resolve it by running
+> `brew install portaudio`.
+
 ### List Voices
 ```python
 from pyneuphonic import Neuphonic
