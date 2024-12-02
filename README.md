@@ -63,7 +63,7 @@ with AudioPlayer() as player:
     for item in response:
         player.play(item.data.audio)
 
-    player.save_audio()  # save the audio to a .wav file
+    player.save_audio('output.wav')  # save the audio to a .wav file
     time.sleep(1)  # ensure all the audio has played before the python program terminates
 ```
 
@@ -85,7 +85,7 @@ async def main():
         async for item in response:
             player.play(item.data.audio)
 
-        player.save_audio()  # save the audio to a .wav file
+        player.save_audio('output.wav')  # save the audio to a .wav file
         await asyncio.sleep(1)  # ensure all the audio has played before the python program terminates
 
 asyncio.run(main())
@@ -125,7 +125,7 @@ async def main():
     await ws.send('Hello, world! <STOP>')  # Both the above line, and this line, are equivalent
 
     await asyncio.sleep(3)  # let the audio play
-    player.save_audio()  # save the audio to a .wav file
+    player.save_audio('output.wav')  # save the audio to a .wav file
     await ws.close()  # close the websocket and terminate the audio resources
 
 asyncio.run(main())
@@ -134,7 +134,7 @@ asyncio.run(main())
 ### Saving Audio
 As per the examples above, you can use the `AudioPlayer` object to save audio.
 ```python
-player.save_audio()
+player.save_audio('output.wav')
 ```
 However, if you do not want to play audio and simply want to save it, check out the examples
 in [snippets/sse/save_audio.py](./snippets/sse/save_audio.py) and

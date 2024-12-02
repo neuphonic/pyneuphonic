@@ -1,12 +1,11 @@
 import wave
-import datetime as dt
 from typing import Optional
 
 
 def save_audio(
     audio_bytes: bytes,
+    file_path: str,
     sample_rate: Optional[int] = 22050,
-    file_path: Optional[str] = None,
 ):
     """
     Takes in an audio buffer and saves it to a .wav file.
@@ -15,15 +14,11 @@ def save_audio(
     ----------
     audio_bytes
         The audio buffer to save. This is all the bytes returned from the server.
+    file_path
+        The file path you want to save the audio to.
     sample_rate
         The sample rate of the audio you want to save. Default is 22050.
-    file_path
-        The file path you want to save the audio to. If None, this will default to
-        f'neuphonic_audio_{dt.datetime.now().isoformat()}'.
     """
-    if file_path is None:
-        file_path = f'neuphonic_audio_{dt.datetime.now().isoformat()}.wav'
-
     with wave.open(file_path, 'wb') as wav_file:
         wav_file.setnchannels(1)
         wav_file.setsampwidth(2)
@@ -68,12 +63,17 @@ class AudioPlayer:
             self.audio_player = None
 
     def save_audio(
-        self, sample_rate: Optional[int] = 22050, file_path: Optional[str] = None
+        self,
+        file_path: str,
+        sample_rate: Optional[int] = 22050,
     ):
         """Saves the audio using pynuephonic.save_audio"""
         save_audio(
             audio_bytes=self.audio_bytes, sample_rate=sample_rate, file_path=file_path
         )
+
+    # Copy the docstring over from save_audio to AudioPlayer.save_audio
+    save_audio.__doc__ = globals()['save_audio'].__doc__
 
     def __enter__(self):
         self.open()
