@@ -78,9 +78,7 @@ async def main():
 
     with AudioPlayer() as player:
         response = sse.send('Hello, world!', tts_config=tts_config)
-
-        async for item in response:
-            player.play(item.data.audio)
+        await player.play_async(response)
 
         player.save_audio('output.wav')  # save the audio to a .wav file
 
