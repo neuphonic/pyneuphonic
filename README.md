@@ -59,12 +59,9 @@ tts_config = TTSConfig(speed=1.05)
 # Create an audio player with `pyaudio`
 with AudioPlayer() as player:
     response = sse.send('Hello, world!', tts_config=tts_config)
-
-    for item in response:
-        player.play(item.data.audio)
+    player.play(response)
 
     player.save_audio('output.wav')  # save the audio to a .wav file
-    time.sleep(1)  # ensure all the audio has played before the python program terminates
 ```
 
 #### Asynchronous SSE
@@ -86,7 +83,6 @@ async def main():
             player.play(item.data.audio)
 
         player.save_audio('output.wav')  # save the audio to a .wav file
-        await asyncio.sleep(1)  # ensure all the audio has played before the python program terminates
 
 asyncio.run(main())
 ```

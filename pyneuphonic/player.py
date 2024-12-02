@@ -1,5 +1,6 @@
 import wave
-from typing import Optional
+from typing import Union, Optional, Iterator
+from pyneuphonic.models import SSEResponse
 
 
 def save_audio(
@@ -47,11 +48,23 @@ class AudioPlayer:
             format=pyaudio.paInt16, channels=1, rate=self.sampling_rate, output=True
         )
 
-    def play(self, audio_bytes: bytes):
-        if self.stream:
-            self.stream.write(audio_bytes)
+    def play(self, data: Union[bytes, Iterator[SSEResponse]]):
+        if isinstance(data, bytes):
+            if self.stream:
+                self.stream.write(data)
 
-        self.audio_bytes += audio_bytes
+            self.audio_bytes += data
+
+        elif isinstance(data, Iterator):
+            for message in data:
+                if not isinstance(message, SSEResponse):
+                    raise ValueError(
+                        '`data` must be an Iterator yielding an object of type'
+                        '`pyneuphonic.models.SSEResponse`'
+                    )
+
+                self.stream.write(message.data.audio)
+                self.audio_bytes += message.data.audio
 
     def close(self):
         if self.stream:
