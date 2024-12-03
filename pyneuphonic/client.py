@@ -5,6 +5,7 @@ from pyneuphonic._voices import Voices
 from pyneuphonic._sse import SSEClient, AsyncSSEClient
 from pyneuphonic._endpoint import Endpoint
 from pyneuphonic._websocket import AsyncWebsocketClient
+from pyneuphonic._agents import Agents
 
 
 class Neuphonic:
@@ -48,6 +49,7 @@ class Neuphonic:
 
         self.voices = Voices(api_key=self._api_key, base_url=self._base_url)
         self.tts = TTS(api_key=self._api_key, base_url=self._base_url)
+        self.agents = Agents(api_key=self._api_key, base_url=self._base_url)
 
 
 class TTS(Endpoint):
