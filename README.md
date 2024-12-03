@@ -13,6 +13,7 @@ For support or to get involved, join our [Discord](https://discord.gg/G258vva7gZ
       - [Asynchronous SSE](#asynchronous-sse)
       - [Asynchronous Websocket](#asynchronous-websocket)
     - [Saving Audio](#saving-audio)
+    - [Agents](#agents)
   - [Example Applications](#example-applications)
 
 ## Documentation
@@ -134,6 +135,15 @@ However, if you do not want to play audio and simply want to save it, check out 
 in [snippets/sse/save_audio.py](./snippets/sse/save_audio.py) and
 [snippets/websocket/save_audio.py](./snippets/websocket/save_audio.py) for examples on how to
 do this.
+
+### Agents
+🚀 Exciting New Feature Alert! 🚀
+
+Stay tuned for the upcoming release of our **Agents** feature! 🤖✨
+With Agents, you'll be able to create, manage, and interact with intelligent virtual assistants like
+never before.
+
+🔜 **Coming Soon!** 🔜
 
 ## Example Applications
 Check out the [snippets](./snippets/) folder for some example applications.
