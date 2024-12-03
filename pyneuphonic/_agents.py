@@ -7,7 +7,7 @@ from ._endpoint import Endpoint
 class Agents(Endpoint):
     def get(
         self,
-        agent_id: str | None = None,
+        agent_id: Optional[str] = None,
     ):
         """
         List created agents.
