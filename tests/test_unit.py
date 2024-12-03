@@ -3,6 +3,7 @@ from pytest_mock import MockerFixture
 from pyneuphonic import Neuphonic, TTSConfig
 from pyneuphonic.models import VoiceItem, SSEResponse, to_dict
 from pydantic import BaseModel
+import uuid
 
 
 def test_tts_config():
@@ -144,3 +145,131 @@ def test_delete_voice(client: Neuphonic, mocker: MockerFixture):
         data: Data
 
     delete_voice_response = DeleteVoiceResponse(**delete_response)
+
+
+class AgentResponse(BaseModel):
+    class Data(BaseModel):
+        message: str
+        id: str
+
+    data: Data
+
+
+def test_create_agent(client: Neuphonic, mocker: MockerFixture):
+    mock_response = mocker.Mock()
+    mock_response.is_success = True
+    random_uuid = str(uuid.uuid4())
+
+    return_value = {
+        'data': {
+            'message': 'Agent successfully created.',
+            'id': random_uuid,
+        }
+    }
+
+    mock_response.json.return_value = return_value
+    mock_create = mocker.patch('httpx.post', return_value=mock_response)
+
+    data = {
+        'name': 'test_create_agent',
+        'prompt': 'You are a helpful agent.',
+        'greeting': None,
+    }
+
+    create_response = client.agents.create(**data)
+
+    create_response = AgentResponse(**create_response)
+    assert create_response.data.id == random_uuid
+
+    mock_create.assert_called_once_with(
+        f'https://{client._base_url}/agents',
+        json=data,
+        headers={'x-api-key': client._api_key},
+        timeout=mocker.ANY,
+    )
+
+
+def test_delete_agent(client: Neuphonic, mocker: MockerFixture):
+    mock_response = mocker.Mock()
+    mock_response.is_success = True
+    random_uuid = str(uuid.uuid4())
+
+    return_value = {
+        'data': {
+            'message': 'Agent successfully deleted.',
+            'id': random_uuid,
+        }
+    }
+
+    mock_response.json.return_value = return_value
+    mock_delete = mocker.patch('httpx.delete', return_value=mock_response)
+
+    delete_response = client.agents.delete(agent_id=random_uuid)
+
+    delete_response = AgentResponse(**delete_response)
+    assert delete_response.data.id == random_uuid
+
+    mock_delete.assert_called_once_with(
+        f'https://{client._base_url}/agents/{random_uuid}',
+        headers={'x-api-key': client._api_key},
+        timeout=mocker.ANY,
+    )
+
+
+def test_list_agents(client: Neuphonic, mocker: MockerFixture):
+    mock_response = mocker.Mock()
+    mock_response.is_success = True
+
+    random_uuid_1 = str(uuid.uuid4())
+    random_uuid_2 = str(uuid.uuid4())
+
+    return_value = {
+        'data': {
+            'agents': [
+                {'id': random_uuid_1, 'name': 'Agent 1'},
+                {'id': random_uuid_2, 'name': 'Agent 2'},
+            ]
+        }
+    }
+
+    mock_response.json.return_value = return_value
+    mock_get = mocker.patch('httpx.get', return_value=mock_response)
+
+    get_response = client.agents.get()
+    assert get_response['data']['agents'][0]['id'] == random_uuid_1
+    assert get_response['data']['agents'][1]['id'] == random_uuid_2
+
+    mock_get.assert_called_once_with(
+        f'https://{client._base_url}/agents',
+        headers={'x-api-key': client._api_key},
+        timeout=mocker.ANY,
+    )
+
+
+def test_list_single_agent(client: Neuphonic, mocker: MockerFixture):
+    mock_response = mocker.Mock()
+    mock_response.is_success = True
+    random_uuid = str(uuid.uuid4())
+
+    return_value = {
+        'data': {
+            'agent': {
+                'id': random_uuid,
+                'name': 'Agent 1',
+                'prompt': 'You are a helpful agent.',
+                'greeting': 'Hi, how can I help you today?',
+            },
+        }
+    }
+
+    mock_response.json.return_value = return_value
+    mock_get = mocker.patch('httpx.get', return_value=mock_response)
+
+    get_response = client.agents.get(agent_id=random_uuid)
+    assert get_response['data']['agent']['id'] == random_uuid
+
+    mock_get.assert_called_once_with(
+        f'https://{client._base_url}/agents/{random_uuid}',
+        headers={'x-api-key': client._api_key},
+        timeout=mocker.ANY,
+    )
