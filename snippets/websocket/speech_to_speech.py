@@ -11,6 +11,8 @@ async def main():
 
     ws = client.agents.AsyncWebsocketClient()
     player = AsyncAudioPlayer()
+
+    # passing in the websocket object will automatically forward audio to the server
     recorder = AsyncAudioRecorder(websocket=ws)
 
     async def on_message(message: APIResponse[AgentResponse]):

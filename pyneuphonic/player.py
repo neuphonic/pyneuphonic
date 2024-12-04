@@ -3,6 +3,7 @@ from typing import Union, Optional, Iterator, AsyncIterator
 from pyneuphonic.models import APIResponse, TTSResponse
 import asyncio
 from base64 import b64encode
+import logging
 
 try:
     import pyaudio
@@ -176,14 +177,14 @@ class AsyncAudioRecorder:
                 data = await self._queue.get()
                 await self._ws.send({'audio': b64encode(data).decode('utf-8')})
             except Exception as e:
-                print(f'Error in _send: {e}')
+                logging.error(f'Error in _send: {e}')
 
     def _callback(self, in_data, frame_count, time_info, status):
         try:
             # Enqueue the incoming audio data for processing in the async loop
             self._queue.put_nowait(in_data)
         except asyncio.QueueFull:
-            print('Audio queue is full! Dropping frames.')
+            logging.error('Audio queue is full! Dropping frames.')
         return None, pyaudio.paContinue
 
     async def record(self):
