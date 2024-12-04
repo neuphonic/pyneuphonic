@@ -1,9 +1,9 @@
 from pyneuphonic import Neuphonic, WebsocketEvents
 from pyneuphonic.player import AsyncAudioPlayer, AsyncAudioRecorder
+from pyneuphonic.models import WebsocketResponse, AgentResponse
 
 import os
 import asyncio
-import base64
 
 
 async def main():
@@ -13,9 +13,9 @@ async def main():
     player = AsyncAudioPlayer()
     recorder = AsyncAudioRecorder(websocket=ws)
 
-    async def on_message(message):
-        if message['data']['type'] == 'audio_response':
-            await player.play(base64.b64decode(message['data']['audio']))
+    async def on_message(message: WebsocketResponse[AgentResponse]):
+        if message.data.type == 'audio_response':
+            await player.play(message.data.audio)
 
     async def on_close():
         await player.close()
