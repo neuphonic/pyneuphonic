@@ -1,7 +1,7 @@
 import pytest
 from pytest_mock import MockerFixture
 from pyneuphonic import Neuphonic, TTSConfig
-from pyneuphonic.models import VoiceItem, SSEResponse, to_dict
+from pyneuphonic.models import VoiceItem, APIResponse, TTSResponse, to_dict
 from pydantic import BaseModel
 import uuid
 
@@ -44,7 +44,7 @@ def test_sse_sync(client: Neuphonic, mocker: MockerFixture):
     count = 0
 
     for item in response:
-        assert isinstance(item, SSEResponse)
+        assert isinstance(item, APIResponse[TTSResponse])
         count += 1
 
     assert count == 3

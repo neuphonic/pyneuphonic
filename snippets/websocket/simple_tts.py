@@ -1,5 +1,5 @@
 from pyneuphonic import Neuphonic, WebsocketEvents
-from pyneuphonic.models import WebsocketResponse
+from pyneuphonic.models import APIResponse, TTSResponse
 from pyneuphonic.player import AudioPlayer
 import os
 import asyncio
@@ -15,7 +15,7 @@ async def main():
     player.open()
 
     # Attach event handlers. Check WebsocketEvents enum for all valid events.
-    async def on_message(message: WebsocketResponse):
+    async def on_message(message: APIResponse[TTSResponse]):
         player.play(message.data.audio)
 
     async def on_close():

@@ -1,5 +1,5 @@
 from pyneuphonic import Neuphonic, WebsocketEvents
-from pyneuphonic.models import WebsocketResponse
+from pyneuphonic.models import APIResponse, TTSResponse
 from pyneuphonic.player import save_audio
 import os
 import asyncio
@@ -12,7 +12,7 @@ async def main():
     audio_bytes = bytearray()
 
     # Attach event handlers. Check WebsocketEvents enum for all valid events.
-    async def on_message(message: WebsocketResponse):
+    async def on_message(message: APIResponse[TTSResponse]):
         # add the audio we recieve to the bytearray so we can save it later
         nonlocal audio_bytes
         audio_bytes += message.data.audio

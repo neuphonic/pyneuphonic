@@ -1,10 +1,5 @@
 import pytest
-from pyneuphonic.models import (
-    SSEResponse,
-    WebsocketResponse,
-    WebsocketEvents,
-    VoiceItem,
-)
+from pyneuphonic.models import APIResponse, WebsocketEvents, VoiceItem, TTSResponse
 from pyneuphonic.player import save_audio
 import asyncio
 import os
@@ -19,7 +14,7 @@ def test_sse_sync(client):
 
     for item in response:
         count += 1
-        assert isinstance(item, SSEResponse)
+        assert isinstance(item, APIResponse[TTSResponse])
 
     assert count > 0
 
@@ -34,7 +29,7 @@ async def test_sse_async(client):
 
     async for item in response:
         count += 1
-        assert isinstance(item, SSEResponse)
+        assert isinstance(item, APIResponse[TTSResponse])
 
     assert count > 0
 
@@ -52,11 +47,11 @@ async def test_websocket_async(client):
         nonlocal on_open_called
         on_open_called = True
 
-    async def on_message(message: WebsocketResponse):
+    async def on_message(message: APIResponse[TTSResponse]):
         nonlocal message_count
         message_count += 1
 
-        assert isinstance(message, WebsocketResponse)
+        assert isinstance(message, APIResponse)
 
     async def on_close():
         nonlocal on_close_called

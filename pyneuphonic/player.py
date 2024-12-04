@@ -1,6 +1,6 @@
 import wave
 from typing import Union, Optional, Iterator, AsyncIterator
-from pyneuphonic.models import SSEResponse
+from pyneuphonic.models import APIResponse, TTSResponse
 import asyncio
 from base64 import b64encode
 
@@ -63,14 +63,14 @@ class AudioPlayer:
             format=pyaudio.paInt16, channels=1, rate=self.sampling_rate, output=True
         )
 
-    def play(self, data: Union[bytes, Iterator[SSEResponse]]):
+    def play(self, data: Union[bytes, Iterator[APIResponse[TTSResponse]]]):
         """
         Play audio data or automatically stream over SSE responses and play the audio.
 
         Parameters
         ----------
-        data : Union[bytes, Iterator[SSEResponse]]
-            The audio data to play, either as bytes or an iterator of SSEResponse.
+        data : Union[bytes, Iterator[TTSResponse]]
+            The audio data to play, either as bytes or an iterator of TTSResponse.
         """
         if isinstance(data, bytes):
             if self.stream:
@@ -79,19 +79,21 @@ class AudioPlayer:
             self.audio_bytes += data
         elif isinstance(data, Iterator):
             for message in data:
-                if not isinstance(message, SSEResponse):
+                if not isinstance(message, APIResponse[TTSResponse]):
                     raise ValueError(
                         '`data` must be an Iterator yielding an object of type'
-                        '`pyneuphonic.models.SSEResponse`'
+                        '`pyneuphonic.models.APIResponse[TTSResponse]`'
                     )
 
                 self.play(message.data.audio)
         else:
             raise TypeError(
-                '`data` must be of type bytes or an Iterator of SSEResponse'
+                '`data` must be of type bytes or an Iterator of APIResponse[TTSResponse]'
             )
 
-    async def play_async(self, data: Union[bytes, AsyncIterator[SSEResponse]]):
+    async def play_async(
+        self, data: Union[bytes, AsyncIterator[APIResponse[TTSResponse]]]
+    ):
         """
         DEPRECATED. This function has been deprecated in favour of AsyncAudioPlayer.
 
@@ -99,23 +101,23 @@ class AudioPlayer:
 
         Parameters
         ----------
-        data : Union[bytes, AsyncIterator[SSEResponse]]
-            The audio data to play, either as bytes or an async iterator of SSEResponse.
+        data : Union[bytes, AsyncIterator[APIResponse[TTSResponse]]]
+            The audio data to play, either as bytes or an async iterator of APIResponse[TTSResponse].
         """
         if isinstance(data, bytes):
             self.play(data)
         elif isinstance(data, AsyncIterator):
             async for message in data:
-                if not isinstance(message, SSEResponse):
+                if not isinstance(message, APIResponse[TTSResponse]):
                     raise ValueError(
                         '`data` must be an AsyncIterator yielding an object of type'
-                        '`pyneuphonic.models.SSEResponse`'
+                        '`pyneuphonic.models.APIResponse[TTSResponse]`'
                     )
 
                 self.play(message.data.audio)
         else:
             raise TypeError(
-                '`data` must be of type bytes or an AsyncIterator of SSEResponse'
+                '`data` must be of type bytes or an AsyncIterator of APIResponse[TTSResponse]'
             )
 
     def close(self):
@@ -155,21 +157,21 @@ class AsyncAudioPlayer(AudioPlayer):
     async def open(self):
         super().open()
 
-    async def play(self, data: Union[bytes, AsyncIterator[SSEResponse]]):
+    async def play(self, data: Union[bytes, AsyncIterator[APIResponse[TTSResponse]]]):
         if isinstance(data, bytes):
             await asyncio.to_thread(super().play, data)
         elif isinstance(data, AsyncIterator):
             async for message in data:
-                if not isinstance(message, SSEResponse):
+                if not isinstance(message, APIResponse[TTSResponse]):
                     raise ValueError(
                         '`data` must be an AsyncIterator yielding an object of type'
-                        '`pyneuphonic.models.SSEResponse`'
+                        '`pyneuphonic.models.APIResponse[TTSResponse]`'
                     )
 
                 await self.play(message.data.audio)
         else:
             raise TypeError(
-                '`data` must be of type bytes or an AsyncIterator of SSEResponse'
+                '`data` must be of type bytes or an AsyncIterator of APIResponse[TTSResponse]'
             )
 
     async def close(self):

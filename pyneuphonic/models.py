@@ -106,23 +106,6 @@ class APIResponse(BaseModel, Generic[T]):
     data: T
 
 
-class WebsocketResponse(BaseModel, Generic[T]):
-    """Structure of responses when using AsyncWebsocketClient"""
-
-    model_config = ConfigDict(extra='allow')
-
-    data: T
-
-
-class SSEResponse(BaseModel):
-    """Structure of response when using SSEClient or AsyncSSEClient."""
-
-    model_config = ConfigDict(extra='allow')
-
-    status_code: int
-    data: TTSResponse
-
-
 class SSERequest(BaseModel):
     """Structure of request when using SSEClient or AsyncSSEClient."""
 
@@ -134,6 +117,6 @@ class SSERequest(BaseModel):
 
 class WebsocketEventHandlers(BaseModel):
     open: Optional[Callable[[], Awaitable[None]]] = None
-    message: Optional[Callable[[WebsocketResponse[T]], Awaitable[None]]] = None
+    message: Optional[Callable[[APIResponse[T]], Awaitable[None]]] = None
     close: Optional[Callable[[], Awaitable[None]]] = None
     error: Optional[Callable[[Exception], Awaitable[None]]] = None
