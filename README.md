@@ -46,9 +46,9 @@ print(voices)
 ### Audio Generation
 #### SSE (Server Side Events)
 ```python
-from pyneuphonic import Neuphonic, AudioPlayer, TTSConfig
+from pyneuphonic import Neuphonic, TTSConfig
+from pyneuphonic.player import AudioPlayer
 import os
-import time
 
 client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_TOKEN'))
 
@@ -67,7 +67,8 @@ with AudioPlayer() as player:
 
 #### Asynchronous SSE
 ```python
-from pyneuphonic import Neuphonic, AudioPlayer, TTSConfig
+from pyneuphonic import Neuphonic, TTSConfig
+from pyneuphonic.player import AsyncAudioPlayer
 import os
 import asyncio
 
@@ -77,9 +78,9 @@ async def main():
     sse = client.tts.AsyncSSEClient()
     tts_config = TTSConfig(speed=1.05)
 
-    with AudioPlayer() as player:
+    async with AsyncAudioPlayer() as player:
         response = sse.send('Hello, world!', tts_config=tts_config)
-        await player.play_async(response)
+        await player.play(response)
 
         player.save_audio('output.wav')  # save the audio to a .wav file
 
@@ -88,8 +89,9 @@ asyncio.run(main())
 
 #### Asynchronous Websocket
 ```python
-from pyneuphonic import Neuphonic, AudioPlayer, TTSConfig, WebsocketEvents
-from pyneuphonic.models import WebsocketResponse
+from pyneuphonic import Neuphonic, TTSConfig, WebsocketEvents
+from pyneuphonic.models import WebsocketResponse, TTSResponse
+from pyneuphonic.player import AsyncAudioPlayer
 import os
 import asyncio
 
@@ -99,15 +101,15 @@ async def main():
     ws = client.tts.AsyncWebsocketClient()
     tts_config = TTSConfig(voice='ebf2c88e-e69d-4eeb-9b9b-9f3a648787a5')
 
-    player = AudioPlayer()
-    player.open()
+    player = AsyncAudioPlayer()
+    await player.open()
 
     # Attach event handlers. Check WebsocketEvents enum for all valid events.
-    async def on_message(message: WebsocketResponse):
-        player.play(message.data.audio)
+    async def on_message(message: WebsocketResponse[TTSResponse]):
+        await player.play(message.data.audio)
 
     async def on_close():
-        player.close()
+        await player.close()
 
     ws.on(WebsocketEvents.MESSAGE, on_message)
     ws.on(WebsocketEvents.CLOSE, on_close)
