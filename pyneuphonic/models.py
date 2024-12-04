@@ -2,6 +2,9 @@ from pydantic import BaseModel as BaseModel, field_validator, ConfigDict
 from typing import List, Optional, Callable, Awaitable, Union
 import base64
 from enum import Enum
+from typing import Generic, TypeVar
+
+T = TypeVar('T')
 
 
 class AgentConfig(BaseModel):
@@ -71,8 +74,8 @@ class VoicesResponse(BaseModel):
     data: VoicesData
 
 
-class AudioData(BaseModel):
-    """Structure of audio data received when using any client."""
+class TTSResponse(BaseModel):
+    """Structure of data received from TTS endpoints, when using any client in`Neuphonic.tts.`"""
 
     model_config = ConfigDict(extra='allow')
 
@@ -91,12 +94,30 @@ class AudioData(BaseModel):
         raise ValueError('`audio` must be a base64 encoded string or bytes.')
 
 
-class WebsocketResponse(BaseModel):
+class AgentResponse(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    type: str
+    audio: Optional[bytes] = None
+    text: Optional[bytes] = None
+
+    @field_validator('audio', mode='before')
+    def validate(cls, v: Union[str, bytes]) -> bytes:
+        """Convert the received audio from the server into bytes that can be played."""
+        if isinstance(v, str):
+            return base64.b64decode(v)
+        elif isinstance(v, bytes):
+            return v
+
+        raise ValueError('`audio` must be a base64 encoded string or bytes.')
+
+
+class WebsocketResponse(BaseModel, Generic[T]):
     """Structure of responses when using AsyncWebsocketClient"""
 
     model_config = ConfigDict(extra='allow')
 
-    data: AudioData
+    data: T
 
 
 class SSEResponse(BaseModel):
@@ -105,7 +126,7 @@ class SSEResponse(BaseModel):
     model_config = ConfigDict(extra='allow')
 
     status_code: int
-    data: AudioData
+    data: TTSResponse
 
 
 class SSERequest(BaseModel):
@@ -119,6 +140,6 @@ class SSERequest(BaseModel):
 
 class WebsocketEventHandlers(BaseModel):
     open: Optional[Callable[[], Awaitable[None]]] = None
-    message: Optional[Callable[[AudioData], Awaitable[None]]] = None
+    message: Optional[Callable[[WebsocketResponse[T]], Awaitable[None]]] = None
     close: Optional[Callable[[], Awaitable[None]]] = None
     error: Optional[Callable[[Exception], Awaitable[None]]] = None

@@ -8,6 +8,7 @@ from pyneuphonic.models import (
     WebsocketEventHandlers,
     TTSConfig,
     WebsocketResponse,
+    TTSResponse,
     WebsocketEvents,
 )
 
@@ -51,8 +52,7 @@ class AsyncWebsocketClient(Endpoint):
         try:
             async for message in self._ws:
                 if isinstance(message, str):
-                    message = WebsocketResponse(**json.loads(message))
-
+                    message = WebsocketResponse[TTSResponse](**json.loads(message))
                     if self.event_handlers.message is not None:
                         await self.event_handlers.message(message)
                     else:

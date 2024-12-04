@@ -9,6 +9,8 @@ from pyneuphonic.models import (
     WebsocketEventHandlers,
     AgentConfig,
     WebsocketEvents,
+    WebsocketResponse,
+    AgentResponse,
 )
 
 
@@ -156,8 +158,10 @@ class AsyncWebsocketClient(Endpoint):
         try:
             async for message in self._ws:
                 if isinstance(message, str):
+                    message = WebsocketResponse[AgentResponse](**json.loads(message))
+
                     if self.event_handlers.message is not None:
-                        await self.event_handlers.message(json.loads(message))
+                        await self.event_handlers.message(message)
                     else:
                         await self.message_queue.put(message)
         except Exception as e:
