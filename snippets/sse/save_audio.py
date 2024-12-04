@@ -1,4 +1,5 @@
-from pyneuphonic import Neuphonic, save_audio
+from pyneuphonic import Neuphonic
+from pyneuphonic.player import save_audio
 import os
 
 

@@ -1,4 +1,5 @@
-from pyneuphonic import Neuphonic, AudioPlayer
+from pyneuphonic import Neuphonic
+from pyneuphonic.player import AudioPlayer
 import os
 import asyncio
 import aioconsole

@@ -4,6 +4,19 @@ import base64
 from enum import Enum
 
 
+class AgentConfig(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    agent_id: Optional[str] = None
+    endpointing: float = 500
+    sampling_rate: int = 16000
+
+    def to_query_params(self) -> str:
+        """Generate a query params string from the AgentConfig object, dropping None values."""
+        params = to_dict(self)
+        return '&'.join(f'{key}={value}' for key, value in params.items())
+
+
 class TTSConfig(BaseModel):
     """
     See https://docs.neuphonic.com/api-reference#options for all available options

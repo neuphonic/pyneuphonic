@@ -1,5 +1,6 @@
-from pyneuphonic import Neuphonic, AudioPlayer, WebsocketEvents
+from pyneuphonic import Neuphonic, WebsocketEvents
 from pyneuphonic.models import WebsocketResponse
+from pyneuphonic.player import AudioPlayer
 import os
 import asyncio
 import aioconsole

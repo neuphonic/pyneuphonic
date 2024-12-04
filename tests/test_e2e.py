@@ -5,7 +5,7 @@ from pyneuphonic.models import (
     WebsocketEvents,
     VoiceItem,
 )
-from pyneuphonic import save_audio
+from pyneuphonic.player import save_audio
 import asyncio
 import os
 
