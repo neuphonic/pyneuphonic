@@ -91,35 +91,6 @@ class AudioPlayer:
                 '`data` must be of type bytes or an Iterator of APIResponse[TTSResponse]'
             )
 
-    async def play_async(
-        self, data: Union[bytes, AsyncIterator[APIResponse[TTSResponse]]]
-    ):
-        """
-        DEPRECATED. This function has been deprecated in favour of AsyncAudioPlayer.
-
-        Asynchronously play audio data or automatically stream over SSE responses and play the audio.
-
-        Parameters
-        ----------
-        data : Union[bytes, AsyncIterator[APIResponse[TTSResponse]]]
-            The audio data to play, either as bytes or an async iterator of APIResponse[TTSResponse].
-        """
-        if isinstance(data, bytes):
-            self.play(data)
-        elif isinstance(data, AsyncIterator):
-            async for message in data:
-                if not isinstance(message, APIResponse[TTSResponse]):
-                    raise ValueError(
-                        '`data` must be an AsyncIterator yielding an object of type'
-                        '`pyneuphonic.models.APIResponse[TTSResponse]`'
-                    )
-
-                self.play(message.data.audio)
-        else:
-            raise TypeError(
-                '`data` must be of type bytes or an AsyncIterator of APIResponse[TTSResponse]'
-            )
-
     def close(self):
         """Close the audio stream and terminate resources."""
         if self.stream:
