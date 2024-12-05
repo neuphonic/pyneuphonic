@@ -1,6 +1,6 @@
 import pytest
 from pyneuphonic.models import APIResponse, WebsocketEvents, VoiceItem, TTSResponse
-from pyneuphonic.player import save_audio
+from pyneuphonic import save_audio
 import asyncio
 import os
 
