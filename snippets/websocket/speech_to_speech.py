@@ -16,8 +16,13 @@ async def main():
     recorder = AsyncAudioRecorder(websocket=ws)
 
     async def on_message(message: APIResponse[AgentResponse]):
+        # server will return 3 types of messages: audio_response, user_transcript, llm_response
         if message.data.type == 'audio_response':
             await player.play(message.data.audio)
+        elif message.data.type == 'user_transcript':
+            print(f'User: {message.data.text}')
+        elif message.data.type == 'llm_response':
+            print(f'Agent: {message.data.text}')
 
     async def on_close():
         await player.close()
