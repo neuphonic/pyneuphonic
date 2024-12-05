@@ -71,7 +71,7 @@ print(result['data']['message'])
 
 If you have successfully cloned a voice, the following message will be displayed: "Voice has successfully been cloned with ID XXXXXXX." Once cloned, you can use this voice just like any of the standard voices when calling the TTS (Text-to-Speech) service.
 
-To view a list of all available voices, simply call the `voices.get(api_key="")` endpoint.
+To view a list of all available voices (including the voices you have cloned), simply call the `client.voices.get(api_key="")` endpoint.
 
 ### Audio Generation
 
