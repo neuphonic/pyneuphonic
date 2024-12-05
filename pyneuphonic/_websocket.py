@@ -112,7 +112,7 @@ class AsyncTTSWebsocketClient(AsyncWebsocketBase):
 
     def url(self, config: Union[TTSConfig, dict]) -> str:
         if not isinstance(config, TTSConfig):
-            config = TTSConfig(config)
+            config = TTSConfig(**config)
 
         return f'{self.ws_url}/speak/{config.language_id}?{config.to_query_params()}'
 
@@ -139,7 +139,7 @@ class AsyncAgentWebsocketClient(AsyncWebsocketBase):
 
     def url(self, config: Union[AgentConfig, dict]) -> str:
         if not isinstance(config, AgentConfig):
-            config = AgentConfig(config)
+            config = AgentConfig(**config)
 
         return f'{self.ws_url}/agents?{config.to_query_params()}'
 
