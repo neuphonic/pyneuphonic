@@ -1,5 +1,7 @@
 import ssl
 import certifi
+import httpx
+from typing import Optional
 
 
 class Endpoint:
@@ -43,3 +45,11 @@ class Endpoint:
         )
 
         return ssl_context
+
+    def raise_for_status(self, response: httpx.Response, message: Optional[str] = None):
+        if not response.is_success:
+            raise httpx.HTTPStatusError(
+                f"{message + ' ' if message is not None else ''}Status code: {response.status_code}. Error: {response.text}",
+                request=response.request,
+                response=response,
+            )

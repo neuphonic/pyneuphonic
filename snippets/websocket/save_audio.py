@@ -1,5 +1,5 @@
 from pyneuphonic import Neuphonic, WebsocketEvents, save_audio
-from pyneuphonic.models import WebsocketResponse
+from pyneuphonic.models import APIResponse, TTSResponse
 import os
 import asyncio
 
@@ -11,7 +11,7 @@ async def main():
     audio_bytes = bytearray()
 
     # Attach event handlers. Check WebsocketEvents enum for all valid events.
-    async def on_message(message: WebsocketResponse):
+    async def on_message(message: APIResponse[TTSResponse]):
         # add the audio we recieve to the bytearray so we can save it later
         nonlocal audio_bytes
         audio_bytes += message.data.audio
@@ -26,7 +26,7 @@ async def main():
     await ws.close()  # close the websocket
 
     # save audio to a file
-    save_audio(audio_bytes=audio_bytes)
+    save_audio(audio_bytes=audio_bytes, file_path='output.wav')
 
 
 asyncio.run(main())

@@ -13,6 +13,7 @@ For support or to get involved, join our [Discord](https://discord.gg/G258vva7gZ
       - [Asynchronous SSE](#asynchronous-sse)
       - [Asynchronous Websocket](#asynchronous-websocket)
     - [Saving Audio](#saving-audio)
+    - [Agents](#agents)
   - [Example Applications](#example-applications)
 
 ## Documentation
@@ -24,6 +25,13 @@ Install this package into your environment using your chosen package manager:
 ```bash
 pip install pyneuphonic
 ```
+
+In most cases, you will be playing the audio returned from our servers directly on your device.
+We offer utilities to play audio through your device's speakers using `pyaudio`.
+To use these utilities, please also `pip install pyaudio`.
+
+> :warning: Mac users encountering a `'portaudio.h' file not found` error can resolve it by running
+> `brew install portaudio`.
 
 ### List Voices
 ```python
@@ -38,9 +46,9 @@ print(voices)
 ### Audio Generation
 #### SSE (Server Side Events)
 ```python
-from pyneuphonic import Neuphonic, AudioPlayer, TTSConfig
+from pyneuphonic import Neuphonic, TTSConfig
+from pyneuphonic.player import AudioPlayer
 import os
-import time
 
 client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_TOKEN'))
 
@@ -52,17 +60,15 @@ tts_config = TTSConfig(speed=1.05)
 # Create an audio player with `pyaudio`
 with AudioPlayer() as player:
     response = sse.send('Hello, world!', tts_config=tts_config)
+    player.play(response)
 
-    for item in response:
-        player.play(item.data.audio)
-
-    player.save_audio()  # save the audio to a .wav file
-    time.sleep(1)  # ensure all the audio has played before the python program terminates
+    player.save_audio('output.wav')  # save the audio to a .wav file
 ```
 
 #### Asynchronous SSE
 ```python
-from pyneuphonic import Neuphonic, AudioPlayer, TTSConfig
+from pyneuphonic import Neuphonic, TTSConfig
+from pyneuphonic.player import AsyncAudioPlayer
 import os
 import asyncio
 
@@ -72,22 +78,20 @@ async def main():
     sse = client.tts.AsyncSSEClient()
     tts_config = TTSConfig(speed=1.05)
 
-    with AudioPlayer() as player:
+    async with AsyncAudioPlayer() as player:
         response = sse.send('Hello, world!', tts_config=tts_config)
+        await player.play(response)
 
-        async for item in response:
-            player.play(item.data.audio)
-
-        player.save_audio()  # save the audio to a .wav file
-        await asyncio.sleep(1)  # ensure all the audio has played before the python program terminates
+        player.save_audio('output.wav')  # save the audio to a .wav file
 
 asyncio.run(main())
 ```
 
 #### Asynchronous Websocket
 ```python
-from pyneuphonic import Neuphonic, AudioPlayer, TTSConfig, WebsocketEvents
-from pyneuphonic.models import WebsocketResponse
+from pyneuphonic import Neuphonic, TTSConfig, WebsocketEvents
+from pyneuphonic.models import APIResponse, TTSResponse
+from pyneuphonic.player import AsyncAudioPlayer
 import os
 import asyncio
 
@@ -97,15 +101,15 @@ async def main():
     ws = client.tts.AsyncWebsocketClient()
     tts_config = TTSConfig(voice='ebf2c88e-e69d-4eeb-9b9b-9f3a648787a5')
 
-    player = AudioPlayer()
-    player.open()
+    player = AsyncAudioPlayer()
+    await player.open()
 
     # Attach event handlers. Check WebsocketEvents enum for all valid events.
-    async def on_message(message: WebsocketResponse):
-        player.play(message.data.audio)
+    async def on_message(message: APIResponse[TTSResponse]):
+        await player.play(message.data.audio)
 
     async def on_close():
-        player.close()
+        await player.close()
 
     ws.on(WebsocketEvents.MESSAGE, on_message)
     ws.on(WebsocketEvents.CLOSE, on_close)
@@ -118,7 +122,7 @@ async def main():
     await ws.send('Hello, world! <STOP>')  # Both the above line, and this line, are equivalent
 
     await asyncio.sleep(3)  # let the audio play
-    player.save_audio()  # save the audio to a .wav file
+    player.save_audio('output.wav')  # save the audio to a .wav file
     await ws.close()  # close the websocket and terminate the audio resources
 
 asyncio.run(main())
@@ -127,12 +131,21 @@ asyncio.run(main())
 ### Saving Audio
 As per the examples above, you can use the `AudioPlayer` object to save audio.
 ```python
-player.save_audio()
+player.save_audio('output.wav')
 ```
 However, if you do not want to play audio and simply want to save it, check out the examples
 in [snippets/sse/save_audio.py](./snippets/sse/save_audio.py) and
 [snippets/websocket/save_audio.py](./snippets/websocket/save_audio.py) for examples on how to
 do this.
+
+### Agents
+🚀 Exciting New Feature Alert! 🚀
+
+Stay tuned for the upcoming release of our **Agents** feature! 🤖✨
+With Agents, you'll be able to create, manage, and interact with intelligent virtual assistants like
+never before.
+
+🔜 **Coming Soon!** 🔜
 
 ## Example Applications
 Check out the [snippets](./snippets/) folder for some example applications.
