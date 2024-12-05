@@ -120,3 +120,20 @@ class WebsocketEventHandlers(BaseModel):
     message: Optional[Callable[[APIResponse[T]], Awaitable[None]]] = None
     close: Optional[Callable[[], Awaitable[None]]] = None
     error: Optional[Callable[[Exception], Awaitable[None]]] = None
+
+
+# --- Deprecated ---
+class WebsocketResponse(BaseModel):
+    """DEPRECATED. Structure of responses when using AsyncWebsocketClient"""
+
+    model_config = ConfigDict(extra='allow')
+    data: TTSResponse
+
+
+class SSEResponse(BaseModel):
+    """DEPRECATED. Structure of response when using SSEClient or AsyncSSEClient."""
+
+    model_config = ConfigDict(extra='allow')
+
+    status_code: int
+    data: TTSResponse
