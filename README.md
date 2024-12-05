@@ -7,7 +7,9 @@ For support or to get involved, join our [Discord](https://discord.gg/G258vva7gZ
 - [PyNeuphonic](#pyneuphonic)
   - [Documentation](#documentation)
     - [Installation](#installation)
-    - [List Voices](#list-voices)
+    - [Voices](#voices)
+      - [Get Voices](#get-voices)
+      - [Clone Voice](#clone-voice)
     - [Audio Generation](#audio-generation)
       - [SSE (Server Side Events)](#sse-server-side-events)
       - [Asynchronous SSE](#asynchronous-sse)
@@ -33,7 +35,12 @@ To use these utilities, please also `pip install pyaudio`.
 > :warning: Mac users encountering a `'portaudio.h' file not found` error can resolve it by running
 > `brew install portaudio`.
 
-### List Voices
+### Voices
+
+#### Get Voices
+
+To get all available voices you can run the following snippet.
+
 ```python
 from pyneuphonic import Neuphonic
 import os
@@ -43,7 +50,35 @@ voices = client.voices.get()  # get's all available voices
 print(voices)
 ```
 
+
+#### Clone Voice
+
+To clone a voice based on a audio file, you can run the following snippet.
+
+```python
+from pyneuphonic import Neuphonic
+import os
+
+client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_TOKEN'))
+
+voice_file_path = 'XXX.wav'
+
+result = client.voices.clone(voice_name='NewNeuphonic', voice_tags=['tag1', 'tag2'], voice_file_path = voice_file_path)
+
+print(result['data']['message'])
+
+```
+
+If you have successfully cloned a voice, the following message will be displayed: "Voice has successfully been cloned with ID XXXXXXX." Once cloned, you can use this voice just like any of the standard voices when calling the TTS (Text-to-Speech) service.
+
+To view a list of all available voices (including the voices you have cloned), simply call the `client.voices.get(api_key="")` endpoint.
+
 ### Audio Generation
+
+When generating audio, you can customize the process by setting various parameters in the **TTSConfig**. These parameters include options such as speed, voice, model, temperature, and more.
+
+Both standard voices and your cloned voices are supported, and you can specify them using their respective voice IDs.
+
 #### SSE (Server Side Events)
 ```python
 from pyneuphonic import Neuphonic, TTSConfig
@@ -54,8 +89,8 @@ client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_TOKEN'))
 
 sse = client.tts.SSEClient()
 
-# TTSConfig is a pydantic model so check out the source code for all valid options
-tts_config = TTSConfig(speed=1.05)
+# TTSConfig is a pydantic model so check out the source code for all valid options, such as speed and voice
+tts_config = TTSConfig(speed=1.05,  voice='ebf2c88e-e69d-4eeb-9b9b-9f3a648787a5')
 
 # Create an audio player with `pyaudio`
 with AudioPlayer() as player:
@@ -76,7 +111,9 @@ async def main():
     client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_TOKEN'))
 
     sse = client.tts.AsyncSSEClient()
-    tts_config = TTSConfig(speed=1.05)
+
+    # Change the voice used for the audio by changing the ID below.
+    tts_config = TTSConfig(speed=1.05, voice='ebf2c88e-e69d-4eeb-9b9b-9f3a648787a5')
 
     async with AsyncAudioPlayer() as player:
         response = sse.send('Hello, world!', tts_config=tts_config)
@@ -99,6 +136,8 @@ async def main():
     client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_TOKEN'))
 
     ws = client.tts.AsyncWebsocketClient()
+
+    # Change the voice used for the audio by changing the ID below.
     tts_config = TTSConfig(voice='ebf2c88e-e69d-4eeb-9b9b-9f3a648787a5')
 
     player = AsyncAudioPlayer()
