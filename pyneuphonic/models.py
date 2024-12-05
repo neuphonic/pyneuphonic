@@ -2,14 +2,30 @@ from pydantic import BaseModel as BaseModel, field_validator, ConfigDict
 from typing import List, Optional, Callable, Awaitable, Union
 import base64
 from enum import Enum
+from typing import Generic, TypeVar
+
+T = TypeVar('T')
 
 
-class TTSConfig(BaseModel):
+class BaseConfig(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
+    def to_query_params(self) -> str:
+        """Generate a query params string from the AgentConfig object, dropping None values."""
+        params = to_dict(self)
+        return '&'.join(f'{key}={value}' for key, value in params.items())
+
+
+class AgentConfig(BaseConfig):
+    agent_id: Optional[str] = None
+    endpointing: float = 500
+    sampling_rate: int = 16000
+
+
+class TTSConfig(BaseConfig):
     """
     See https://docs.neuphonic.com/api-reference#options for all available options
     """
-
-    model_config = ConfigDict(extra='allow')
 
     speed: Optional[float] = 1.0
     temperature: Optional[float] = 0.5
@@ -18,11 +34,6 @@ class TTSConfig(BaseModel):
     sampling_rate: Optional[int] = 22050
     encoding: Optional[str] = 'pcm_linear'
     language_id: Optional[str] = 'en'
-
-    def to_query_params(self) -> str:
-        """Generate a query params string from the TTSConfig object, dropping None values."""
-        params = to_dict(self)
-        return '&'.join(f'{key}={value}' for key, value in params.items())
 
 
 class WebsocketEvents(Enum):
@@ -58,41 +69,41 @@ class VoicesResponse(BaseModel):
     data: VoicesData
 
 
-class AudioData(BaseModel):
-    """Structure of audio data received when using any client."""
-
+class AudioResponse(BaseModel):
     model_config = ConfigDict(extra='allow')
 
-    audio: bytes
-    text: Optional[str] = None
-    sampling_rate: Optional[int] = None
+    audio: Optional[bytes] = None
 
     @field_validator('audio', mode='before')
-    def validate(cls, v: Union[str, bytes]) -> bytes:
+    def validate(cls, v: Optional[Union[str, bytes]]) -> Optional[bytes]:
         """Convert the received audio from the server into bytes that can be played."""
         if isinstance(v, str):
             return base64.b64decode(v)
         elif isinstance(v, bytes):
             return v
+        elif v is None:
+            return None
 
         raise ValueError('`audio` must be a base64 encoded string or bytes.')
 
 
-class WebsocketResponse(BaseModel):
-    """Structure of responses when using AsyncWebsocketClient"""
+class TTSResponse(AudioResponse):
+    """Structure of data received from TTS endpoints, when using any client in`Neuphonic.tts.`"""
 
+    text: Optional[str] = None
+    sampling_rate: Optional[int] = None
+
+
+class AgentResponse(AudioResponse):
+    type: str
+    text: Optional[str] = None
+
+
+class APIResponse(BaseModel, Generic[T]):
     model_config = ConfigDict(extra='allow')
 
-    data: AudioData
-
-
-class SSEResponse(BaseModel):
-    """Structure of response when using SSEClient or AsyncSSEClient."""
-
-    model_config = ConfigDict(extra='allow')
-
-    status_code: int
-    data: AudioData
+    status_code: Optional[int] = None  # only set on SSE responses
+    data: T
 
 
 class SSERequest(BaseModel):
@@ -106,6 +117,23 @@ class SSERequest(BaseModel):
 
 class WebsocketEventHandlers(BaseModel):
     open: Optional[Callable[[], Awaitable[None]]] = None
-    message: Optional[Callable[[AudioData], Awaitable[None]]] = None
+    message: Optional[Callable[[APIResponse[T]], Awaitable[None]]] = None
     close: Optional[Callable[[], Awaitable[None]]] = None
     error: Optional[Callable[[Exception], Awaitable[None]]] = None
+
+
+# --- Deprecated ---
+class WebsocketResponse(BaseModel):
+    """DEPRECATED. Structure of responses when using AsyncWebsocketClient"""
+
+    model_config = ConfigDict(extra='allow')
+    data: TTSResponse
+
+
+class SSEResponse(BaseModel):
+    """DEPRECATED. Structure of response when using SSEClient or AsyncSSEClient."""
+
+    model_config = ConfigDict(extra='allow')
+
+    status_code: int
+    data: TTSResponse

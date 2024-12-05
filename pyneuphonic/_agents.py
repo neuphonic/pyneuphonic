@@ -1,7 +1,8 @@
 from typing import Optional
 import httpx
 
-from ._endpoint import Endpoint
+from pyneuphonic._endpoint import Endpoint
+from pyneuphonic._websocket import AsyncAgentWebsocketClient
 
 
 class Agents(Endpoint):
@@ -101,3 +102,6 @@ class Agents(Endpoint):
         self.raise_for_status(response=response, message='Failed to delete agent.')
 
         return response.json()
+
+    def AsyncWebsocketClient(self):
+        return AsyncAgentWebsocketClient(api_key=self._api_key, base_url=self._base_url)

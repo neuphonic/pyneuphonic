@@ -3,14 +3,14 @@ import json
 from typing import Generator, AsyncGenerator, Optional, Union
 
 from pyneuphonic._endpoint import Endpoint
-from pyneuphonic.models import TTSConfig, SSEResponse, to_dict
+from pyneuphonic.models import TTSConfig, APIResponse, TTSResponse, to_dict
 
 
 class SSEClientBase(Endpoint):
     """Contains shared functions used by both the SSEClient and the AsyncSSE Client."""
 
-    def _parse_message(self, message: str) -> Optional[SSEResponse]:
-        """Parse each response from the server. Return as an SSEResponse object."""
+    def _parse_message(self, message: str) -> Optional[APIResponse[TTSResponse]]:
+        """Parse each response from the server. Return as an APIResponse object."""
         lines = message.split('\n')
         data = {}
 
@@ -27,7 +27,7 @@ class SSEClientBase(Endpoint):
                 data[key] = value
 
         if 'data' in data:
-            return SSEResponse(**json.loads(data['data']))
+            return APIResponse[TTSResponse](**json.loads(data['data']))
 
         return None
 
@@ -67,9 +67,9 @@ class SSEClient(SSEClientBase):
 
     def send(
         self, text: str, tts_config: Union[TTSConfig, dict] = TTSConfig()
-    ) -> Generator[SSEResponse, None, None]:
+    ) -> Generator[APIResponse[TTSResponse], None, None]:
         """
-        Send a text to the TTS (text-to-speech) service and receive a stream of SSEResponse messages.
+        Send a text to the TTS (text-to-speech) service and receive a stream of APIResponse messages.
 
         Parameters
         ----------
@@ -81,8 +81,8 @@ class SSEClient(SSEClientBase):
 
         Yields
         ------
-        Generator[SSEResponse, None, None]
-            A generator yielding SSEResponse messages.
+        Generator[APIResponse[TTSResponse], None, None]
+            A generator yielding APIResponse messages.
         """
         if not isinstance(tts_config, TTSConfig):
             tts_config = TTSConfig(**tts_config)
@@ -121,7 +121,7 @@ class AsyncSSEClient(SSEClientBase):
 
     async def send(
         self, text: str, tts_config: Union[TTSConfig, dict] = TTSConfig()
-    ) -> AsyncGenerator[SSEResponse, None]:
+    ) -> AsyncGenerator[APIResponse[TTSResponse], None]:
         if not isinstance(tts_config, TTSConfig):
             tts_config = TTSConfig(**tts_config)
 

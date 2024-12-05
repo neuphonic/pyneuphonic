@@ -4,7 +4,7 @@ import os
 from pyneuphonic._voices import Voices
 from pyneuphonic._sse import SSEClient, AsyncSSEClient
 from pyneuphonic._endpoint import Endpoint
-from pyneuphonic._websocket import AsyncWebsocketClient
+from pyneuphonic._websocket import AsyncTTSWebsocketClient
 from pyneuphonic._agents import Agents
 
 
@@ -63,5 +63,5 @@ class TTS(Endpoint):
             api_key=self._api_key, base_url=self._base_url, timeout=timeout
         )
 
-    def AsyncWebsocketClient(self) -> AsyncWebsocketClient:
-        return AsyncWebsocketClient(api_key=self._api_key, base_url=self._base_url)
+    def AsyncWebsocketClient(self) -> AsyncTTSWebsocketClient:
+        return AsyncTTSWebsocketClient(api_key=self._api_key, base_url=self._base_url)

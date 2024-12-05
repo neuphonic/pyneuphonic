@@ -1,3 +1,3 @@
 from pyneuphonic.client import Neuphonic
-from pyneuphonic.models import TTSConfig, WebsocketEvents
-from pyneuphonic.player import AudioPlayer, save_audio
+from pyneuphonic.models import TTSConfig, WebsocketEvents, AgentConfig
+from pyneuphonic._utils import save_audio

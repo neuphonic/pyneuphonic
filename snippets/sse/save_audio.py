@@ -12,7 +12,7 @@ def main():
     for item in response:
         audio_bytes += item.data.audio
 
-    save_audio(audio_bytes=audio_bytes)
+    save_audio(audio_bytes=audio_bytes, file_path='output.wav')
 
 
 if __name__ == '__main__':
