@@ -39,7 +39,7 @@ To use these utilities, please also `pip install pyaudio`.
 
 #### Get Voices
 
-To get all available voices for you can run the following snippet.
+To get all available voices you can run the following snippet.
 
 ```python
 from pyneuphonic import Neuphonic
