@@ -13,6 +13,7 @@ websockets = "^12.0"
 certifi = "^2024.0.0"
 pydantic = "^2.9.2"
 httpx = "^0.27.2"
+aioconsole = "^0.7.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2.2"
@@ -32,7 +33,6 @@ optional = true
 
 [tool.poetry.group.extras.dependencies]
 pyaudio = "^0.2.14"
-aioconsole = "^0.7.1"
 ollama = "0.2.1"
 
 [build-system]

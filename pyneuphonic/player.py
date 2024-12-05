@@ -1,9 +1,11 @@
+import asyncio
+import logging
+
 from typing import Union, Optional, Iterator, AsyncIterator
 from pyneuphonic.models import APIResponse, TTSResponse
-from pyneuphonic import save_audio
-import asyncio
+from pyneuphonic._utils import save_audio
 from base64 import b64encode
-import logging
+
 
 try:
     import pyaudio
