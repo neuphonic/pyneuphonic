@@ -90,7 +90,7 @@ asyncio.run(main())
 #### Asynchronous Websocket
 ```python
 from pyneuphonic import Neuphonic, TTSConfig, WebsocketEvents
-from pyneuphonic.models import WebsocketResponse, TTSResponse
+from pyneuphonic.models import APIResponse, TTSResponse
 from pyneuphonic.player import AsyncAudioPlayer
 import os
 import asyncio
@@ -105,7 +105,7 @@ async def main():
     await player.open()
 
     # Attach event handlers. Check WebsocketEvents enum for all valid events.
-    async def on_message(message: WebsocketResponse[TTSResponse]):
+    async def on_message(message: APIResponse[TTSResponse]):
         await player.play(message.data.audio)
 
     async def on_close():
