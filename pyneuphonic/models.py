@@ -72,7 +72,7 @@ class VoicesResponse(BaseModel):
 class AudioResponse(BaseModel):
     model_config = ConfigDict(extra='allow')
 
-    audio: Optional[bytes]
+    audio: Optional[bytes] = None
 
     @field_validator('audio', mode='before')
     def validate(cls, v: Optional[Union[str, bytes]]) -> Optional[bytes]:
@@ -96,7 +96,7 @@ class TTSResponse(AudioResponse):
 
 class AgentResponse(AudioResponse):
     type: str
-    text: Optional[bytes] = None
+    text: Optional[str] = None
 
 
 class APIResponse(BaseModel, Generic[T]):
