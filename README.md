@@ -15,6 +15,7 @@ For support or to get involved, join our [Discord](https://discord.gg/G258vva7gZ
       - [Asynchronous SSE](#asynchronous-sse)
       - [Asynchronous Websocket](#asynchronous-websocket)
     - [Saving Audio](#saving-audio)
+    - [List Voices](#list-voices)
     - [Agents](#agents)
   - [Example Applications](#example-applications)
 
@@ -34,6 +35,12 @@ To use these utilities, please also `pip install pyaudio`.
 
 > :warning: Mac users encountering a `'portaudio.h' file not found` error can resolve it by running
 > `brew install portaudio`.
+
+Get your API key from the [Neuphonic website](https://beta.neuphonic.com) and set it in your environment, for example
+
+```bash
+export NEUPHONIC_API_TOKEN=<YOUR API KEY HERE>
+```
 
 ### Voices
 
@@ -177,14 +184,45 @@ in [snippets/sse/save_audio.py](./snippets/sse/save_audio.py) and
 [snippets/websocket/save_audio.py](./snippets/websocket/save_audio.py) for examples on how to
 do this.
 
+### List Voices
+```python
+from pyneuphonic import Neuphonic
+import os
+
+client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_TOKEN'))
+voices = client.voices.get()  # get's all available voices
+print(voices)
+```
+
 ### Agents
-🚀 Exciting New Feature Alert! 🚀
 
-Stay tuned for the upcoming release of our **Agents** feature! 🤖✨
-With Agents, you'll be able to create, manage, and interact with intelligent virtual assistants like
-never before.
+🚀 New Feature Alert! 🚀
 
-🔜 **Coming Soon!** 🔜
+With Agents, you'll be able to create, manage, and interact with intelligent AI assistants. You can create an agent
+easily using the example here:
+
+```python
+import os
+import asyncio
+
+from pyneuphonic import Neuphonic, Agent, AgentConfig
+
+
+async def main():
+    client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_TOKEN'))
+
+    agent_id = client.agents.create(
+        name='Agent 1',
+        prompt='You are a helpful agent. Answer in 10 words or less.',
+        greeting='Hi, how can I help you today?'
+    )['data']['id']
+
+    agent = Agent(client, agent_id=agent_id, tts_model='neu_hq')
+
+    await agent.start()
+
+asyncio.run(main())
+```
 
 ## Example Applications
 Check out the [snippets](./snippets/) folder for some example applications.
