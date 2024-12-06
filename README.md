@@ -33,14 +33,10 @@ To use these utilities, please also `pip install pyaudio`.
 > :warning: Mac users encountering a `'portaudio.h' file not found` error can resolve it by running
 > `brew install portaudio`.
 
-### List Voices
-```python
-from pyneuphonic import Neuphonic
-import os
+Get your API key from the [Neuphonic website](https://beta.neuphonic.com) and set it in your environment, for example
 
-client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_TOKEN'))
-voices = client.voices.get()  # get's all available voices
-print(voices)
+```bash
+export NEUPHONIC_API_TOKEN=<YOUR API KEY HERE>
 ```
 
 ### Audio Generation
@@ -138,12 +134,45 @@ in [snippets/sse/save_audio.py](./snippets/sse/save_audio.py) and
 [snippets/websocket/save_audio.py](./snippets/websocket/save_audio.py) for examples on how to
 do this.
 
-### Agents
-🚀 Exciting New Feature Alert! 🚀
+### List Voices
+```python
+from pyneuphonic import Neuphonic
+import os
 
-Stay tuned for the upcoming release of our **Agents** feature! 🤖✨
-With Agents, you'll be able to create, manage, and interact with intelligent virtual assistants like
-never before.
+client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_TOKEN'))
+voices = client.voices.get()  # get's all available voices
+print(voices)
+```
+
+### Agents
+
+🚀 New Feature Alert! 🚀
+
+With Agents, you'll be able to create, manage, and interact with intelligent AI assistants. You can create an agent
+easily using the example here:
+
+```python
+import os
+import asyncio
+
+from pyneuphonic import Neuphonic, Agent, AgentConfig
+
+
+async def main():
+    client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_TOKEN'))
+
+    agent_id = client.agents.create(
+        name='Agent 1',
+        prompt='You are a helpful agent. Answer in 10 words or less.',
+        greeting='Hi, how can I help you today?'
+    )['data']['id']
+
+    agent = Agent(client, agent_id=agent_id, tts_model='neu_hq')
+
+    await agent.start()
+
+asyncio.run(main())
+```
 
 🔜 **Coming Soon!** 🔜
 
