@@ -10,7 +10,6 @@ For support or to get involved, join our [Discord](https://discord.gg/G258vva7gZ
       - [API Key](#api-key)
     - [Voices](#voices)
       - [Get Voices](#get-voices)
-      - [Clone Voice](#clone-voice)
     - [Audio Generation](#audio-generation)
       - [SSE (Server Side Events)](#sse-server-side-events)
       - [Asynchronous SSE](#asynchronous-sse)
@@ -52,39 +51,9 @@ import os
 
 client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_TOKEN'))
 voices = client.voices.get()  # get's all available voices
-print(voices)
-```
 
-
-#### Clone Voice
-To clone a voice based on a audio file, you can run the following snippet:
-```python
-from pyneuphonic import Neuphonic
-import os
-
-client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_TOKEN'))
-
-# Replace '<VOICE_FILE>.wav' with the path to your audio file
-voice_file_path = '<VOICE_FILE>.wav'
-
-result = client.voices.clone(
-  voice_name='Olivia', # Insert a name for the voice here
-  voice_file_path = voice_file_path
-)
-
-print(result['data'])
-
-# A successful response will look like this:
-# {
-#     "message": "Voice has successfully been cloned with ID 18da030a-a998-4467-bab0-b17eb537f546",
-#     "voice_id": "18da030a-a998-4467-bab0-b17eb537f546"
-# }
-```
-You can use the above `voice_id` to use this voice when using the TTS functionality.
-
-To delete a voice, use:
-```python
-client.voices.delete(voice_id='<VOICE_ID>')
+for voice in voices:
+    print(voice)
 ```
 
 ### Audio Generation
