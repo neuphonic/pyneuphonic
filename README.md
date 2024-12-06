@@ -224,7 +224,5 @@ async def main():
 asyncio.run(main())
 ```
 
-🔜 **Coming Soon!** 🔜
-
 ## Example Applications
 Check out the [snippets](./snippets/) folder for some example applications.
