@@ -5,7 +5,7 @@ from pyneuphonic.client import Neuphonic
 from pyneuphonic.models import APIResponse, AgentResponse, AgentConfig, WebsocketEvents
 try:
     from pyneuphonic.player import AsyncAudioPlayer, AsyncAudioRecorder
-except:
+except Exception as e:
     print("WARNING: audio player and recorder not imported!")
 
 
