@@ -3,7 +3,10 @@ import aioconsole
 
 from pyneuphonic.client import Neuphonic
 from pyneuphonic.models import APIResponse, AgentResponse, AgentConfig, WebsocketEvents
-from pyneuphonic.player import AsyncAudioPlayer, AsyncAudioRecorder
+try:
+    from pyneuphonic.player import AsyncAudioPlayer, AsyncAudioRecorder
+except:
+    print("WARNING: audio player and recorder not imported!")
 
 
 def default_on_message(message: APIResponse[AgentResponse]):
