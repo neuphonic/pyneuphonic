@@ -68,8 +68,7 @@ client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_TOKEN'))
 voice_file_path = '<VOICE_FILE>.wav'
 
 result = client.voices.clone(
-  voice_name='Olivia',
-  voice_tags=['Female', 'Thirties'],
+  voice_name='Olivia', # Insert a name for the voice here
   voice_file_path = voice_file_path
 )
 
