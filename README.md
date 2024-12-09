@@ -159,6 +159,55 @@ in [snippets/sse/save_audio.py](./snippets/sse/save_audio.py) and
 [snippets/websocket/save_audio.py](./snippets/websocket/save_audio.py) for examples on how to
 do this.
 
+### Speech Restoration
+
+Speech restoration involves enhancing and repairing degraded audio to improve its clarity, intelligibility, and overall quality, all while preserving the original content. Follow these simple steps to restore your audio clips:
+
+#### Basic Restoration
+To restore an audio clip without additional input, use the following code:
+
+```python
+voice_file_path = 'example.wav'
+response = client.restorations.restore(voice_file_path)
+```
+
+#### Status of Restoration Job / Retrieve Results
+Once you queue a job for restoration using the `.restore()` method you will receive an associated job id (uuid).
+To get the status and the link to receive the results of your job you call the `.get()` method as following.
+
+```python
+client.restorations.get(job_id = job_id)
+```
+
+
+
+#### Restoration with a Transcript and Language Code
+For better restoration quality, you can provide a transcript of the audio and specify a language code (default is English). Here's how:
+
+```python
+voice_file_path = 'example.wav'
+transcript = 'Example Transcript' # Specify Transcript
+lang_code = 'eng-us'  # Specify language code
+is_transcript_file = False # Transcript is string
+response = client.restorations.restore(voice_file_path, transcript, lang_code)
+```
+
+#### Restoration with a Transcript File
+If you have the transcript stored in a file, you can use it instead of a transcript string:
+
+```python
+voice_file_path = 'example.wav'
+transcript = 'example.txt'
+lang_code = 'eng-us'
+is_transcript_file = True # Switch this to true to feed in a file as transcript.
+response = client.restorations.restore(voice_file_path, transcript, lang_code)
+```
+**NOTE:** You have to set is_transcript_file to true for the program to read this as a file rather than a string.
+
+
+**Note:** Providing a transcript significantly improves the restoration quality of your audio clip. If no transcript is provided, the output may not be as refined.
+
+
 ### Agents
 
 🚀 New Feature Alert! 🚀
