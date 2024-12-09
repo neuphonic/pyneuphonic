@@ -10,14 +10,19 @@ class Restore(Endpoint):
         audio_path: str,
         transcript: str = '',
         lang_code: str = 'eng-us',
+        is_transcript_file: bool = False,
     ):
-        # if transcript is a path
-        if os.path.isabs(transcript):
-            files = {
-                'audio_file': open(audio_path, 'rb'),
-                'transcript': open(transcript, 'rb'),
-            }
-            data = {'lang_code': lang_code}
+        if is_transcript_file:
+            # if transcript is a path
+            if os.path.exists(transcript) and os.path.isfile(transcript):
+                files = {
+                    'audio_file': open(audio_path, 'rb'),
+                    'transcript': open(transcript, 'rb'),
+                }
+                data = {'lang_code': lang_code}
+            else:
+                raise ValueError('No valid file found at the provided path.')
+
         # if transcript is a string
         else:
             files = {'audio_file': open(audio_path, 'rb')}
