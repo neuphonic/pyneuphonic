@@ -7,9 +7,9 @@ For support or to get involved, join our [Discord](https://discord.gg/G258vva7gZ
 - [PyNeuphonic](#pyneuphonic)
   - [Documentation](#documentation)
     - [Installation](#installation)
+      - [API Key](#api-key)
     - [Voices](#voices)
       - [Get Voices](#get-voices)
-      - [Clone Voice](#clone-voice)
     - [Audio Generation](#audio-generation)
       - [SSE (Server Side Events)](#sse-server-side-events)
       - [Asynchronous SSE](#asynchronous-sse)
@@ -35,38 +35,25 @@ To use these utilities, please also `pip install pyaudio`.
 > :warning: Mac users encountering a `'portaudio.h' file not found` error can resolve it by running
 > `brew install portaudio`.
 
+#### API Key
+Get your API key from the [Neuphonic website](https://beta.neuphonic.com) and set it in your
+environment, for example:
+```bash
+export NEUPHONIC_API_TOKEN=<YOUR API KEY HERE>
+```
+
 ### Voices
-
 #### Get Voices
-
 To get all available voices you can run the following snippet.
-
 ```python
 from pyneuphonic import Neuphonic
 import os
 
 client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_TOKEN'))
 voices = client.voices.get()  # get's all available voices
-print(voices)
-```
 
-
-#### Clone Voice
-
-To clone a voice based on a audio file, you can run the following snippet.
-
-```python
-from pyneuphonic import Neuphonic
-import os
-
-client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_TOKEN'))
-
-voice_file_path = 'XXX.wav'
-
-result = client.voices.clone(voice_name='NewNeuphonic', voice_tags=['tag1', 'tag2'], voice_file_path = voice_file_path)
-
-print(result['data']['message'])
-
+for voice in voices:
+    print(voice)
 ```
 
 If you have successfully cloned a voice, the following message will be displayed: "Voice has successfully been cloned with ID XXXXXXX." Once cloned, you can use this voice just like any of the standard voices when calling the TTS (Text-to-Speech) service.
@@ -120,13 +107,7 @@ result = client.voices.update(voice_id=XXX)
 print(result)
 ```
 
-
 ### Audio Generation
-
-When generating audio, you can customize the process by setting various parameters in the **TTSConfig**. These parameters include options such as speed, voice, model, temperature, and more.
-
-Both standard voices and your cloned voices are supported, and you can specify them using their respective voice IDs.
-
 #### SSE (Server Side Events)
 ```python
 from pyneuphonic import Neuphonic, TTSConfig
@@ -137,8 +118,12 @@ client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_TOKEN'))
 
 sse = client.tts.SSEClient()
 
-# TTSConfig is a pydantic model so check out the source code for all valid options, such as speed and voice
-tts_config = TTSConfig(speed=1.05,  voice='ebf2c88e-e69d-4eeb-9b9b-9f3a648787a5')
+# TTSConfig is a pydantic model so check out the source code for all valid options
+tts_config = TTSConfig(
+    model='neu_hq',
+    speed=1.05,
+    voice='e564ba7e-aa8d-46a2-96a8-8dffedade48f'  # use client.voices.get() to view all voice ids
+)
 
 # Create an audio player with `pyaudio`
 with AudioPlayer() as player:
@@ -160,7 +145,7 @@ async def main():
 
     sse = client.tts.AsyncSSEClient()
 
-    # Change the voice used for the audio by changing the ID below.
+    # Set the desired configurations: playback speed and voice
     tts_config = TTSConfig(speed=1.05, voice='ebf2c88e-e69d-4eeb-9b9b-9f3a648787a5')
 
     async with AsyncAudioPlayer() as player:
@@ -185,7 +170,7 @@ async def main():
 
     ws = client.tts.AsyncWebsocketClient()
 
-    # Change the voice used for the audio by changing the ID below.
+    # Set the desired voice
     tts_config = TTSConfig(voice='ebf2c88e-e69d-4eeb-9b9b-9f3a648787a5')
 
     player = AsyncAudioPlayer()
@@ -226,13 +211,34 @@ in [snippets/sse/save_audio.py](./snippets/sse/save_audio.py) and
 do this.
 
 ### Agents
-🚀 Exciting New Feature Alert! 🚀
 
-Stay tuned for the upcoming release of our **Agents** feature! 🤖✨
-With Agents, you'll be able to create, manage, and interact with intelligent virtual assistants like
-never before.
+🚀 New Feature Alert! 🚀
 
-🔜 **Coming Soon!** 🔜
+With Agents, you'll be able to create, manage, and interact with intelligent AI assistants. You can create an agent
+easily using the example here:
+
+```python
+import os
+import asyncio
+
+from pyneuphonic import Neuphonic, Agent, AgentConfig
+
+
+async def main():
+    client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_TOKEN'))
+
+    agent_id = client.agents.create(
+        name='Agent 1',
+        prompt='You are a helpful agent. Answer in 10 words or less.',
+        greeting='Hi, how can I help you today?'
+    )['data']['id']
+
+    agent = Agent(client, agent_id=agent_id, tts_model='neu_hq')
+
+    await agent.start()
+
+asyncio.run(main())
+```
 
 ## Example Applications
 Check out the [snippets](./snippets/) folder for some example applications.

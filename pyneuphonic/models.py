@@ -18,8 +18,9 @@ class BaseConfig(BaseModel):
 
 class AgentConfig(BaseConfig):
     agent_id: Optional[str] = None
-    endpointing: float = 500
+    endpointing: float = 50
     sampling_rate: int = 16000
+    mode: str = 'asr-llm-tts'
 
 
 class TTSConfig(BaseConfig):
