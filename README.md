@@ -56,6 +56,57 @@ for voice in voices:
     print(voice)
 ```
 
+If you have successfully cloned a voice, the following message will be displayed: "Voice has successfully been cloned with ID XXXXXXX." Once cloned, you can use this voice just like any of the standard voices when calling the TTS (Text-to-Speech) service.
+
+To view a list of all available voices (including the voices you have cloned), simply call the `client.voices.get(api_key="")` endpoint.
+
+
+#### Update Voice
+
+To update a voice which already exists, i.e. update the reference clip for a voice name you already have provided you can do as follows.
+
+Update based on the new clip and the old name:
+
+```python
+
+voice_file_path = 'XXX.wav'
+
+result = client.voices.update(voice_file_path = voice_file_path,
+voice_name='NewNeuphonic')
+
+print(result)
+```
+
+
+Alternatively, if you wanna provide the voice id:
+```python
+result = client.voices.update(voice_file_path = voice_file_path,
+voice_id=XXX)
+
+print(result)
+```
+
+#### Delete Voice
+
+To delete a voice which already exists.
+
+```python
+
+voice_file_path = 'XXX.wav'
+
+result = client.voices.update(voice_name='NewNeuphonic')
+
+print(result)
+```
+
+Alternatively, if you wanna provide the voice id:
+
+```python
+result = client.voices.update(voice_id=XXX)
+
+print(result)
+```
+
 ### Audio Generation
 #### SSE (Server Side Events)
 ```python
