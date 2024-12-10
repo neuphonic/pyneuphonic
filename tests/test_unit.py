@@ -3,10 +3,12 @@ import pytest
 import tempfile
 import wave
 from pytest_mock import MockerFixture
-from pyneuphonic import Neuphonic, TTSConfig
-from pyneuphonic.models import VoiceItem, APIResponse, TTSResponse, to_dict
 from pydantic import BaseModel
 import uuid
+from pyneuphonic import Neuphonic, TTSConfig
+from pyneuphonic.models import VoiceItem, APIResponse, TTSResponse, to_dict
+
+from unittest.mock import MagicMock
 
 
 def test_tts_config():
@@ -88,7 +90,7 @@ async def test_websocket_async(client: Neuphonic, mocker: MockerFixture):
 
 
 @pytest.mark.asyncio
-def test_get_voices(client: Neuphonic, mocker: MockerFixture):
+async def test_get_voices(client: Neuphonic, mocker: MockerFixture):
     mock_response = mocker.Mock()
     mock_response.is_success = True
 
@@ -134,7 +136,7 @@ class CloneVoiceResponse(BaseModel):
 
 
 @pytest.mark.asyncio
-def test_clone_voice(client: Neuphonic, mocker: MockerFixture):
+async def test_clone_voice(client: Neuphonic, mocker: MockerFixture):
     # Set up inputs
     voice_name = 'TestVoice-SDK'
     voice_tags = ['tag1', 'tag2']
@@ -220,10 +222,94 @@ def test_delete_voice(client: Neuphonic, mocker: MockerFixture):
     # Deserialize response into the correct response model
     delete_voice_response = CloneVoiceResponse(**delete_response)
 
-
     # Check the response message
     assert 'Voice was successfully deleted' in delete_voice_response.data.message
     assert delete_voice_response.data.voice_id == voice_id
+
+
+# Example of a test where the HTTP post is mocked
+def test_restore_with_transcript_file_success(client: Neuphonic, mocker: MockerFixture):
+    # Mock the response of httpx.post
+    mock_response = MagicMock()
+    mock_response.is_success = True
+    mock_response.json.return_value = {'status': 'success', 'job_id': '1234'}
+
+    mock_http_post = mocker.patch('httpx.post', autospec=True)
+    mock_http_post.return_value = mock_response
+
+    with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as temp_file:
+        audio_path = temp_file.name
+
+    with tempfile.NamedTemporaryFile(suffix='.txt', delete=False) as temp_file:
+        transcript_file = temp_file.name
+
+    result = client.restorations.restore(
+        audio_path, transcript_file, is_transcript_file=True
+    )
+
+    assert result['status'] == 'success'
+    assert result['job_id'] == '1234'
+
+
+# Example of a test where the HTTP post is mocked
+def test_restore_with_transcript_string_success(
+    client: Neuphonic, mocker: MockerFixture
+):
+    # Mock the response of httpx.post
+    mock_response = MagicMock()
+    mock_response.is_success = True
+    mock_response.json.return_value = {'status': 'success', 'job_id': '1234'}
+
+    mock_http_post = mocker.patch('httpx.post', autospec=True)
+    mock_http_post.return_value = mock_response
+
+    with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as temp_file:
+        audio_path = temp_file.name
+
+    result = client.restorations.restore(
+        audio_path, 'transcript.txt', is_transcript_file=False
+    )
+
+    assert result['status'] == 'success'
+    assert result['job_id'] == '1234'
+
+
+# Example of a test where the HTTP post is mocked
+def test_restore_with_transcript_string_failure(
+    client: Neuphonic, mocker: MockerFixture
+):
+    # Mock the response of httpx.post
+    mock_response = MagicMock()
+    mock_response.is_success = True
+    # mock_response.json.return_value = {"status": "success", "job_id": "1234"}
+
+    mock_http_post = mocker.patch('httpx.post', autospec=True)
+    mock_http_post.return_value = mock_response
+
+    with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as temp_file:
+        audio_path = temp_file.name
+
+    with pytest.raises(ValueError, match='No valid file found at the provided path.'):
+        client.restorations.restore(
+            audio_path, 'transcript.txt', is_transcript_file=True
+        )
+
+
+def test_restore_get(client: Neuphonic, mocker: MockerFixture):
+    # Mock the response of httpx.post
+    mock_response = MagicMock()
+    mock_response.is_success = True
+    mock_response.json.return_value = {'status': 'Finished', 'job_id': '1234'}
+
+    mock_http_post = mocker.patch('httpx.get', autospec=True)
+    mock_http_post.return_value = mock_response
+
+    with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as temp_file:
+        audio_path = temp_file.name
+
+    result = client.restorations.get(job_id='1234')
+
+    assert result['status'] == 'Finished'
 
 
 class AgentResponse(BaseModel):
