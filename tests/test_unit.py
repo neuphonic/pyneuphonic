@@ -299,7 +299,7 @@ def test_restore_get(client: Neuphonic, mocker: MockerFixture):
     # Mock the response of httpx.post
     mock_response = MagicMock()
     mock_response.is_success = True
-    mock_response.json.return_value = {'status': 'success', 'job_id': '1234'}
+    mock_response.json.return_value = {'status': 'Finished', 'job_id': '1234'}
 
     mock_http_post = mocker.patch('httpx.get', autospec=True)
     mock_http_post.return_value = mock_response
@@ -307,7 +307,7 @@ def test_restore_get(client: Neuphonic, mocker: MockerFixture):
     with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as temp_file:
         audio_path = temp_file.name
 
-    result = client.restorations.get(job_id='hihi')
+    result = client.restorations.get(job_id='1234')
 
     assert result['status'] == 'Finished'
 
