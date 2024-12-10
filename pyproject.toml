@@ -1,7 +1,7 @@
 # POETRY CONFIG
 [tool.poetry]
 name = "pyneuphonic"
-version = "1.3.0"
+version = "1.3.1"
 description = "A python SDK for the Neuphonic TTS Engine."
 authors = ["Neuphonic <support@neuphonic.com>"]
 readme = "README.md"
