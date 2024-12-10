@@ -90,7 +90,7 @@ async def test_websocket_async(client: Neuphonic, mocker: MockerFixture):
 
 
 @pytest.mark.asyncio
-def test_get_voices(client: Neuphonic, mocker: MockerFixture):
+async def test_get_voices(client: Neuphonic, mocker: MockerFixture):
     mock_response = mocker.Mock()
     mock_response.is_success = True
 
@@ -136,7 +136,7 @@ class CloneVoiceResponse(BaseModel):
 
 
 @pytest.mark.asyncio
-def test_clone_voice(client: Neuphonic, mocker: MockerFixture):
+async def test_clone_voice(client: Neuphonic, mocker: MockerFixture):
     # Set up inputs
     voice_name = 'TestVoice-SDK'
     voice_tags = ['tag1', 'tag2']
