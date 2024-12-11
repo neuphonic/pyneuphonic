@@ -43,7 +43,21 @@ class Restore(Endpoint):
         # Return the JSON response content as a dictionary
         return response.json()
 
-    def get(self, job_id):
+    def jobs(self):
+        response = httpx.get(f'{self.http_url}/restore', headers=self.headers)
+
+        # Handle response errors
+        if not response.is_success:
+            raise httpx.HTTPStatusError(
+                f'Failed to get status of this restoration job. Status code: {response.status_code}. Error: {response.text}',
+                request=response.request,
+                response=response,
+            )
+
+        # Return the JSON response content as a dictionary
+        return response.json()
+
+    def get(self, job_id=None):
         response = httpx.get(f'{self.http_url}/restore/{job_id}', headers=self.headers)
 
         # Handle response errors
