@@ -261,7 +261,7 @@ print(status) # Dictionary with the status of the job and the url where you can 
 
 #### List all Active and Historic Jobs
 
-To list all your active and historical jobs you can run the `.jobs()` function.
+To list all your active and previous jobs you can run the `.jobs()` function.
 
 ```python
 jobs = client.restorations.jobs()
