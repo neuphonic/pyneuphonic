@@ -56,10 +56,29 @@ for voice in voices:
     print(voice)
 ```
 
+#### Clone Voice
+
+To clone a voice based on a audio file, you can run the following snippet.
+
+```python
+from pyneuphonic import Neuphonic
+import os
+
+client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_TOKEN'))
+
+voice_file_path = 'XXX.wav'
+
+result = client.voices.clone(voice_name='NewNeuphonic', voice_tags=['tag1', 'tag2'], voice_file_path = voice_file_path)
+
+print(result['data']['message'])
+
+```
+
 If you have successfully cloned a voice, the following message will be displayed: "Voice has successfully been cloned with ID XXXXXXX." Once cloned, you can use this voice just like any of the standard voices when calling the TTS (Text-to-Speech) service.
 
 To view a list of all available voices (including the voices you have cloned), simply call the `client.voices.get(api_key="")` endpoint.
 
+**Note:** Your voice reference clip must meet the following criteria: it should be at least 6 seconds long, in .mp3 or .wav format, and no larger than 10 MB in size.
 
 #### Update Voice
 
@@ -85,6 +104,7 @@ voice_id=XXX)
 
 print(result)
 ```
+**Note:** Your voice reference clip must meet the following criteria: it should be at least 6 seconds long, in .mp3 or .wav format, and no larger than 10 MB in size.
 
 #### Delete Voice
 
@@ -214,23 +234,30 @@ do this.
 
 Speech restoration involves enhancing and repairing degraded audio to improve its clarity, intelligibility, and overall quality, all while preserving the original content. Follow these simple steps to restore your audio clips:
 
+**Note:** Your audio clip must meet the following criteria: it should be in .mp3 or .wav format, and no larger than 10 MB in size.
+
 #### Basic Restoration
 To restore an audio clip without additional input, use the following code:
 
 ```python
 voice_file_path = 'example.wav'
 response = client.restorations.restore(voice_file_path)
-```
 
-#### Status of Restoration Job / Retrieve Results
-Once you queue a job for restoration using the `.restore()` method you will receive an associated job id (uuid).
+print(response) # A dictionary containing the job_id 
+
+job_id = response['job_id']
+status = client.restorations.get(response['job_id'])
+```
+If the job is completed, the status will include the URL where you can access the results (file_url). If the status is 'Not Finished,' please wait a moment before rerunning restorations.get(). Once the status changes to 'Finished,' you will be able to retrieve the results.
+
+#### Get Status of Restoration Job / Retrieve Results
+Once you queue a job for restoration using the `.restore()` method you will receive an associated job id (uuid) as a member of the response.
 To get the status and the link to receive the results of your job you call the `.get()` method as following.
 
 ```python
-client.restorations.get(job_id = job_id)
+status = client.restorations.get(job_id = job_id)
+print(status) # Dictionary with the status of the job and the url where you can retrieve the results.
 ```
-
-
 
 #### Restoration with a Transcript and Language Code
 For better restoration quality, you can provide a transcript of the audio and specify a language code (default is English). Here's how:
@@ -253,8 +280,7 @@ lang_code = 'eng-us'
 is_transcript_file = True # Switch this to true to feed in a file as transcript.
 response = client.restorations.restore(voice_file_path, transcript, lang_code)
 ```
-**NOTE:** You have to set is_transcript_file to true for the program to read this as a file rather than a string.
-
+**Note:** You have to set is_transcript_file to true for the program to read this as a file rather than a string.
 
 **Note:** Providing a transcript significantly improves the restoration quality of your audio clip. If no transcript is provided, the output may not be as refined.
 
