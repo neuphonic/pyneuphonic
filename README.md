@@ -243,7 +243,7 @@ To restore an audio clip without additional input, use the following code:
 voice_file_path = 'example.wav'
 response = client.restorations.restore(voice_file_path)
 
-print(response) # A dictionary containing the job_id 
+print(response) # A dictionary containing the job_id
 
 job_id = response['job_id']
 status = client.restorations.get(response['job_id'])
@@ -258,6 +258,16 @@ To get the status and the link to receive the results of your job you call the `
 status = client.restorations.get(job_id = job_id)
 print(status) # Dictionary with the status of the job and the url where you can retrieve the results.
 ```
+
+#### List all Active and Historic Jobs
+
+To list all your active and historical jobs you can run the `.jobs()` function.
+
+```python
+jobs = client.restorations.jobs()
+print(jobs)
+```
+
 
 #### Restoration with a Transcript and Language Code
 For better restoration quality, you can provide a transcript of the audio and specify a language code (default is English). Here's how:
