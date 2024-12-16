@@ -54,7 +54,7 @@ class Voices(Endpoint):
 
         # Prepare the multipart form-data payload
         data = {
-            'voice_tags': '{' + (', ').join(voice_tags) + '}',
+            'voice_tags': voice_tags,
         }
         files = {'voice_file': open(voice_file_path, 'rb')}
 
@@ -79,7 +79,12 @@ class Voices(Endpoint):
         return response.json()
 
     def update(
-        self, voice_file_path: str, voice_id: str = None, voice_name: str = None
+        self,
+        new_voice_file_path: str,
+        voice_id: str = None,
+        voice_name: str = None,
+        new_voice_name: str = None,
+        new_voice_tags: list[str] = None,
     ) -> dict:
         """
         Update a voice by its ID or name.
@@ -117,10 +122,15 @@ class Voices(Endpoint):
                     f'No voice found with the name {voice_name}. You cannot update this voice.'
                 )
 
-        files = {'voice_file': open(voice_file_path, 'rb')}
+        data = {
+            'new_voice_tags': new_voice_tags,
+        }
+
+        files = {'new_voice_file': open(new_voice_file_path, 'rb')}
 
         response = httpx.patch(
-            f'{self.http_url}/voices/clone?voice_id={voice_id}',
+            f'{self.http_url}/voices/clone?voice_id={voice_id}&new_voice_name={new_voice_name}',
+            data=data,
             headers=self.headers,
             timeout=self.timeout,
             files=files,
