@@ -54,7 +54,7 @@ class Voices(Endpoint):
 
         # Prepare the multipart form-data payload
         data = {
-            'voice_tags': voice_tags,
+            'voice_tags': '{' + (', ').join(voice_tags) + '}',
         }
         files = {'voice_file': open(voice_file_path, 'rb')}
 
