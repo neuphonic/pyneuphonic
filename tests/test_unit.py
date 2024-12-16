@@ -140,6 +140,7 @@ async def test_clone_voice(client: Neuphonic, mocker: MockerFixture):
     # Set up inputs
     voice_name = 'TestVoice-SDK'
     voice_tags = ['tag1', 'tag2']
+    voice_tags_adapted = '{"tag1", "tag2"}'
 
     # Mock the file content
     with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as temp_file:
@@ -180,7 +181,7 @@ async def test_clone_voice(client: Neuphonic, mocker: MockerFixture):
         base_url = os.getenv('NEUPHONIC_API_URL', 'default-api-url')
         mock_post.assert_called_once_with(
             f'https://{base_url}/voices/clone?voice_name={voice_name}',
-            data={'voice_tags': voice_tags},
+            data={'voice_tags': voice_tags_adapted},
             files={'voice_file': mocker.ANY},  # Matches the file object
             headers={'x-api-key': mocker.ANY},  # Ensure the API key is present
             timeout=10,
