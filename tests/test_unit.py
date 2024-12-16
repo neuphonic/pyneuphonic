@@ -140,7 +140,7 @@ async def test_clone_voice(client: Neuphonic, mocker: MockerFixture):
     # Set up inputs
     voice_name = 'TestVoice-SDK'
     voice_tags = ['tag1', 'tag2']
-    voice_tags_adapted = '{"tag1", "tag2"}'
+    voice_tags_adapted = '{tag1, tag2}'
 
     # Mock the file content
     with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as temp_file:
