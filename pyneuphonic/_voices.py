@@ -52,8 +52,12 @@ class Voices(Endpoint):
             If the request to clone the voice fails.
         """
 
+        # Convert voice tags to a string
+        if voice_tags:
+            voice_tags = (', ').join(voice_tags)
+
         # Prepare the multipart form-data payload
-        data = {
+        params = {
             'voice_tags': voice_tags,
         }
         files = {'voice_file': open(voice_file_path, 'rb')}
@@ -61,7 +65,7 @@ class Voices(Endpoint):
         # Send the POST request with voice_name as a query parameter
         response = httpx.post(
             f'{self.http_url}/voices/clone?voice_name={voice_name}',
-            data=data,
+            params=params,
             files=files,
             headers=self.headers,
             timeout=self.timeout,
@@ -85,7 +89,6 @@ class Voices(Endpoint):
         voice_name: str = None,
         new_voice_name: str = '',
         new_voice_tags: list[str] = None,
-        remove_voice_tags: list[str] = None,
     ) -> dict:
         """
         Update a voice by its ID or name.
@@ -124,27 +127,29 @@ class Voices(Endpoint):
                     f'No voice found with the name {voice_name}. You cannot update this voice.'
                 )
 
+        # Convert voice tags to a string
+        if new_voice_tags:
+            new_voice_tags = (', ').join(new_voice_tags)
+
         # If voice_file is not given
         if new_voice_file_path is None:
-            data = {
+            params = {
                 'new_voice_tags': new_voice_tags,
-                'remove_voice_tags': remove_voice_tags,
                 'new_voice_file': new_voice_file_path,
             }
             files = {}
 
         # If voice file is given
         else:
-            data = {
+            params = {
                 'new_voice_tags': new_voice_tags,
-                'remove_voice_tags': remove_voice_tags,
             }
             files = {'new_voice_file': open(new_voice_file_path, 'rb')}
 
         # Call API
         response = httpx.patch(
             f'{self.http_url}/voices/clone?voice_id={voice_id}&new_voice_name={new_voice_name}',
-            data=data,
+            params=params,
             headers=self.headers,
             timeout=self.timeout,
             files=files,
