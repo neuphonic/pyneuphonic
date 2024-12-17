@@ -26,6 +26,23 @@ class Voices(Endpoint):
 
         return voice_response.data.voices
 
+    def voice(self, voice_id):
+        """Get information about specific voice."""
+        response = httpx.get(
+            f'{self.http_url}/voices/{voice_id}',
+            headers=self.headers,
+            timeout=self.timeout,
+        )
+
+        if not response.is_success:
+            raise httpx.HTTPStatusError(
+                f'Failed to fetch voice. Status code: {response.status_code}. Error: {response.text}',
+                request=response.request,
+                response=response,
+            )
+
+        return response.json()
+
     def clone(
         self, voice_name: str, voice_file_path: str, voice_tags: List[str] = []
     ) -> dict:

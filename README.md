@@ -56,6 +56,14 @@ for voice in voices:
     print(voice)
 ```
 
+#### Get Voice
+To get information about an existing voice please call.
+```
+voice= client.voices.voice(voice_id=XXX)  # Gets information about the selected voice id
+print(voice) # Response contains all information about this voice
+```
+
+
 #### Clone Voice
 
 To clone a voice based on a audio file, you can run the following snippet.
