@@ -102,13 +102,9 @@ print(result)
 ```
 
 You can feed in your desired update in these attributes:
-- new_voice_name = 'NewNeuphonic'
-- new_voice_file_path = ...
-- new_voice_tags=["new-tag1", ..., "new-tag2"]
-- remove_voice_tags=["remove-tag1", ..., "remove-tag2"] - If you put in tags that do not exists in the list previously nothing will be updated.
-
-
-
+- `new_voice_name` = 'NewNeuphonic'
+- `new_voice_file_path` = ...
+- `new_voice_tags`=["new-tag1", ..., "new-tag2"] - Overwrites all preexisting voice tags
 
 
 **Note:** Your voice reference clip must meet the following criteria: it should be at least 6 seconds long, in .mp3 or .wav format, and no larger than 10 MB in size.
