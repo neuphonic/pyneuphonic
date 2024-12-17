@@ -80,11 +80,12 @@ class Voices(Endpoint):
 
     def update(
         self,
-        new_voice_file_path: str,
+        new_voice_file_path: str = None,
         voice_id: str = None,
         voice_name: str = None,
-        new_voice_name: str = None,
+        new_voice_name: str = '',
         new_voice_tags: list[str] = None,
+        remove_voice_tags: list[str] = None,
     ) -> dict:
         """
         Update a voice by its ID or name.
@@ -108,6 +109,7 @@ class Voices(Endpoint):
             permissions to update the voice.
         """
 
+        # Accept case if user only provide name
         if not voice_id:
             # Get all voices for this user
             voices = self.get()
@@ -122,12 +124,24 @@ class Voices(Endpoint):
                     f'No voice found with the name {voice_name}. You cannot update this voice.'
                 )
 
-        data = {
-            'new_voice_tags': new_voice_tags,
-        }
+        # If voice_file is not given
+        if new_voice_file_path is None:
+            data = {
+                'new_voice_tags': new_voice_tags,
+                'remove_voice_tags': remove_voice_tags,
+                'new_voice_file': new_voice_file_path,
+            }
+            files = {}
 
-        files = {'new_voice_file': open(new_voice_file_path, 'rb')}
+        # If voice file is given
+        else:
+            data = {
+                'new_voice_tags': new_voice_tags,
+                'remove_voice_tags': remove_voice_tags,
+            }
+            files = {'new_voice_file': open(new_voice_file_path, 'rb')}
 
+        # Call API
         response = httpx.patch(
             f'{self.http_url}/voices/clone?voice_id={voice_id}&new_voice_name={new_voice_name}',
             data=data,

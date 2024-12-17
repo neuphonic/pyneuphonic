@@ -82,28 +82,35 @@ To view a list of all available voices (including the voices you have cloned), s
 
 #### Update Voice
 
-To update a voice which already exists, i.e. update the reference clip for a voice name you already have provided you can do as follows.
+You can update the reference clip, the voice name and the tags for the user.
+You have to feed in one or multiple of voice name (`new_voice_name`),
+file_path (`new_voice_file_path`) and tags (`new_voice_tags`, `remove_voice_tags`) for the voice to be updated accordingly.
 
 Update based on the new clip and the old name:
 
 ```python
-
-voice_file_path = 'XXX.wav'
-
-result = client.voices.update(voice_file_path = voice_file_path,
-voice_name='NewNeuphonic')
+result = client.voices.update(voice_name='NewNeuphonic', ...)
 
 print(result)
 ```
-
 
 Alternatively, if you wanna provide the voice id:
 ```python
-result = client.voices.update(voice_file_path = voice_file_path,
-voice_id=XXX)
+result = client.voices.update(voice_id=XXX, ...)
 
 print(result)
 ```
+
+You can feed in your desired update in these attributes:
+- new_voice_name = 'NewNeuphonic'
+- new_voice_file_path = ...
+- new_voice_tags=["new-tag1", ..., "new-tag2"]
+- remove_voice_tags=["remove-tag1", ..., "remove-tag2"] - If you put in tags that do not exists in the list previously nothing will be updated.
+
+
+
+
+
 **Note:** Your voice reference clip must meet the following criteria: it should be at least 6 seconds long, in .mp3 or .wav format, and no larger than 10 MB in size.
 
 #### Delete Voice
