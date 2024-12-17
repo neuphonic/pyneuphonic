@@ -26,8 +26,42 @@ class Voices(Endpoint):
 
         return voice_response.data.voices
 
-    def voice(self, voice_id):
-        """Get information about specific voice."""
+    def voice(self, voice_id: str = None, voice_name: str = None):
+        """Get information about specific voice.
+
+        Parameters
+        ----------
+        voice_name : str
+            The voice name you want to retreive the information for.
+        voice_id : str
+            The voice id you want to retreive the information for.
+
+        Returns
+        -------
+        dict
+            A dictionary with the response data from the API.
+
+        Raises
+        ------
+        httpx.HTTPStatusError
+            If the request to clone the voice fails.
+        """
+
+        # Accept case if user only provide name
+        if not voice_id:
+            # Get all voices for this user
+            voices = self.get()
+            try:
+                # Fetch voice id
+                voice_id = next(
+                    voice.id for voice in voices if voice.name == voice_name
+                )
+
+            except StopIteration as e:
+                raise ValueError(
+                    f'No voice found with the name {voice_name}. You cannot update this voice.'
+                )
+
         response = httpx.get(
             f'{self.http_url}/voices/{voice_id}',
             headers=self.headers,
