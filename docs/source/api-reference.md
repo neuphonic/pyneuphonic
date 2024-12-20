@@ -1,116 +1,329 @@
-# API Reference
-The Neuphonic text-to-speech (TTS) API is composed primarily of two endpoints, serving a websocket
-API and a server side events (SSE) API.
-For the lowest latency, we recommend opting for the websocket API.
+# PyNeuphonic
+The official Neuphonic Python library providing simple, convenient access to the Neuphonic text-to-speech websocket
+API from any Python 3.9+ application.
 
-The API is located at:
- - Websocket: `wss://eu-west-1.api.neuphonic.com`
- - HTTP: `https://eu-west-1.api.neuphonic.com`
+For support or to get involved, join our [Discord](https://discord.gg/G258vva7gZ)!
 
-We deploy our servers as close to you as possible to give you the lowest latency.
-Currently, we have deployments in `eu-west-1`, if you are unhappy with the latency in your region,
-shoot us a message and we can get this resolved!
+- [PyNeuphonic](#pyneuphonic)
+  - [Documentation](#documentation)
+    - [Installation](#installation)
+      - [API Key](#api-key)
+    - [Voices](#voices)
+      - [Get Voices](#get-voices)
+    - [Audio Generation](#audio-generation)
+      - [SSE (Server Side Events)](#sse-server-side-events)
+      - [Asynchronous SSE](#asynchronous-sse)
+      - [Asynchronous Websocket](#asynchronous-websocket)
+    - [Saving Audio](#saving-audio)
+    - [Agents](#agents)
+  - [Example Applications](#example-applications)
 
-## Authentication
-All requests to the TTS API must contain the `x-api-key` header or `api_key` query parameter to
-authenticate your request.
-```{code-block} python
-:caption: Websocket authentication
-import websockets
+## Documentation
+See [https://docs.neuphonic.com](https://docs.neuphonic.com) for the complete API documentation.
 
-ws = await websockets.connect(
-    'wss://eu-west-1.api.neuphonic.com/speak/en',
-    extra_headers={'x-api-key': '<API_TOKEN>'},
-)
+### Installation
+Install this package into your environment using your chosen package manager:
 
-await ws.send({'text': 'Hello, world!'})
+```bash
+pip install pyneuphonic
 ```
 
-```{code-block} python
-:caption: SSE authentication
-import httpx
+In most cases, you will be playing the audio returned from our servers directly on your device.
+We offer utilities to play audio through your device's speakers using `pyaudio`.
+To use these utilities, please also `pip install pyaudio`.
 
-with httpx.stream(
-    method='POST',
-    url='https://eu-west-1.api.neuphonic.com/sse/speak/en',
-    headers={'x-api-key': '<API_TOKEN>'},
-    json={'text': 'Hello, World!'},
-) as response:
-    for message in response.iter_lines():
-        print(message)
+> :warning: Mac users encountering a `'portaudio.h' file not found` error can resolve it by running
+> `brew install portaudio`.
+
+#### API Key
+Get your API key from the [Neuphonic website](https://beta.neuphonic.com) and set it in your
+environment, for example:
+```bash
+export NEUPHONIC_API_TOKEN=<YOUR API KEY HERE>
 ```
 
-## Voices
-To retrieve a list of all available voices, use the `/voices` endpoint.
-```{code-block} python
-:caption: Websocket authentication
-import httpx
+### Voices
+#### Get Voices
+To get all available voices you can run the following snippet.
+```python
+from pyneuphonic import Neuphonic
 import os
 
-response = httpx.get(
-    f'https://eu-west-1.api.neuphonic.com/voices',
-    headers={'x-api-key': os.environ.get('NEUPHONIC_API_TOKEN')},
+client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_TOKEN'))
+voices = client.voices.get()  # get's all available voices
+
+for voice in voices:
+    print(voice)
+```
+
+#### Clone Voice
+
+To clone a voice based on a audio file, you can run the following snippet.
+
+```python
+from pyneuphonic import Neuphonic
+import os
+
+client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_TOKEN'))
+
+voice_file_path = 'XXX.wav'
+
+result = client.voices.clone(voice_name='NewNeuphonic', voice_tags=['tag1', 'tag2'], voice_file_path = voice_file_path)
+
+print(result['data']['message'])
+
+```
+
+If you have successfully cloned a voice, the following message will be displayed: "Voice has successfully been cloned with ID XXXXXXX." Once cloned, you can use this voice just like any of the standard voices when calling the TTS (Text-to-Speech) service.
+
+To view a list of all available voices (including the voices you have cloned), simply call the `client.voices.get(api_key="")` endpoint.
+
+**Note:** Your voice reference clip must meet the following criteria: it should be at least 6 seconds long, in .mp3 or .wav format, and no larger than 10 MB in size.
+
+#### Update Voice
+
+To update a voice which already exists, i.e. update the reference clip for a voice name you already have provided you can do as follows.
+
+Update based on the new clip and the old name:
+
+```python
+
+voice_file_path = 'XXX.wav'
+
+result = client.voices.update(voice_file_path = voice_file_path,
+voice_name='NewNeuphonic')
+
+print(result)
+```
+
+
+Alternatively, if you wanna provide the voice id:
+```python
+result = client.voices.update(voice_file_path = voice_file_path,
+voice_id=XXX)
+
+print(result)
+```
+**Note:** Your voice reference clip must meet the following criteria: it should be at least 6 seconds long, in .mp3 or .wav format, and no larger than 10 MB in size.
+
+#### Delete Voice
+
+To delete a voice which already exists.
+
+```python
+
+voice_file_path = 'XXX.wav'
+
+result = client.voices.update(voice_name='NewNeuphonic')
+
+print(result)
+```
+
+Alternatively, if you wanna provide the voice id:
+
+```python
+result = client.voices.update(voice_id=XXX)
+
+print(result)
+```
+
+### Audio Generation
+#### SSE (Server Side Events)
+```python
+from pyneuphonic import Neuphonic, TTSConfig
+from pyneuphonic.player import AudioPlayer
+import os
+
+client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_TOKEN'))
+
+sse = client.tts.SSEClient()
+
+# TTSConfig is a pydantic model so check out the source code for all valid options
+tts_config = TTSConfig(
+    model='neu_hq',
+    speed=1.05,
+    voice='e564ba7e-aa8d-46a2-96a8-8dffedade48f'  # use client.voices.get() to view all voice ids
 )
 
-print(response.json())
-```
-Which will print a list of voices, with their corresponding `voice_id` and other metadata.
+# Create an audio player with `pyaudio`
+with AudioPlayer() as player:
+    response = sse.send('Hello, world!', tts_config=tts_config)
+    player.play(response)
 
-## Models
-We currently have two models:
- - **neu_fast** - Our dynamic, incremental TTS model which generates audio with extremely low latency.
- - **neu_hq** - Our higher quality model which generates better sounding audio, at the cost of a
-  small increase in latency.
-
-```{code-block} python
-:caption: Selecting the model (websocket)
-import websockets
-
-# Connect to the websocket with your desired parameters
-ws = await websockets.connect(
-    'wss://eu-west-1.api.neuphonic.com/speak/en?model=<MODEL>&voice=<VOICE_ID>"&...',
-    extra_headers={'x-api-key': '<API_TOKEN>'},
-)
-
-await ws.send({'text': 'Hello, world!'})
+    player.save_audio('output.wav')  # save the audio to a .wav file
 ```
 
-```{code-block} python
-:caption: Selecting the model (SSE)
-import httpx
+#### Asynchronous SSE
+```python
+from pyneuphonic import Neuphonic, TTSConfig
+from pyneuphonic.player import AsyncAudioPlayer
+import os
+import asyncio
 
-# Connect to the SSE with your desired parameters
-with httpx.stream(
-    method='POST',
-    url='https://eu-west-1.api.neuphonic.com/sse/speak/en',
-    headers={'x-api-key': '<API_TOKEN>'},
-    json={'text': 'Hello, World!', model: {model: '<MODEL>', voice: '<VOICE_ID>'}},
-) as response:
-    for message in response.iter_lines():
-        print(message)
+async def main():
+    client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_TOKEN'))
+
+    sse = client.tts.AsyncSSEClient()
+
+    # Set the desired configurations: playback speed and voice
+    tts_config = TTSConfig(speed=1.05, voice='ebf2c88e-e69d-4eeb-9b9b-9f3a648787a5')
+
+    async with AsyncAudioPlayer() as player:
+        response = sse.send('Hello, world!', tts_config=tts_config)
+        await player.play(response)
+
+        player.save_audio('output.wav')  # save the audio to a .wav file
+
+asyncio.run(main())
 ```
 
-### Options
-There are a variety of options that you can pass into the models to alter the audio output.
-These are all passed into the websocket as query parameters or in the body of the SSE request.
- - `model` - one of `neu_fast` or `neu_hq`.
- - `voice` - this is the `voice_id` for your desired voice.
- - `speed` - the audio playback speed. Can range from 0.7 to 1.6.
- - `temperature` - this is the randomness you want to introduce into the audio generation. Default
- is 0.5 and this must be between 0 and 1. This is only valid for the `neu_fast` model.
- - `sampling_rate` - this is the sampling rate of the returned audio. Default is 22050 and this must
- be either 22050 and 8000.
- - `encoding` - the encoding of the returned audio. Defaut is `pcm_linear` and this must be either
- `pcm_linear` or `pcm_mulaw` (the latter of which you would use if you were generating audio to be
- played on a phone call).
- - `language_id` - this is set at the end of the url `/speak/{language_id}` or `/sse/speak/{language_id}`
- and dictates the language used for the input text and output audio. We currently only offer english
- so this must be set to `en`.
+#### Asynchronous Websocket
+```python
+from pyneuphonic import Neuphonic, TTSConfig, WebsocketEvents
+from pyneuphonic.models import APIResponse, TTSResponse
+from pyneuphonic.player import AsyncAudioPlayer
+import os
+import asyncio
+
+async def main():
+    client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_TOKEN'))
+
+    ws = client.tts.AsyncWebsocketClient()
+
+    # Set the desired voice
+    tts_config = TTSConfig(voice='ebf2c88e-e69d-4eeb-9b9b-9f3a648787a5')
+
+    player = AsyncAudioPlayer()
+    await player.open()
+
+    # Attach event handlers. Check WebsocketEvents enum for all valid events.
+    async def on_message(message: APIResponse[TTSResponse]):
+        await player.play(message.data.audio)
+
+    async def on_close():
+        await player.close()
+
+    ws.on(WebsocketEvents.MESSAGE, on_message)
+    ws.on(WebsocketEvents.CLOSE, on_close)
+
+    await ws.open(tts_config=tts_config)
+
+    # A special symbol ' <STOP>' must be sent to the server, otherwise the server will wait for
+    # more text to be sent before generating the last few snippets of audio
+    await ws.send('Hello, world!', autocomplete=True)
+    await ws.send('Hello, world! <STOP>')  # Both the above line, and this line, are equivalent
+
+    await asyncio.sleep(3)  # let the audio play
+    player.save_audio('output.wav')  # save the audio to a .wav file
+    await ws.close()  # close the websocket and terminate the audio resources
+
+asyncio.run(main())
+```
+
+### Saving Audio
+As per the examples above, you can use the `AudioPlayer` object to save audio.
+```python
+player.save_audio('output.wav')
+```
+However, if you do not want to play audio and simply want to save it, check out the examples
+in [snippets/sse/save_audio.py](./snippets/sse/save_audio.py) and
+[snippets/websocket/save_audio.py](./snippets/websocket/save_audio.py) for examples on how to
+do this.
+
+### Speech Restoration
+
+Speech restoration involves enhancing and repairing degraded audio to improve its clarity, intelligibility, and overall quality, all while preserving the original content. Follow these simple steps to restore your audio clips:
+
+**Note:** Your audio clip must meet the following criteria: it should be in .mp3 or .wav format, and no larger than 10 MB in size.
+
+#### Basic Restoration
+To restore an audio clip without additional input, use the following code:
+
+```python
+voice_file_path = 'example.wav'
+response = client.restorations.restore(voice_file_path)
+
+print(response) # A dictionary containing the job_id
+
+job_id = response['job_id']
+status = client.restorations.get(response['job_id'])
+```
+If the job is completed, the status will include the URL where you can access the results (file_url). If the status is 'Not Finished,' please wait a moment before rerunning restorations.get(). Once the status changes to 'Finished,' you will be able to retrieve the results.
+
+#### Get Status of Restoration Job / Retrieve Results
+Once you queue a job for restoration using the `.restore()` method you will receive an associated job id (uuid) as a member of the response.
+To get the status and the link to receive the results of your job you call the `.get()` method as following.
+
+```python
+status = client.restorations.get(job_id = job_id)
+print(status) # Dictionary with the status of the job and the url where you can retrieve the results.
+```
+
+#### List all Active and Historic Jobs
+
+To list all your active and previous jobs you can run the `.jobs()` function.
+
+```python
+jobs = client.restorations.jobs()
+print(jobs)
+```
 
 
-## Playing Audio and SDKs
-We recommend checking out our [Python SDK](https://github.com/neuphonic/pyneuphonic) which simplifies a lot of the above and provides an
-easy way to interact, generate and play audio with the Neuphonic API.
+#### Restoration with a Transcript and Language Code
+For better restoration quality, you can provide a transcript of the audio and specify a language code (default is English). Here's how:
 
-Reach out to us at support@neuphonic.com you would like an SDK for another language or framework, or
-join our [Discord](https://discord.gg/G258vva7gZ).
+```python
+voice_file_path = 'example.wav'
+transcript = 'Example Transcript' # Specify Transcript
+lang_code = 'eng-us'  # Specify language code
+is_transcript_file = False # Transcript is string
+response = client.restorations.restore(voice_file_path, transcript, lang_code)
+```
+
+#### Restoration with a Transcript File
+If you have the transcript stored in a file, you can use it instead of a transcript string:
+
+```python
+voice_file_path = 'example.wav'
+transcript = 'example.txt'
+lang_code = 'eng-us'
+is_transcript_file = True # Switch this to true to feed in a file as transcript.
+response = client.restorations.restore(voice_file_path, transcript, lang_code)
+```
+**Note:** You have to set is_transcript_file to true for the program to read this as a file rather than a string.
+
+**Note:** Providing a transcript significantly improves the restoration quality of your audio clip. If no transcript is provided, the output may not be as refined.
+
+
+### Agents
+
+🚀 New Feature Alert! 🚀
+
+With Agents, you'll be able to create, manage, and interact with intelligent AI assistants. You can create an agent
+easily using the example here:
+
+```python
+import os
+import asyncio
+
+from pyneuphonic import Neuphonic, Agent, AgentConfig
+
+
+async def main():
+    client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_TOKEN'))
+
+    agent_id = client.agents.create(
+        name='Agent 1',
+        prompt='You are a helpful agent. Answer in 10 words or less.',
+        greeting='Hi, how can I help you today?'
+    )['data']['id']
+
+    agent = Agent(client, agent_id=agent_id, tts_model='neu_hq')
+
+    await agent.start()
+
+asyncio.run(main())
+```
+
+## Example Applications
+Check out the [snippets](./snippets/) folder for some example applications.
