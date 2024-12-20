@@ -26,6 +26,57 @@ class Voices(Endpoint):
 
         return voice_response.data.voices
 
+    def voice(self, voice_id: str = None, voice_name: str = None):
+        """Get information about specific voice.
+
+        Parameters
+        ----------
+        voice_name : str
+            The voice name you want to retreive the information for.
+        voice_id : str
+            The voice id you want to retreive the information for.
+
+        Returns
+        -------
+        dict
+            A dictionary with the response data from the API.
+
+        Raises
+        ------
+        httpx.HTTPStatusError
+            If the request to clone the voice fails.
+        """
+
+        # Accept case if user only provide name
+        if not voice_id:
+            # Get all voices for this user
+            voices = self.get()
+            try:
+                # Fetch voice id
+                voice_id = next(
+                    voice.id for voice in voices if voice.name == voice_name
+                )
+
+            except StopIteration as e:
+                raise ValueError(
+                    f'No voice found with the name {voice_name}. You cannot update this voice.'
+                )
+
+        response = httpx.get(
+            f'{self.http_url}/voices/{voice_id}',
+            headers=self.headers,
+            timeout=self.timeout,
+        )
+
+        if not response.is_success:
+            raise httpx.HTTPStatusError(
+                f'Failed to fetch voice. Status code: {response.status_code}. Error: {response.text}',
+                request=response.request,
+                response=response,
+            )
+
+        return response.json()
+
     def clone(
         self, voice_name: str, voice_file_path: str, voice_tags: List[str] = []
     ) -> dict:
@@ -52,8 +103,12 @@ class Voices(Endpoint):
             If the request to clone the voice fails.
         """
 
+        # Convert voice tags to a string
+        if voice_tags:
+            voice_tags = (', ').join(voice_tags)
+
         # Prepare the multipart form-data payload
-        data = {
+        params = {
             'voice_tags': voice_tags,
         }
         files = {'voice_file': open(voice_file_path, 'rb')}
@@ -61,7 +116,7 @@ class Voices(Endpoint):
         # Send the POST request with voice_name as a query parameter
         response = httpx.post(
             f'{self.http_url}/voices/clone?voice_name={voice_name}',
-            data=data,
+            params=params,
             files=files,
             headers=self.headers,
             timeout=self.timeout,
@@ -79,7 +134,12 @@ class Voices(Endpoint):
         return response.json()
 
     def update(
-        self, voice_file_path: str, voice_id: str = None, voice_name: str = None
+        self,
+        new_voice_file_path: str = None,
+        voice_id: str = None,
+        voice_name: str = None,
+        new_voice_name: str = '',
+        new_voice_tags: list[str] = None,
     ) -> dict:
         """
         Update a voice by its ID or name.
@@ -103,6 +163,7 @@ class Voices(Endpoint):
             permissions to update the voice.
         """
 
+        # Accept case if user only provide name
         if not voice_id:
             # Get all voices for this user
             voices = self.get()
@@ -117,10 +178,29 @@ class Voices(Endpoint):
                     f'No voice found with the name {voice_name}. You cannot update this voice.'
                 )
 
-        files = {'voice_file': open(voice_file_path, 'rb')}
+        # Convert voice tags to a string
+        if new_voice_tags:
+            new_voice_tags = (', ').join(new_voice_tags)
 
+        # If voice_file is not given
+        if new_voice_file_path is None:
+            params = {
+                'new_voice_tags': new_voice_tags,
+                'new_voice_file': new_voice_file_path,
+            }
+            files = {}
+
+        # If voice file is given
+        else:
+            params = {
+                'new_voice_tags': new_voice_tags,
+            }
+            files = {'new_voice_file': open(new_voice_file_path, 'rb')}
+
+        # Call API
         response = httpx.patch(
-            f'{self.http_url}/voices/clone?voice_id={voice_id}',
+            f'{self.http_url}/voices/clone?voice_id={voice_id}&new_voice_name={new_voice_name}',
+            params=params,
             headers=self.headers,
             timeout=self.timeout,
             files=files,
