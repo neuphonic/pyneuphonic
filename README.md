@@ -10,11 +10,21 @@ For support or to get involved, join our [Discord](https://discord.gg/G258vva7gZ
       - [API Key](#api-key)
     - [Voices](#voices)
       - [Get Voices](#get-voices)
+      - [Get Voice](#get-voice)
+      - [Clone Voice](#clone-voice)
+      - [Update Voice](#update-voice)
+      - [Delete Voice](#delete-voice)
     - [Audio Generation](#audio-generation)
       - [SSE (Server Side Events)](#sse-server-side-events)
       - [Asynchronous SSE](#asynchronous-sse)
       - [Asynchronous Websocket](#asynchronous-websocket)
     - [Saving Audio](#saving-audio)
+    - [Speech Restoration](#speech-restoration)
+      - [Basic Restoration](#basic-restoration)
+      - [Get Status of Restoration Job / Retrieve Results](#get-status-of-restoration-job--retrieve-results)
+      - [List all Active and Historic Jobs](#list-all-active-and-historic-jobs)
+      - [Restoration with a Transcript and Language Code](#restoration-with-a-transcript-and-language-code)
+      - [Restoration with a Transcript File](#restoration-with-a-transcript-file)
     - [Agents](#agents)
   - [Example Applications](#example-applications)
 
@@ -308,9 +318,7 @@ response = client.restorations.restore(voice_file_path, transcript, lang_code)
 
 ### Agents
 
-🚀 New Feature Alert! 🚀
-
-With Agents, you'll be able to create, manage, and interact with intelligent AI assistants. You can create an agent
+With Agents, you can create, manage, and interact with intelligent AI assistants. You can create an agent
 easily using the example here:
 
 ```python
