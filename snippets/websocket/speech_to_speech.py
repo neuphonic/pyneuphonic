@@ -1,6 +1,6 @@
 from pyneuphonic import Neuphonic, WebsocketEvents
 from pyneuphonic.player import AsyncAudioPlayer, AsyncAudioRecorder
-from pyneuphonic.models import APIResponse, AgentResponse
+from pyneuphonic.models import APIResponse, AgentResponse, AgentConfig
 
 import os
 import asyncio
@@ -13,7 +13,9 @@ async def main():
     player = AsyncAudioPlayer()
 
     # passing in the websocket object will automatically forward audio to the server
-    recorder = AsyncAudioRecorder(websocket=ws)
+    # passing in the player will ensure that the recorder is paused while the speaker is playing
+    # sampling_rate=16000 is used for quicker speech recognition
+    recorder = AsyncAudioRecorder(sampling_rate=16000, websocket=ws, player=player)
 
     async def on_message(message: APIResponse[AgentResponse]):
         # server will return 3 types of messages: audio_response, user_transcript, llm_response
@@ -32,7 +34,7 @@ async def main():
     ws.on(WebsocketEvents.CLOSE, on_close)
 
     await player.open()
-    await ws.open()
+    await ws.open(agent_config=AgentConfig(sampling_rate=16000))
     await recorder.record()
 
     try:

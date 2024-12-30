@@ -3,10 +3,11 @@ import aioconsole
 
 from pyneuphonic.client import Neuphonic
 from pyneuphonic.models import APIResponse, AgentResponse, AgentConfig, WebsocketEvents
+
 try:
     from pyneuphonic.player import AsyncAudioPlayer, AsyncAudioRecorder
 except Exception as e:
-    print("WARNING: audio player and recorder not imported!")
+    print('WARNING: audio player and recorder not imported!')
 
 
 def default_on_message(message: APIResponse[AgentResponse]):
@@ -16,20 +17,26 @@ def default_on_message(message: APIResponse[AgentResponse]):
         print(f'Agent: {message.data.text}')
 
 
-class Agent():
-
-    def __init__(self, client: Neuphonic, mute=False, on_message=default_on_message, **kwargs):
+class Agent:
+    def __init__(
+        self, client: Neuphonic, mute=False, on_message=default_on_message, **kwargs
+    ):
         self.config = AgentConfig(**kwargs)
         self.mute = mute
 
         self.ws = client.agents.AsyncWebsocketClient()
 
+        self.player = None
         if not self.mute:
             self.player = AsyncAudioPlayer()
 
         if 'asr' in self.config.mode:
             # passing in the websocket object will automatically forward audio to the server
-            self.recorder = AsyncAudioRecorder(websocket=self.ws)
+            self.recorder = AsyncAudioRecorder(
+                sampling_rate=self.config.sampling_rate,
+                websocket=self.ws,
+                player=self.player,
+            )
 
         self.on_message_hook = on_message
 
@@ -61,7 +68,9 @@ class Agent():
 
         else:
             while True:
-                user_text = await aioconsole.ainput("\nEnter text to speak (or 'quit' to exit): ")
+                user_text = await aioconsole.ainput(
+                    "\nEnter text to speak (or 'quit' to exit): "
+                )
 
                 if user_text.lower() == 'quit':
                     break
