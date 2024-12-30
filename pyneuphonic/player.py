@@ -5,6 +5,7 @@ from typing import Union, Optional, Iterator, AsyncIterator
 from pyneuphonic.models import APIResponse, TTSResponse
 from pyneuphonic._utils import save_audio
 from base64 import b64encode
+import time
 
 
 try:
@@ -33,6 +34,14 @@ class AudioPlayer:
         self.stream = None
         self.audio_bytes = bytearray()
 
+        # indicates when audio will stop playing
+        self._playback_end = time.perf_counter()
+
+    @property
+    def is_playing(self):
+        """Returns True if there is audio currently playing."""
+        return time.perf_counter() < self._playback_end
+
     def open(self):
         """Open the audio stream for playback. `pyaudio` must be installed."""
         self.audio_player = pyaudio.PyAudio()  # create the PyAudio player
@@ -53,8 +62,14 @@ class AudioPlayer:
         """
         if isinstance(data, bytes):
             if self.stream:
-                self.stream.write(data)
+                duration = len(data) / (2 * self.sampling_rate)
 
+                if self.is_playing:
+                    self._playback_end += duration
+                else:
+                    self._playback_end = time.perf_counter() + duration
+
+                self.stream.write(data)
             self.audio_bytes += data
         elif isinstance(data, Iterator):
             for message in data:
@@ -138,12 +153,15 @@ class AsyncAudioPlayer(AudioPlayer):
 
 
 class AsyncAudioRecorder:
-    def __init__(self, sampling_rate: int = 16000, websocket=None):
+    def __init__(
+        self, sampling_rate: int = 16000, websocket=None, player: AudioPlayer = None
+    ):
         self.p = None
         self.stream = None
         self.sampling_rate = sampling_rate
 
         self._ws = websocket
+        self.player = player
         self._queue = asyncio.Queue()  # Use a queue to handle audio data asynchronously
 
         self._tasks = []
@@ -153,7 +171,9 @@ class AsyncAudioRecorder:
             try:
                 # Wait for audio data from the queue
                 data = await self._queue.get()
-                await self._ws.send({'audio': b64encode(data).decode('utf-8')})
+
+                if self.player is not None and not self.player.is_playing:
+                    await self._ws.send({'audio': b64encode(data).decode('utf-8')})
             except Exception as e:
                 logging.error(f'Error in _send: {e}')
 
