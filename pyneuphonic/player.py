@@ -7,14 +7,15 @@ from pyneuphonic._utils import save_audio
 from base64 import b64encode
 import time
 
-
 try:
     import pyaudio
 except ModuleNotFoundError:
-    message = (
-        '`pip install pyaudio` required to use any `pyneuphonic.player` resources.'
+    logging.warning(
+        '(pyneuphonic) `pyaudio` is not installed, so audio playback and audio recording'
+        ' functionality will not be enabled, and attempting to use this functionality may'
+        ' throw errors. `pip install pyaudio` to resolve. This message may be ignored if'
+        ' audio playback and recording features are not required.'
     )
-    raise ModuleNotFoundError(message)
 
 
 class AudioPlayer:
