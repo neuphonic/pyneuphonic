@@ -133,8 +133,6 @@ To delete a voice which already exists.
 
 ```python
 
-voice_file_path = 'XXX.wav'
-
 result = client.voices.delete(voice_name='NewNeuphonic')
 
 print(result)
