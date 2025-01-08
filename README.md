@@ -69,7 +69,7 @@ for voice in voices:
 #### Get Voice
 To get information about an existing voice please call.
 ```
-voice= client.voices.voice(voice_id=XXX)  # Gets information about the selected voice id
+voice = client.voices.voice(voice_id=XXX)  # Gets information about the selected voice id
 print(voice) # Response contains all information about this voice
 ```
 
@@ -86,7 +86,7 @@ client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_TOKEN'))
 
 voice_file_path = 'XXX.wav'
 
-result = client.voices.clone(voice_name='NewNeuphonic', voice_tags=['tag1', 'tag2'], voice_file_path = voice_file_path)
+result = client.voices.clone(voice_name='NewNeuphonic', voice_tags=['tag1', 'tag2'], voice_file_path=voice_file_path)
 
 print(result['data']['message'])
 
