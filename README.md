@@ -135,7 +135,7 @@ To delete a voice which already exists.
 
 voice_file_path = 'XXX.wav'
 
-result = client.voices.update(voice_name='NewNeuphonic')
+result = client.voices.delete(voice_name='NewNeuphonic')
 
 print(result)
 ```
@@ -143,7 +143,7 @@ print(result)
 Alternatively, if you wanna provide the voice id:
 
 ```python
-result = client.voices.update(voice_id=XXX)
+result = client.voices.delete(voice_id=XXX)
 
 print(result)
 ```
