@@ -180,7 +180,7 @@ async def test_clone_voice(client: Neuphonic, mocker: MockerFixture):
         # Ensure httpx.post was called with correct parameters
         base_url = os.getenv('NEUPHONIC_API_URL', 'default-api-url')
         mock_post.assert_called_once_with(
-            f'https://{base_url}/voices/clone?voice_name={voice_name}',
+            f'https://{base_url}/voices?voice_name={voice_name}',
             params={'voice_tags': voice_tags_adapted},
             files={'voice_file': mocker.ANY},  # Matches the file object
             headers={'x-api-key': mocker.ANY},  # Ensure the API key is present
@@ -215,7 +215,7 @@ def test_delete_voice(client: Neuphonic, mocker: MockerFixture):
     # Assert the HTTP method and endpoint were called correctly
     base_url = os.getenv('NEUPHONIC_API_URL')
     mock_delete.assert_called_once_with(
-        f'https://{base_url}/voices/clone?voice_id={voice_id}',
+        f'https://{base_url}/voices?voice_id={voice_id}',
         headers={'x-api-key': mocker.ANY},  # Ensures api key was present
         timeout=10,
     )

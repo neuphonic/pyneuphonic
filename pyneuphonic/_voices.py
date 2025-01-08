@@ -115,7 +115,7 @@ class Voices(Endpoint):
 
         # Send the POST request with voice_name as a query parameter
         response = httpx.post(
-            f'{self.http_url}/voices/clone?voice_name={voice_name}',
+            f'{self.http_url}/voices?voice_name={voice_name}',
             params=params,
             files=files,
             headers=self.headers,
@@ -199,7 +199,7 @@ class Voices(Endpoint):
 
         # Call API
         response = httpx.patch(
-            f'{self.http_url}/voices/clone?voice_id={voice_id}&new_voice_name={new_voice_name}',
+            f'{self.http_url}/voices?voice_id={voice_id}&new_voice_name={new_voice_name}',
             params=params,
             headers=self.headers,
             timeout=self.timeout,
@@ -252,7 +252,7 @@ class Voices(Endpoint):
                 )
 
         response = httpx.delete(
-            f'{self.http_url}/voices/clone?voice_id={voice_id}',
+            f'{self.http_url}/voices?voice_id={voice_id}',
             headers=self.headers,
             timeout=self.timeout,
         )
