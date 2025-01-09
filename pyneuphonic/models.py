@@ -88,7 +88,7 @@ class TTSConfig(BaseConfig):
     )
 
     temperature: Optional[float] = Field(
-        deafult=None,
+        default=None,
         description='Randomness introduced into the text-to-speech model. Ranges from 0 to 1.0.',
         examples=[0.5, 0.7],
     )
@@ -106,7 +106,7 @@ class TTSConfig(BaseConfig):
     )
 
     voice: Optional[str] = Field(
-        deafult=None,
+        default=None,
         description=(
             'The voice_id for the desired voice. Ensure that this voice_id is available for the '
             'selected model.'
