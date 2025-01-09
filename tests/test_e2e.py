@@ -1,5 +1,5 @@
 import pytest
-from pyneuphonic.models import APIResponse, WebsocketEvents, VoiceItem, TTSResponse
+from pyneuphonic.models import APIResponse, WebsocketEvents, TTSResponse, VoiceObject
 from pyneuphonic import save_audio
 import asyncio
 import os
@@ -86,7 +86,8 @@ def test_get_voices(client):
     assert len(voices) > 0
 
     for voice in voices:
-        assert isinstance(voice, VoiceItem)
+        assert isinstance(voice, dict)
+        assert all(key in voice for key in VoiceObject.__annotations__.keys())
 
 
 @pytest.mark.asyncio

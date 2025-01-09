@@ -6,7 +6,7 @@ from pytest_mock import MockerFixture
 from pydantic import BaseModel
 import uuid
 from pyneuphonic import Neuphonic, TTSConfig
-from pyneuphonic.models import VoiceItem, APIResponse, TTSResponse, to_dict
+from pyneuphonic.models import APIResponse, TTSResponse, VoiceObject, to_dict
 
 from unittest.mock import MagicMock
 
@@ -124,7 +124,8 @@ async def test_get_voices(client: Neuphonic, mocker: MockerFixture):
     assert len(voices) == 3
 
     for voice in voices:
-        assert isinstance(voice, VoiceItem)
+        assert isinstance(voice, dict)
+        assert all(key in voice for key in VoiceObject.__annotations__.keys())
 
 
 class CloneVoiceResponse(BaseModel):
