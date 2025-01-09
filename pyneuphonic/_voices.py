@@ -1,14 +1,20 @@
-from typing import List
+from typing import List, Optional
 
 import httpx
 
 from ._endpoint import Endpoint
-from .models import VoicesResponse, VoiceItem
+from .models import APIResponse, VoiceObject  # noqa: F401
 
 
 class Voices(Endpoint):
-    def get(self) -> List[VoiceItem]:
-        """List all the voices."""
+    def get(self) -> APIResponse[dict]:
+        """Lists all voices in your voice library.
+
+        Returns
+        -------
+        APIResponse[dict]
+            response.data['voices'] will be a list of VoiceObject objects.
+        """
         response = httpx.get(
             f'{self.http_url}/voices',
             headers=self.headers,
@@ -22,11 +28,9 @@ class Voices(Endpoint):
                 response=response,
             )
 
-        voice_response = VoicesResponse(**response.json())
+        return APIResponse(**response.json())
 
-        return voice_response.data.voices
-
-    def voice(self, voice_id: str = None, voice_name: str = None):
+    def voice(self, voice_id: str = None, voice_name: str = None) -> APIResponse[dict]:
         """Get information about specific voice.
 
         Parameters
@@ -38,8 +42,8 @@ class Voices(Endpoint):
 
         Returns
         -------
-        dict
-            A dictionary with the response data from the API.
+        APIResponse[dict]
+            response.data['voice'] will be a single VoiceObject object.
 
         Raises
         ------
@@ -75,11 +79,11 @@ class Voices(Endpoint):
                 response=response,
             )
 
-        return response.json()
+        return APIResponse(**response.json())
 
     def clone(
         self, voice_name: str, voice_file_path: str, voice_tags: List[str] = []
-    ) -> dict:
+    ) -> APIResponse[dict]:
         """
         Clone a voice by uploading a file with the specified name and tags.
 
@@ -94,8 +98,8 @@ class Voices(Endpoint):
 
         Returns
         -------
-        dict
-            A dictionary with the response data from the API.
+        APIResponse[dict]
+            response.data will contain a success message with voice_id of the cloned voice.
 
         Raises
         ------
@@ -131,7 +135,7 @@ class Voices(Endpoint):
             )
 
         # Return the JSON response content as a dictionary
-        return response.json()
+        return APIResponse(**response.json())
 
     def update(
         self,
@@ -139,22 +143,27 @@ class Voices(Endpoint):
         voice_id: str = None,
         voice_name: str = None,
         new_voice_name: str = '',
-        new_voice_tags: list[str] = None,
-    ) -> dict:
+        new_voice_tags: Optional[List[str]] = None,
+    ) -> APIResponse[dict]:
         """
         Update a voice by its ID or name.
 
         Parameters
         ----------
         voice_id : str
-            The ID of the voice to be deleted.
+            The ID of the voice to update.
         voice_name : str
-            The name of the voice to be deleted.
+            The name of the voice to update. This does not need to be provided if voice_id
+            is provided.
+        new_voice_name: str
+            The new name updated name for the voice.
+        new_voice_tags: Optional[List[str]]
+            The new tags for the voice.
 
         Returns
         -------
-        dict
-            A dictionary with the response data from the API.
+        APIResponse[dict]
+            response.data will contain a success message with the updated fields of the voice.
 
         Raises
         ------
@@ -215,9 +224,9 @@ class Voices(Endpoint):
             )
 
         # Return the JSON response content as a dictionary
-        return response.json()
+        return APIResponse(**response.json())
 
-    def delete(self, voice_id: str = None, voice_name=None) -> dict:
+    def delete(self, voice_id: str = None, voice_name=None) -> APIResponse[dict]:
         """
         Delete a voice by its ID.
 
@@ -228,8 +237,8 @@ class Voices(Endpoint):
 
         Returns
         -------
-        dict
-            A dictionary with the response data from the API.
+        APIResponse[dict]
+            response.data will contain a success message with the updated fields of the voice.
 
         Raises
         ------
@@ -266,4 +275,4 @@ class Voices(Endpoint):
             )
 
         # Return the JSON response content as a dictionary
-        return response.json()
+        return APIResponse(**response.json())

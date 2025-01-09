@@ -1,8 +1,14 @@
 from pydantic import BaseModel as BaseModel, field_validator, ConfigDict, Field
-from typing import List, Optional, Callable, Awaitable, Union
+from typing import List, Optional, Callable, Awaitable, Union, TypedDict
 import base64
 from enum import Enum
 from typing import Generic, TypeVar
+
+
+def to_dict(model: BaseModel):
+    """Returns a pydantic model as dict, with all of the None items removed."""
+    return {k: v for k, v in model.model_dump().items() if v is not None}
+
 
 T = TypeVar('T')
 
@@ -127,74 +133,9 @@ class TTSConfig(BaseConfig):
     )
 
 
-class WebsocketEvents(Enum):
-    """
-    Enum describing all of the valid websocket events that callbacks can be bound to.
-    """
-
-    OPEN: str = 'open'
-    MESSAGE: str = 'message'
-    CLOSE: str = 'close'
-    ERROR: str = 'error'
-
-
-def to_dict(model: BaseModel):
-    """Returns a pydantic model as dict, with all of the None items removed."""
-    return {k: v for k, v in model.model_dump().items() if v is not None}
-
-
-class VoiceItem(BaseModel):
-    model_config = ConfigDict(extra='allow')
-    model_config['protected_namespaces'] = ()
-
-    id: str
-    name: str
-    tags: List[str] = []
-    model_availability: List[str] = []
-
-
-class VoicesResponse(BaseModel):
-    """Response from /voices endpoint."""
-
-    model_config = ConfigDict(extra='allow')
-
-    class VoicesData(BaseModel):
-        voices: List[VoiceItem]
-
-    data: VoicesData
-
-
-class AudioResponse(BaseModel):
-    model_config = ConfigDict(extra='allow')
-
-    audio: Optional[bytes] = None
-
-    @field_validator('audio', mode='before')
-    def validate(cls, v: Optional[Union[str, bytes]]) -> Optional[bytes]:
-        """Convert the received audio from the server into bytes that can be played."""
-        if isinstance(v, str):
-            return base64.b64decode(v)
-        elif isinstance(v, bytes):
-            return v
-        elif v is None:
-            return None
-
-        raise ValueError('`audio` must be a base64 encoded string or bytes.')
-
-
-class TTSResponse(AudioResponse):
-    """Structure of data received from TTS endpoints, when using any client in`Neuphonic.tts.`"""
-
-    text: Optional[str] = None
-    sampling_rate: Optional[int] = None
-
-
-class AgentResponse(AudioResponse):
-    type: str
-    text: Optional[str] = None
-
-
 class APIResponse(BaseModel, Generic[T]):
+    """All responses from the API will be typed with this pydantic model."""
+
     model_config = ConfigDict(extra='allow')
 
     data: Optional[T] = Field(
@@ -203,7 +144,11 @@ class APIResponse(BaseModel, Generic[T]):
     )
 
     metadata: Optional[dict] = Field(
-        default=None, description='Additional metadata from the API.'
+        default=None,
+        description=(
+            'Additional metadata from the API. This will include pagination metadata for paginated '
+            'endpoints.'
+        ),
     )
 
     """
@@ -225,16 +170,133 @@ class APIResponse(BaseModel, Generic[T]):
     )
 
 
-class SSERequest(BaseModel):
-    """Structure of request when using SSEClient or AsyncSSEClient."""
+class VoiceObject(TypedDict):
+    """TypedDict representing a voice object with its attributes."""
+
+    id: str
+    """
+    The voice_id for the voice.
+    Examples: ['8e9c4bc8-3979-48ab-8626-df53befc2090']
+    """
+
+    name: str
+    """
+    The name of the voice.
+    Examples: ['Holly', 'Annie', 'Miles']
+    """
+
+    tags: List[str]
+    """
+    A list of tags describing the voice.
+    Examples: [['Male', 'American', 'Fourties', 'Narrator'], ['Female', 'British', 'Twenties', 'Excited']]
+    """
+
+    model_availability: List[str]
+    """
+    A list of models that this voice is available on.
+    Examples: [['neu_fast', 'neu_hq'], ['neu_hq']]
+    """
+
+
+class AgentObject(TypedDict):
+    """TypedDict representing an agent object with its attributes."""
+
+    id: str
+    """
+    The agent_id for the agent.
+    Examples: ['1234abcd-5678-efgh-9101-ijklmnopqrst']
+    """
+
+    name: str
+    """
+    The name of the agent.
+    Examples: ['Helpful Receptionist', 'Delivery Person', 'John Smith']
+    """
+
+    prompt: Optional[str]
+    """
+    The prompt used by the agent.
+    Examples: ['You are a helpful agent. Answer in 20 words or less.']
+    """
+
+    greeting: Optional[str]
+    """
+    The greeting message of the agent.
+    Examples: ['Hello! How can I help you?', 'Hi there! What can I do for you today?']
+    """
+
+
+class AudioBaseModel(BaseModel):
+    """
+    Base model for any models containg audio.
+    """
 
     model_config = ConfigDict(extra='allow')
 
-    text: str
-    model: TTSConfig
+    audio: Optional[bytes] = Field(
+        default=None,
+        description=(
+            'Audio received from the server. The server returns audio as a base64 encoded string, '
+            'this will be parsed into bytes by the field_validator.'
+        ),
+    )
+
+    @field_validator('audio', mode='before')
+    def validate(cls, v: Optional[Union[str, bytes]]) -> Optional[bytes]:
+        """Convert the received audio from the server from base64 into bytes."""
+        if isinstance(v, str):
+            return base64.b64decode(v)
+        elif isinstance(v, bytes):
+            return v
+        elif v is None:
+            return None
+
+        raise ValueError('`audio` must be a base64 encoded string or bytes.')
+
+
+class TTSResponse(AudioBaseModel):
+    """Structure of data received from TTS endpoints, when using any client in `Neuphonic.tts.`"""
+
+    text: Optional[str] = Field(
+        default=None, description='Text corresponding to the audio snippet.'
+    )
+
+    sampling_rate: Optional[int] = Field(
+        default=None,
+        description='Sampling rate of the audio snippet.',
+        examples=[8000, 16000, 22050],
+    )
+
+
+class AgentResponse(AudioBaseModel):
+    """Structure of data received from Agent endpoints, when using any client in `Neuphonic.agent`."""
+
+    type: str = Field(
+        description='Which type of message is being sent the server',
+        examples=['llm_response', 'audio_response', 'user_transcript'],
+    )
+
+    text: Optional[str] = Field(
+        default=None,
+        description=(
+            'This will contain the corresponding text if the `type` is `llm_response` or '
+            '`user_transcript`.'
+        ),
+    )
+
+
+class WebsocketEvents(Enum):
+    """Enum describing all of the valid websocket events that callbacks can be bound to."""
+
+    OPEN: str = 'open'
+    MESSAGE: str = 'message'
+    CLOSE: str = 'close'
+    ERROR: str = 'error'
 
 
 class WebsocketEventHandlers(BaseModel):
+    """Pydantic model to hold all websocket callbacks."""
+
     open: Optional[Callable[[], Awaitable[None]]] = None
     message: Optional[Callable[[APIResponse[T]], Awaitable[None]]] = None
     close: Optional[Callable[[], Awaitable[None]]] = None
