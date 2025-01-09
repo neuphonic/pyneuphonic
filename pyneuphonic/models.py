@@ -1,4 +1,4 @@
-from pydantic import BaseModel as BaseModel, field_validator, ConfigDict
+from pydantic import BaseModel as BaseModel, field_validator, ConfigDict, Field
 from typing import List, Optional, Callable, Awaitable, Union
 import base64
 from enum import Enum
@@ -17,27 +17,121 @@ class BaseConfig(BaseModel):
 
 
 class AgentConfig(BaseConfig):
-    agent_id: Optional[str] = None
-    endpointing: float = 50
+    """
+    API parameters passed to the /agent endpoint.
+    """
+
+    agent_id: Optional[str] = Field(
+        default=None,
+        description='Id of selected agent. If none, then a default agent will be used.',
+        examples=[
+            'da78ea32-9225-436e-b10d-d5b101bb01a6'
+        ],  # note - this is not a real agent_id
+    )
+
+    endpointing: Optional[float] = Field(
+        default=None,
+        description=(
+            'This is how long (in milliseconds) the speech recognition program will listen for '
+            'silence in the recieved audio until it decides that the user is finished speaking.'
+        ),
+        examples=[50, 100, 1000],
+    )
+
+    mode: Optional[str] = Field(
+        default='asr-llm-tts',
+        description=(
+            'This option decides how you want to use the agent. `asr-llm-tts` option indicates that '
+            'you want to do audio in, audio out. `llm-tts` indicates that you want to do text in, '
+            'audio out.'
+        ),
+        examples=['asr-llm-tts', 'llm-tts'],
+    )
+
     sampling_rate: int = 16000
-    mode: str = 'asr-llm-tts'
+
+    incoming_sampling_rate: Optional[int] = Field(
+        default=16000,
+        description=(
+            'Sampling rate of the audio sent to the server. Lower sampling raes will generally '
+            'yield faster transcription.'
+        ),
+        examples=[8000, 16000, 22050],
+    )
+
+    outgoing_sampling_rate: Optional[int] = Field(
+        default=22050,
+        description='Sampling rate of the audio returned from the server.',
+        examples=[8000, 16000, 22050],
+    )
+
+    incoming_encoding: Optional[str] = Field(
+        default='pcm_linear',
+        description='Encoding of the audio sent to the server.',
+        examples=['pcm_linear', 'pcm_mulaw'],
+    )
+
+    outgoing_encoding: Optional[str] = Field(
+        default='pcm_linear',
+        description='Encoding of the audio returned from the server.',
+        examples=['pcm_linear', 'pcm_mulaw'],
+    )
 
 
 class TTSConfig(BaseConfig):
     """
-    See https://docs.neuphonic.com/api-reference#options for all available options
+    Model parameters passed to the text to speech endpoints.
     """
 
-    speed: Optional[float] = 1.0
-    temperature: Optional[float] = 0.5
-    model: Optional[str] = 'neu_fast'
-    voice: Optional[str] = None  # if None, default is used.
-    sampling_rate: Optional[int] = 22050
-    encoding: Optional[str] = 'pcm_linear'
-    language_id: Optional[str] = 'en'
+    speed: Optional[float] = Field(
+        default=1.0, description='Playback speed of audio.', examples=[0.7, 1.0, 1.5]
+    )
+
+    temperature: Optional[float] = Field(
+        deafult=None,
+        description='Randomness introduced into the text-to-speech model. Ranges from 0 to 1.0.',
+        examples=[0.5, 0.7],
+    )
+
+    model: Optional[str] = Field(
+        default=None,
+        description='The text-to-speech model to use.',
+        examples=['neu_fast', 'neu_hq'],
+    )
+
+    language_id: str = Field(
+        default='en',
+        description=('Language id for the desired language.'),
+        example=['en'],
+    )
+
+    voice: Optional[str] = Field(
+        deafult=None,
+        description=(
+            'The voice_id for the desired voice. Ensure that this voice_id is available for the '
+            'selected model.'
+        ),
+        examples=['8e9c4bc8-3979-48ab-8626-df53befc2090'],
+    )
+
+    sampling_rate: Optional[int] = Field(
+        default=22050,
+        description='Sampling rate of the audio returned from the server.',
+        examples=[8000, 16000, 22050],
+    )
+
+    encoding: Optional[str] = Field(
+        default='pcm_linear',
+        description='Encoding of the audio returned from the server.',
+        examples=['pcm_linear', 'pcm_mulaw'],
+    )
 
 
 class WebsocketEvents(Enum):
+    """
+    Enum describing all of the valid websocket events that callbacks can be bound to.
+    """
+
     OPEN: str = 'open'
     MESSAGE: str = 'message'
     CLOSE: str = 'close'
@@ -103,8 +197,32 @@ class AgentResponse(AudioResponse):
 class APIResponse(BaseModel, Generic[T]):
     model_config = ConfigDict(extra='allow')
 
-    status_code: Optional[int] = None  # only set on SSE responses
-    data: T
+    data: Optional[T] = Field(
+        default=None,
+        description='API response data. This will contain data on a succesful response.',
+    )
+
+    metadata: Optional[dict] = Field(
+        default=None, description='Additional metadata from the API.'
+    )
+
+    """
+    The below two fields only exist for responses from SSE endpoints.
+    """
+    status_code: Optional[int] = Field(
+        default=None,
+        description=(
+            'Status code of API response. This is only set for responses on the SSE endpoints.'
+        ),
+        examples=[200, 400],
+    )
+
+    errors: Optional[List[str]] = Field(
+        default=None,
+        description=(
+            'All errors associated with the SSE response, if the status_code is a non 2XX code.'
+        ),
+    )
 
 
 class SSERequest(BaseModel):
