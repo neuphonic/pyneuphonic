@@ -29,7 +29,7 @@ class Restore(Endpoint):
             data = {'lang_code': lang_code, 'transcript': transcript}
 
         response = httpx.post(
-            f'{self.http_url}/restore/job', files=files, data=data, headers=self.headers
+            f'{self.http_url}/restore', files=files, data=data, headers=self.headers
         )
 
         # Handle response errors
