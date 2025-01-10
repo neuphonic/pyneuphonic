@@ -212,7 +212,7 @@ def test_delete_voice(client: Neuphonic, mocker: MockerFixture):
     # Assert the HTTP method and endpoint were called correctly
     base_url = os.getenv('NEUPHONIC_API_URL')
     mock_delete.assert_called_once_with(
-        f'https://{base_url}/voices?voice_id={voice_id}',
+        f'https://{base_url}/voices/{voice_id}',
         headers={'x-api-key': mocker.ANY},  # Ensures api key was present
         timeout=10,
     )
