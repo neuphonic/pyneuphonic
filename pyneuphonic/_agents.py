@@ -3,13 +3,14 @@ import httpx
 
 from pyneuphonic._endpoint import Endpoint
 from pyneuphonic._websocket import AsyncAgentWebsocketClient
+from pyneuphonic.models import APIResponse, AgentObject  # noqa: F401
 
 
 class Agents(Endpoint):
     def get(
         self,
         agent_id: Optional[str] = None,
-    ):
+    ) -> APIResponse[dict]:
         """
         List created agents.
 
@@ -20,6 +21,11 @@ class Agents(Endpoint):
         ----------
         agent_id
             The ID of the agent to fetch. If None, fetches all agents.
+
+        Returns
+        -------
+        APIResponse[dict]
+            response.data['agent'] will be an object of type AgentObject.
 
         Raises
         ------
@@ -34,14 +40,14 @@ class Agents(Endpoint):
 
         self.raise_for_status(response=response, message='Failed to fetch agents.')
 
-        return response.json()
+        return APIResponse(**response.json())
 
     def create(
         self,
         name: str,
         prompt: Optional[str] = None,
         greeting: Optional[str] = None,
-    ) -> dict:
+    ) -> APIResponse[dict]:
         """
         Create a new agent.
 
@@ -53,6 +59,11 @@ class Agents(Endpoint):
             The prompt for the agent.
         greeting
             The initial greeting message for the agent.
+
+        Returns
+        -------
+        APIResponse[dict]
+            response.data will contain a success message on successful creation.
 
         Raises
         ------
@@ -74,12 +85,12 @@ class Agents(Endpoint):
 
         self.raise_for_status(response=response, message='Failed to create agent.')
 
-        return response.json()
+        return APIResponse(**response.json())
 
     def delete(
         self,
         agent_id: str,
-    ):
+    ) -> APIResponse[dict]:
         """
         Delete an agent.
 
@@ -87,6 +98,11 @@ class Agents(Endpoint):
         ----------
         agent_id : str
             The ID of the agent to delete.
+
+        Returns
+        -------
+        APIResponse[dict]
+            response.data will contain a delete message on successful deletion.
 
         Raises
         ------
@@ -101,7 +117,7 @@ class Agents(Endpoint):
 
         self.raise_for_status(response=response, message='Failed to delete agent.')
 
-        return response.json()
+        return APIResponse(**response.json())
 
     def AsyncWebsocketClient(self):
         return AsyncAgentWebsocketClient(api_key=self._api_key, base_url=self._base_url)

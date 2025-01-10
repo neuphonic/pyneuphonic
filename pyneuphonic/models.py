@@ -108,7 +108,7 @@ class TTSConfig(BaseConfig):
     language_id: str = Field(
         default='en',
         description=('Language id for the desired language.'),
-        example=['en'],
+        examples=['en'],
     )
 
     voice: Optional[str] = Field(
