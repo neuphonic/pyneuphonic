@@ -20,9 +20,7 @@ async def main():
                 break
 
             response = sse.send(user_text)
-
-            for item in response:
-                player.play(item.data.audio)
+            player.play(response)
 
 
 if __name__ == '__main__':
