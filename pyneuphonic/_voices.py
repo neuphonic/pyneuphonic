@@ -30,6 +30,28 @@ class Voices(Endpoint):
 
         return APIResponse(**response.json())
 
+    def _get_voice_id_from_name(self, voice_name) -> str:
+        """Gets the voice_id given a voice name.
+
+        Parameters
+        ----------
+        voice_name : str
+            The name of the voice to retrieve the voice_id for.
+
+        Raises
+        ------
+        ValueError
+            Raised if there is no voice with the provided name.
+        """
+        response = self.get()
+        voices = response.data['voices']
+
+        try:
+            # extract the voice_id for the requested voice from the list of all voices
+            return next(voice['id'] for voice in voices if voice['name'] == voice_name)
+        except StopIteration as e:
+            raise ValueError(f'No voice found with the name {voice_name}.')
+
     def voice(self, voice_id: str = None, voice_name: str = None) -> APIResponse[dict]:
         """Get information about specific voice.
 
@@ -53,18 +75,7 @@ class Voices(Endpoint):
 
         # Accept case if user only provide name
         if not voice_id:
-            # Get all voices for this user
-            voices = self.get()
-            try:
-                # Fetch voice id
-                voice_id = next(
-                    voice.id for voice in voices if voice.name == voice_name
-                )
-
-            except StopIteration as e:
-                raise ValueError(
-                    f'No voice found with the name {voice_name}. You cannot update this voice.'
-                )
+            voice_id = self._get_voice_id_from_name(voice_name=voice_name)
 
         response = httpx.get(
             f'{self.http_url}/voices/{voice_id}',
@@ -139,9 +150,9 @@ class Voices(Endpoint):
 
     def update(
         self,
-        new_voice_file_path: str = None,
-        voice_id: str = None,
-        voice_name: str = None,
+        voice_id: Optional[str] = None,
+        voice_name: Optional[str] = None,
+        new_voice_file_path: Optional[str] = None,
         new_voice_name: str = '',
         new_voice_tags: Optional[List[str]] = None,
     ) -> APIResponse[dict]:
@@ -150,11 +161,13 @@ class Voices(Endpoint):
 
         Parameters
         ----------
-        voice_id : str
+        voice_id : Optional[str]
             The ID of the voice to update.
-        voice_name : str
+        voice_name : Optional[str]
             The name of the voice to update. This does not need to be provided if voice_id
             is provided.
+        new_voice_file_path: Optional[str]
+            The file path for the new audio file to use for the cloned voice.
         new_voice_name: str
             The new name updated name for the voice.
         new_voice_tags: Optional[List[str]]
@@ -174,15 +187,9 @@ class Voices(Endpoint):
 
         # Accept case if user only provide name
         if not voice_id:
-            # Get all voices for this user
-            voices = self.get()
             try:
-                # Fetch voice id
-                voice_id = next(
-                    voice.id for voice in voices if voice.name == voice_name
-                )
-
-            except StopIteration as e:
+                voice_id = self._get_voice_id_from_name(voice_name=voice_name)
+            except ValueError as e:
                 raise ValueError(
                     f'No voice found with the name {voice_name}. You cannot update this voice.'
                 )
@@ -208,7 +215,7 @@ class Voices(Endpoint):
 
         # Call API
         response = httpx.patch(
-            f'{self.http_url}/voices?voice_id={voice_id}&new_voice_name={new_voice_name}',
+            f'{self.http_url}/voices/{voice_id}?new_voice_name={new_voice_name}',
             params=params,
             headers=self.headers,
             timeout=self.timeout,
@@ -247,21 +254,15 @@ class Voices(Endpoint):
             permissions to delete the voice.
         """
         if not voice_id:
-            # Get all voices for this user
-            voices = self.get()
             try:
-                # Fetch voice id
-                voice_id = next(
-                    voice.id for voice in voices if voice.name == voice_name
-                )
-
-            except StopIteration as e:
+                voice_id = self._get_voice_id_from_name(voice_name=voice_name)
+            except ValueError as e:
                 raise ValueError(
                     f'No voice found with the name {voice_name}. You cannot Delete this voice.'
                 )
 
         response = httpx.delete(
-            f'{self.http_url}/voices?voice_id={voice_id}',
+            f'{self.http_url}/voices/{voice_id}',
             headers=self.headers,
             timeout=self.timeout,
         )
