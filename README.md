@@ -60,17 +60,17 @@ from pyneuphonic import Neuphonic
 import os
 
 client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_TOKEN'))
-voices = client.voices.get()  # get's all available voices
+response = client.voices.get()  # get's all available voices
+voices = response.data['voices']
 
-for voice in voices:
-    print(voice)
+voices
 ```
 
 #### Get Voice
 To get information about an existing voice please call.
-```
-voice = client.voices.voice(voice_id=XXX)  # Gets information about the selected voice id
-print(voice) # Response contains all information about this voice
+```python
+response = client.voices.voice(voice_id='<VOICE_ID>')  # Gets information about the selected voice id
+response.data  # Response contains all information about this voice
 ```
 
 
@@ -84,66 +84,73 @@ import os
 
 client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_TOKEN'))
 
-voice_file_path = 'XXX.wav'
+response = client.voices.clone(
+    voice_name='<VOICE_NAME>',
+    voice_tags=['tag1', 'tag2'],  # optional, add descriptive tags of what your voice sounds like
+    voice_file_path='<FILE_PATH>.wav'  # replace with file path to a sample of the voice to clone
+)
 
-result = client.voices.clone(voice_name='NewNeuphonic', voice_tags=['tag1', 'tag2'], voice_file_path=voice_file_path)
-
-print(result['data']['message'])
-
+response.data  # this will contain a success message with the voice_id of the cloned voice
 ```
 
-If you have successfully cloned a voice, the following message will be displayed: "Voice has successfully been cloned with ID XXXXXXX." Once cloned, you can use this voice just like any of the standard voices when calling the TTS (Text-to-Speech) service.
+If you have successfully cloned a voice, the following message will be displayed: "Voice has
+successfully been cloned with ID <VOICE_ID>." Once cloned, you can use this voice just like any of
+the standard voices when calling the TTS (Text-to-Speech) service.
 
-To view a list of all available voices (including the voices you have cloned), simply call the `client.voices.get(api_key="")` endpoint.
+To see a list of all available voices, including cloned ones, use `client.voices.get()` as shown in
+the example a few sections above.
 
-**Note:** Your voice reference clip must meet the following criteria: it should be at least 6 seconds long, in .mp3 or .wav format, and no larger than 10 MB in size.
+**Note:** Your voice reference clip must meet the following criteria: it should be at least 6
+seconds long, in .mp3 or .wav format, and no larger than 10 MB in size.
 
 #### Update Voice
 
-You can update the reference clip, the voice name and the tags for the user.
-You have to feed in one or multiple of voice name (`new_voice_name`),
-file_path (`new_voice_file_path`) and tags (`new_voice_tags`, `remove_voice_tags`) for the voice to be updated accordingly.
-
-Update based on the new clip and the old name:
+You can update any of the attributes of a voice: name, tags and the reference audio file the voice
+was cloned on.
+You can select which voice to update using either it's `voice_id` or it's name.
 
 ```python
-result = client.voices.update(voice_name='NewNeuphonic', ...)
+# Updating using the original voice's name
+response = client.voices.update(
+    voice_name='<ORIGINAL_VOICE_NAME>',  # this is the name of voice we want to update
 
-print(result)
+    # Provide any, or all of the following, to update the voice
+    new_voice_name='<NEW_VOICE_NAME>',
+    new_voice_tags=['new_tag_1', 'new_tag_2'],  # overwrite all previous tags
+    new_voice_file_path='<NEW_FILE_PATH>.wav',
+)
+
+response.data
 ```
 
-Alternatively, if you wanna provide the voice id:
 ```python
-result = client.voices.update(voice_id=XXX, ...)
+# Updating using the original voice's `voice_id`
+response = client.voices.update(
+    voice_id ='<VOICE_ID>',  # this is the id of voice we want to update
 
-print(result)
+    # Provide any, or all of the following, to update the voice
+    new_voice_name='<NEW_VOICE_NAME>',
+    new_voice_tags=['new_tag_1', 'new_tag_2'],  # overwrite all previous tags
+    new_voice_file_path='<NEW_FILE_PATH>.wav',
+)
+
+response.data
 ```
-
-You can feed in your desired update in these attributes:
-- `new_voice_name` = 'NewNeuphonic'
-- `new_voice_file_path` = ...
-- `new_voice_tags`=["new-tag1", ..., "new-tag2"] - Overwrites all preexisting voice tags
-
 
 **Note:** Your voice reference clip must meet the following criteria: it should be at least 6 seconds long, in .mp3 or .wav format, and no larger than 10 MB in size.
 
 #### Delete Voice
-
-To delete a voice which already exists.
+To delete a cloned voice:
 
 ```python
-
-result = client.voices.delete(voice_name='NewNeuphonic')
-
-print(result)
+# Delete using the voice's name
+response = client.voices.delete(voice_name='<VOICE_NAME>')
+response.data
 ```
-
-Alternatively, if you wanna provide the voice id:
-
 ```python
-result = client.voices.delete(voice_id=XXX)
-
-print(result)
+# Delete using the voices `voice_id`
+response = client.voices.delete(voice_id='<VOICE_ID>')
+response.data
 ```
 
 ### Audio Generation
@@ -333,7 +340,7 @@ async def main():
         name='Agent 1',
         prompt='You are a helpful agent. Answer in 10 words or less.',
         greeting='Hi, how can I help you today?'
-    )['data']['id']
+    ).data['id']
 
     agent = Agent(client, agent_id=agent_id, tts_model='neu_hq')
 
