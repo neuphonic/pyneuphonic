@@ -6,7 +6,7 @@ from typing import Generic, TypeVar
 
 
 def to_dict(model: BaseModel):
-    """Returns a pydantic model as dict, with all of the None items removed."""
+    """Returns a pydantic model as a dictionary, excluding items with None values."""
     return {k: v for k, v in model.model_dump().items() if v is not None}
 
 
@@ -17,29 +17,27 @@ class BaseConfig(BaseModel):
     model_config = ConfigDict(extra='allow')
 
     def to_query_params(self) -> str:
-        """Generate a query params string from the AgentConfig object, dropping None values."""
+        """Generate a query parameter string from the object, excluding None values."""
         params = to_dict(self)
         return '&'.join(f'{key}={value}' for key, value in params.items())
 
 
 class AgentConfig(BaseConfig):
     """
-    API parameters passed to the /agent endpoint.
+    API parameters for the /agent endpoint.
     """
 
     agent_id: Optional[str] = Field(
         default=None,
-        description='Id of selected agent. If none, then a default agent will be used.',
-        examples=[
-            'da78ea32-9225-436e-b10d-d5b101bb01a6'
-        ],  # note - this is not a real agent_id
+        description='ID of the selected agent. If None, a default agent will be used.',
+        examples=['da78ea32-9225-436e-b10d-d5b101bb01a6'],  # example agent_id
     )
 
     endpointing: Optional[float] = Field(
         default=None,
         description=(
-            'This is how long (in milliseconds) the speech recognition program will listen for '
-            'silence in the recieved audio until it decides that the user is finished speaking.'
+            'Duration (in milliseconds) the speech recognition program will listen for '
+            'silence in the received audio before concluding the user has finished speaking.'
         ),
         examples=[50, 100, 1000],
     )
@@ -47,9 +45,8 @@ class AgentConfig(BaseConfig):
     mode: Optional[str] = Field(
         default='asr-llm-tts',
         description=(
-            'This option decides how you want to use the agent. `asr-llm-tts` option indicates that '
-            'you want to do audio in, audio out. `llm-tts` indicates that you want to do text in, '
-            'audio out.'
+            'Mode of agent usage. `asr-llm-tts` indicates audio input and output. '
+            '`llm-tts` indicates text input and audio output.'
         ),
         examples=['asr-llm-tts', 'llm-tts'],
     )
@@ -59,7 +56,7 @@ class AgentConfig(BaseConfig):
     incoming_sampling_rate: Optional[int] = Field(
         default=16000,
         description=(
-            'Sampling rate of the audio sent to the server. Lower sampling raes will generally '
+            'Sampling rate of the audio sent to the server. Lower rates generally '
             'yield faster transcription.'
         ),
         examples=[8000, 16000, 22050],
@@ -86,16 +83,18 @@ class AgentConfig(BaseConfig):
 
 class TTSConfig(BaseConfig):
     """
-    Model parameters passed to the text to speech endpoints.
+    Model parameters for the text-to-speech endpoints.
     """
 
     speed: Optional[float] = Field(
-        default=1.0, description='Playback speed of audio.', examples=[0.7, 1.0, 1.5]
+        default=1.0,
+        description='Playback speed of the audio.',
+        examples=[0.7, 1.0, 1.5],
     )
 
     temperature: Optional[float] = Field(
         default=None,
-        description='Randomness introduced into the text-to-speech model. Ranges from 0 to 1.0.',
+        description='Randomness introduced into the text-to-speech model. Range: 0 to 1.0.',
         examples=[0.5, 0.7],
     )
 
@@ -107,14 +106,14 @@ class TTSConfig(BaseConfig):
 
     language_id: str = Field(
         default='en',
-        description=('Language id for the desired language.'),
+        description='Language ID for the desired language.',
         examples=['en'],
     )
 
     voice: Optional[str] = Field(
         default=None,
         description=(
-            'The voice_id for the desired voice. Ensure that this voice_id is available for the '
+            'The voice ID for the desired voice. Ensure this voice ID is available for the '
             'selected model.'
         ),
         examples=['8e9c4bc8-3979-48ab-8626-df53befc2090'],
@@ -134,30 +133,30 @@ class TTSConfig(BaseConfig):
 
 
 class APIResponse(BaseModel, Generic[T]):
-    """All responses from the API will be typed with this pydantic model."""
+    """All API responses will be typed with this pydantic model."""
 
     model_config = ConfigDict(extra='allow')
 
     data: Optional[T] = Field(
         default=None,
-        description='API response data. This will contain data on a succesful response.',
+        description='API response data. Contains data on a successful response.',
     )
 
     metadata: Optional[dict] = Field(
         default=None,
         description=(
-            'Additional metadata from the API. This will include pagination metadata for paginated '
+            'Additional metadata from the API. Includes pagination metadata for paginated '
             'endpoints.'
         ),
     )
 
     """
-    The below two fields only exist for responses from SSE endpoints.
+    The following fields are only for responses from SSE endpoints.
     """
     status_code: Optional[int] = Field(
         default=None,
         description=(
-            'Status code of API response. This is only set for responses on the SSE endpoints.'
+            'Status code of the API response. Only set for responses on SSE endpoints.'
         ),
         examples=[200, 400],
     )
@@ -165,7 +164,7 @@ class APIResponse(BaseModel, Generic[T]):
     errors: Optional[List[str]] = Field(
         default=None,
         description=(
-            'All errors associated with the SSE response, if the status_code is a non 2XX code.'
+            'All errors associated with the SSE response, if the status_code is non-2XX.'
         ),
     )
 
@@ -175,7 +174,7 @@ class VoiceObject(TypedDict):
 
     id: str
     """
-    The voice_id for the voice.
+    The voice ID.
     Examples: ['8e9c4bc8-3979-48ab-8626-df53befc2090']
     """
 
@@ -188,7 +187,7 @@ class VoiceObject(TypedDict):
     tags: List[str]
     """
     A list of tags describing the voice.
-    Examples: [['Male', 'American', 'Fourties', 'Narrator'], ['Female', 'British', 'Twenties', 'Excited']]
+    Examples: [['Male', 'American', 'Forties', 'Narrator'], ['Female', 'British', 'Twenties', 'Excited']]
     """
 
     model_availability: List[str]
@@ -197,13 +196,18 @@ class VoiceObject(TypedDict):
     Examples: [['neu_fast', 'neu_hq'], ['neu_hq']]
     """
 
+    standard: str
+    """
+    Indicates whether this is a standard voice provided by Neuphonic, or a cloned voice.
+    """
+
 
 class AgentObject(TypedDict):
     """TypedDict representing an agent object with its attributes."""
 
     id: str
     """
-    The agent_id for the agent.
+    The agent ID.
     Examples: ['1234abcd-5678-efgh-9101-ijklmnopqrst']
     """
 
@@ -228,7 +232,7 @@ class AgentObject(TypedDict):
 
 class AudioBaseModel(BaseModel):
     """
-    Base model for any models containg audio.
+    Base model for any models containing audio.
     """
 
     model_config = ConfigDict(extra='allow')
@@ -237,7 +241,7 @@ class AudioBaseModel(BaseModel):
         default=None,
         description=(
             'Audio received from the server. The server returns audio as a base64 encoded string, '
-            'this will be parsed into bytes by the field_validator.'
+            'which will be parsed into bytes by the field_validator.'
         ),
     )
 
@@ -255,7 +259,7 @@ class AudioBaseModel(BaseModel):
 
 
 class TTSResponse(AudioBaseModel):
-    """Structure of data received from TTS endpoints, when using any client in `Neuphonic.tts.`"""
+    """Structure of data received from TTS endpoints, when using any client in `Neuphonic.tts`."""
 
     text: Optional[str] = Field(
         default=None, description='Text corresponding to the audio snippet.'
@@ -272,21 +276,20 @@ class AgentResponse(AudioBaseModel):
     """Structure of data received from Agent endpoints, when using any client in `Neuphonic.agent`."""
 
     type: str = Field(
-        description='Which type of message is being sent the server',
+        description='Type of message being sent by the server',
         examples=['llm_response', 'audio_response', 'user_transcript'],
     )
 
     text: Optional[str] = Field(
         default=None,
         description=(
-            'This will contain the corresponding text if the `type` is `llm_response` or '
-            '`user_transcript`.'
+            'Corresponding text if the `type` is `llm_response` or `user_transcript`.'
         ),
     )
 
 
 class WebsocketEvents(Enum):
-    """Enum describing all of the valid websocket events that callbacks can be bound to."""
+    """Enum describing all valid websocket events that callbacks can be bound to."""
 
     OPEN: str = 'open'
     MESSAGE: str = 'message'
