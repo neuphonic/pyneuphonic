@@ -3,10 +3,9 @@ import pytest
 import tempfile
 import wave
 from pytest_mock import MockerFixture
-from pydantic import BaseModel
 import uuid
 from pyneuphonic import Neuphonic, TTSConfig
-from pyneuphonic.models import VoiceItem, APIResponse, TTSResponse, to_dict
+from pyneuphonic.models import APIResponse, TTSResponse, VoiceObject, to_dict
 
 from unittest.mock import MagicMock
 
@@ -119,20 +118,16 @@ async def test_get_voices(client: Neuphonic, mocker: MockerFixture):
     mock_response.json.return_value = return_value
     mock_get = mocker.patch('httpx.get', return_value=mock_response)
 
-    voices = client.voices.get()
+    response = client.voices.get()
+    assert isinstance(response, APIResponse)
+    voices = response.data['voices']
 
     assert len(voices) == 3
 
     for voice in voices:
-        assert isinstance(voice, VoiceItem)
-
-
-class CloneVoiceResponse(BaseModel):
-    class Data(BaseModel):
-        message: str
-        voice_id: str
-
-    data: Data
+        assert isinstance(voice, dict)
+        # assert that the response only contains valid keys, and not extra keys
+        assert all(key in VoiceObject.__annotations__.keys() for key in voice)
 
 
 @pytest.mark.asyncio
@@ -159,23 +154,21 @@ async def test_clone_voice(client: Neuphonic, mocker: MockerFixture):
 
         # Configure the mock response
         mock_response = mocker.Mock()
-        mock_response.json.return_value = {
+        return_value = {
             'data': {
                 'message': 'Voice has successfully been cloned.',
                 'voice_id': '12345',
             }
         }
+        mock_response.json.return_value = return_value
         mock_post.return_value = mock_response
 
         # Call the clone method
         response = client.voices.clone(voice_name, voice_file_path, voice_tags)
-        clone_voice_response = CloneVoiceResponse(**response)
 
         # Assertions
-        assert (
-            'Voice has successfully been cloned.' in clone_voice_response.data.message
-        )
-        assert clone_voice_response.data.voice_id == '12345'
+        assert isinstance(response, APIResponse)
+        assert return_value['data'] == response.data
 
         # Ensure httpx.post was called with correct parameters
         base_url = os.getenv('NEUPHONIC_API_URL', 'default-api-url')
@@ -210,22 +203,19 @@ def test_delete_voice(client: Neuphonic, mocker: MockerFixture):
     mock_delete = mocker.patch('httpx.delete', return_value=mock_response)
 
     # Delete Voice
-    delete_response = client.voices.delete(voice_id)
+    response = client.voices.delete(voice_id)
+
+    # Assertions
+    assert isinstance(response, APIResponse)
+    assert return_value['data'] == response.data
 
     # Assert the HTTP method and endpoint were called correctly
     base_url = os.getenv('NEUPHONIC_API_URL')
     mock_delete.assert_called_once_with(
-        f'https://{base_url}/voices?voice_id={voice_id}',
+        f'https://{base_url}/voices/{voice_id}',
         headers={'x-api-key': mocker.ANY},  # Ensures api key was present
         timeout=10,
     )
-
-    # Deserialize response into the correct response model
-    delete_voice_response = CloneVoiceResponse(**delete_response)
-
-    # Check the response message
-    assert 'Voice was successfully deleted' in delete_voice_response.data.message
-    assert delete_voice_response.data.voice_id == voice_id
 
 
 # Example of a test where the HTTP post is mocked
@@ -313,14 +303,6 @@ def test_restore_get(client: Neuphonic, mocker: MockerFixture):
     assert result['status'] == 'Finished'
 
 
-class AgentResponse(BaseModel):
-    class Data(BaseModel):
-        message: str
-        id: str
-
-    data: Data
-
-
 def test_create_agent(client: Neuphonic, mocker: MockerFixture):
     mock_response = mocker.Mock()
     mock_response.is_success = True
@@ -342,10 +324,11 @@ def test_create_agent(client: Neuphonic, mocker: MockerFixture):
         'greeting': None,
     }
 
-    create_response = client.agents.create(**data)
+    response = client.agents.create(**data)
 
-    create_response = AgentResponse(**create_response)
-    assert create_response.data.id == random_uuid
+    # Assertions
+    assert isinstance(response, APIResponse)
+    assert return_value['data'] == response.data
 
     mock_create.assert_called_once_with(
         f'https://{client._base_url}/agents',
@@ -370,10 +353,11 @@ def test_delete_agent(client: Neuphonic, mocker: MockerFixture):
     mock_response.json.return_value = return_value
     mock_delete = mocker.patch('httpx.delete', return_value=mock_response)
 
-    delete_response = client.agents.delete(agent_id=random_uuid)
+    response = client.agents.delete(agent_id=random_uuid)
 
-    delete_response = AgentResponse(**delete_response)
-    assert delete_response.data.id == random_uuid
+    # Assertions
+    assert isinstance(response, APIResponse)
+    assert return_value['data'] == response.data
 
     mock_delete.assert_called_once_with(
         f'https://{client._base_url}/agents/{random_uuid}',
@@ -401,9 +385,11 @@ def test_list_agents(client: Neuphonic, mocker: MockerFixture):
     mock_response.json.return_value = return_value
     mock_get = mocker.patch('httpx.get', return_value=mock_response)
 
-    get_response = client.agents.get()
-    assert get_response['data']['agents'][0]['id'] == random_uuid_1
-    assert get_response['data']['agents'][1]['id'] == random_uuid_2
+    response = client.agents.get()
+
+    # Assertions
+    assert isinstance(response, APIResponse)
+    assert return_value['data'] == response.data
 
     mock_get.assert_called_once_with(
         f'https://{client._base_url}/agents',
@@ -431,8 +417,11 @@ def test_list_single_agent(client: Neuphonic, mocker: MockerFixture):
     mock_response.json.return_value = return_value
     mock_get = mocker.patch('httpx.get', return_value=mock_response)
 
-    get_response = client.agents.get(agent_id=random_uuid)
-    assert get_response['data']['agent']['id'] == random_uuid
+    response = client.agents.get(agent_id=random_uuid)
+
+    # Assertions
+    assert isinstance(response, APIResponse)
+    assert return_value['data'] == response.data
 
     mock_get.assert_called_once_with(
         f'https://{client._base_url}/agents/{random_uuid}',

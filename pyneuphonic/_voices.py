@@ -1,14 +1,20 @@
-from typing import List
+from typing import List, Optional
 
 import httpx
 
 from ._endpoint import Endpoint
-from .models import VoicesResponse, VoiceItem
+from .models import APIResponse, VoiceObject  # noqa: F401
 
 
 class Voices(Endpoint):
-    def get(self) -> List[VoiceItem]:
-        """List all the voices."""
+    def get(self) -> APIResponse[dict]:
+        """Lists all voices in your voice library.
+
+        Returns
+        -------
+        APIResponse[dict]
+            response.data['voices'] will be a list of VoiceObject objects.
+        """
         response = httpx.get(
             f'{self.http_url}/voices',
             headers=self.headers,
@@ -22,11 +28,31 @@ class Voices(Endpoint):
                 response=response,
             )
 
-        voice_response = VoicesResponse(**response.json())
+        return APIResponse(**response.json())
 
-        return voice_response.data.voices
+    def _get_voice_id_from_name(self, voice_name) -> str:
+        """Gets the voice_id given a voice name.
 
-    def voice(self, voice_id: str = None, voice_name: str = None):
+        Parameters
+        ----------
+        voice_name : str
+            The name of the voice to retrieve the voice_id for.
+
+        Raises
+        ------
+        ValueError
+            Raised if there is no voice with the provided name.
+        """
+        response = self.get()
+        voices = response.data['voices']
+
+        try:
+            # extract the voice_id for the requested voice from the list of all voices
+            return next(voice['id'] for voice in voices if voice['name'] == voice_name)
+        except StopIteration as e:
+            raise ValueError(f'No voice found with the name {voice_name}.')
+
+    def voice(self, voice_id: str = None, voice_name: str = None) -> APIResponse[dict]:
         """Get information about specific voice.
 
         Parameters
@@ -38,8 +64,8 @@ class Voices(Endpoint):
 
         Returns
         -------
-        dict
-            A dictionary with the response data from the API.
+        APIResponse[dict]
+            response.data['voice'] will be a single VoiceObject object.
 
         Raises
         ------
@@ -49,18 +75,7 @@ class Voices(Endpoint):
 
         # Accept case if user only provide name
         if not voice_id:
-            # Get all voices for this user
-            voices = self.get()
-            try:
-                # Fetch voice id
-                voice_id = next(
-                    voice.id for voice in voices if voice.name == voice_name
-                )
-
-            except StopIteration as e:
-                raise ValueError(
-                    f'No voice found with the name {voice_name}. You cannot update this voice.'
-                )
+            voice_id = self._get_voice_id_from_name(voice_name=voice_name)
 
         response = httpx.get(
             f'{self.http_url}/voices/{voice_id}',
@@ -75,11 +90,11 @@ class Voices(Endpoint):
                 response=response,
             )
 
-        return response.json()
+        return APIResponse(**response.json())
 
     def clone(
         self, voice_name: str, voice_file_path: str, voice_tags: List[str] = []
-    ) -> dict:
+    ) -> APIResponse[dict]:
         """
         Clone a voice by uploading a file with the specified name and tags.
 
@@ -94,8 +109,8 @@ class Voices(Endpoint):
 
         Returns
         -------
-        dict
-            A dictionary with the response data from the API.
+        APIResponse[dict]
+            response.data will contain a success message with voice_id of the cloned voice.
 
         Raises
         ------
@@ -131,30 +146,37 @@ class Voices(Endpoint):
             )
 
         # Return the JSON response content as a dictionary
-        return response.json()
+        return APIResponse(**response.json())
 
     def update(
         self,
-        new_voice_file_path: str = None,
-        voice_id: str = None,
-        voice_name: str = None,
+        voice_id: Optional[str] = None,
+        voice_name: Optional[str] = None,
+        new_voice_file_path: Optional[str] = None,
         new_voice_name: str = '',
-        new_voice_tags: list[str] = None,
-    ) -> dict:
+        new_voice_tags: Optional[List[str]] = None,
+    ) -> APIResponse[dict]:
         """
         Update a voice by its ID or name.
 
         Parameters
         ----------
-        voice_id : str
-            The ID of the voice to be deleted.
-        voice_name : str
-            The name of the voice to be deleted.
+        voice_id : Optional[str]
+            The ID of the voice to update.
+        voice_name : Optional[str]
+            The name of the voice to update. This does not need to be provided if voice_id
+            is provided.
+        new_voice_file_path: Optional[str]
+            The file path for the new audio file to use for the cloned voice.
+        new_voice_name: str
+            The new name updated name for the voice.
+        new_voice_tags: Optional[List[str]]
+            The new tags for the voice.
 
         Returns
         -------
-        dict
-            A dictionary with the response data from the API.
+        APIResponse[dict]
+            response.data will contain a success message with the updated fields of the voice.
 
         Raises
         ------
@@ -165,15 +187,9 @@ class Voices(Endpoint):
 
         # Accept case if user only provide name
         if not voice_id:
-            # Get all voices for this user
-            voices = self.get()
             try:
-                # Fetch voice id
-                voice_id = next(
-                    voice.id for voice in voices if voice.name == voice_name
-                )
-
-            except StopIteration as e:
+                voice_id = self._get_voice_id_from_name(voice_name=voice_name)
+            except ValueError as e:
                 raise ValueError(
                     f'No voice found with the name {voice_name}. You cannot update this voice.'
                 )
@@ -199,7 +215,7 @@ class Voices(Endpoint):
 
         # Call API
         response = httpx.patch(
-            f'{self.http_url}/voices?voice_id={voice_id}&new_voice_name={new_voice_name}',
+            f'{self.http_url}/voices/{voice_id}?new_voice_name={new_voice_name}',
             params=params,
             headers=self.headers,
             timeout=self.timeout,
@@ -215,9 +231,9 @@ class Voices(Endpoint):
             )
 
         # Return the JSON response content as a dictionary
-        return response.json()
+        return APIResponse(**response.json())
 
-    def delete(self, voice_id: str = None, voice_name=None) -> dict:
+    def delete(self, voice_id: str = None, voice_name=None) -> APIResponse[dict]:
         """
         Delete a voice by its ID.
 
@@ -228,8 +244,8 @@ class Voices(Endpoint):
 
         Returns
         -------
-        dict
-            A dictionary with the response data from the API.
+        APIResponse[dict]
+            response.data will contain a success message with the updated fields of the voice.
 
         Raises
         ------
@@ -238,21 +254,15 @@ class Voices(Endpoint):
             permissions to delete the voice.
         """
         if not voice_id:
-            # Get all voices for this user
-            voices = self.get()
             try:
-                # Fetch voice id
-                voice_id = next(
-                    voice.id for voice in voices if voice.name == voice_name
-                )
-
-            except StopIteration as e:
+                voice_id = self._get_voice_id_from_name(voice_name=voice_name)
+            except ValueError as e:
                 raise ValueError(
                     f'No voice found with the name {voice_name}. You cannot Delete this voice.'
                 )
 
         response = httpx.delete(
-            f'{self.http_url}/voices?voice_id={voice_id}',
+            f'{self.http_url}/voices/{voice_id}',
             headers=self.headers,
             timeout=self.timeout,
         )
@@ -266,4 +276,4 @@ class Voices(Endpoint):
             )
 
         # Return the JSON response content as a dictionary
-        return response.json()
+        return APIResponse(**response.json())
