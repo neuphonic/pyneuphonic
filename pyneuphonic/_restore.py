@@ -2,6 +2,7 @@ import httpx
 import os
 
 from ._endpoint import Endpoint
+from .models import APIResponse
 
 
 class Restore(Endpoint):
@@ -11,7 +12,7 @@ class Restore(Endpoint):
         transcript: str = '',
         lang_code: str = 'eng-us',
         is_transcript_file: bool = False,
-    ):
+    ) -> APIResponse[dict]:
         if is_transcript_file:
             # if transcript is a path
             if os.path.exists(transcript) and os.path.isfile(transcript):
@@ -40,10 +41,9 @@ class Restore(Endpoint):
                 response=response,
             )
 
-        # Return the JSON response content as a dictionary
-        return response.json()
+        return APIResponse(**response.json())
 
-    def jobs(self):
+    def jobs(self) -> APIResponse[dict]:
         response = httpx.get(f'{self.http_url}/restore', headers=self.headers)
 
         # Handle response errors
@@ -54,10 +54,9 @@ class Restore(Endpoint):
                 response=response,
             )
 
-        # Return the JSON response content as a dictionary
-        return response.json()
+        return APIResponse(**response.json())
 
-    def get(self, job_id=None):
+    def get(self, job_id=None) -> APIResponse[dict]:
         response = httpx.get(f'{self.http_url}/restore/{job_id}', headers=self.headers)
 
         # Handle response errors
@@ -68,5 +67,4 @@ class Restore(Endpoint):
                 response=response,
             )
 
-        # Return the JSON response content as a dictionary
-        return response.json()
+        return APIResponse(**response.json())
