@@ -223,7 +223,7 @@ def test_restore_with_transcript_file_success(client: Neuphonic, mocker: MockerF
     # Mock the response of httpx.post
     mock_response = MagicMock()
     mock_response.is_success = True
-    mock_response.json.return_value = {'status': 'success', 'job_id': '1234'}
+    mock_response.json.return_value = {'data': {'status': 'success', 'job_id': '1234'}}
 
     mock_http_post = mocker.patch('httpx.post', autospec=True)
     mock_http_post.return_value = mock_response
@@ -234,12 +234,12 @@ def test_restore_with_transcript_file_success(client: Neuphonic, mocker: MockerF
     with tempfile.NamedTemporaryFile(suffix='.txt', delete=False) as temp_file:
         transcript_file = temp_file.name
 
-    result = client.restorations.restore(
+    response = client.restorations.restore(
         audio_path, transcript_file, is_transcript_file=True
     )
 
-    assert result['status'] == 'success'
-    assert result['job_id'] == '1234'
+    assert response.data['status'] == 'success'
+    assert response.data['job_id'] == '1234'
 
 
 # Example of a test where the HTTP post is mocked
@@ -249,7 +249,7 @@ def test_restore_with_transcript_string_success(
     # Mock the response of httpx.post
     mock_response = MagicMock()
     mock_response.is_success = True
-    mock_response.json.return_value = {'status': 'success', 'job_id': '1234'}
+    mock_response.json.return_value = {'data': {'status': 'success', 'job_id': '1234'}}
 
     mock_http_post = mocker.patch('httpx.post', autospec=True)
     mock_http_post.return_value = mock_response
@@ -257,12 +257,12 @@ def test_restore_with_transcript_string_success(
     with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as temp_file:
         audio_path = temp_file.name
 
-    result = client.restorations.restore(
+    response = client.restorations.restore(
         audio_path, 'transcript.txt', is_transcript_file=False
     )
 
-    assert result['status'] == 'success'
-    assert result['job_id'] == '1234'
+    assert response.data['status'] == 'success'
+    assert response.data['job_id'] == '1234'
 
 
 # Example of a test where the HTTP post is mocked
@@ -290,7 +290,7 @@ def test_restore_get(client: Neuphonic, mocker: MockerFixture):
     # Mock the response of httpx.post
     mock_response = MagicMock()
     mock_response.is_success = True
-    mock_response.json.return_value = {'status': 'Finished', 'job_id': '1234'}
+    mock_response.json.return_value = {'data': {'status': 'Finished', 'job_id': '1234'}}
 
     mock_http_post = mocker.patch('httpx.get', autospec=True)
     mock_http_post.return_value = mock_response
@@ -298,9 +298,9 @@ def test_restore_get(client: Neuphonic, mocker: MockerFixture):
     with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as temp_file:
         audio_path = temp_file.name
 
-    result = client.restorations.get(job_id='1234')
+    response = client.restorations.get(job_id='1234')
 
-    assert result['status'] == 'Finished'
+    assert response.data['status'] == 'Finished'
 
 
 def test_create_agent(client: Neuphonic, mocker: MockerFixture):
