@@ -252,8 +252,8 @@ As per the examples above, you can use the `AudioPlayer` object to save audio.
 player.save_audio('output.wav')
 ```
 However, if you do not want to play audio and simply want to save it, check out the examples
-in [snippets/sse/save_audio.py](./snippets/sse/save_audio.py) and
-[snippets/websocket/save_audio.py](./snippets/websocket/save_audio.py) for examples on how to
+in [examples/sse/save_audio.py](./examples/sse/save_audio.py) and
+[examples/websocket/save_audio.py](./examples/websocket/save_audio.py) for examples on how to
 do this.
 
 ### Speech Restoration
@@ -351,4 +351,4 @@ asyncio.run(main())
 ```
 
 ## Example Applications
-Check out the [snippets](./snippets/) folder for some example applications.
+Check out the [examples](./examples/) folder for some example applications.
