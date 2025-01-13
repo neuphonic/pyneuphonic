@@ -322,14 +322,13 @@ response = client.restorations.restore(voice_file_path, transcript, lang_code, i
 
 
 ### Agents
-
-With Agents, you can create, manage, and interact with intelligent AI assistants. You can create an agent
-easily using the example here:
-
+With Agents, you can create, manage, and interact with intelligent AI assistants. You can create an
+agent easily using the example here:
 ```python
 import os
 import asyncio
 
+# See AgentConfig model for full list of parameters to configure the agent
 from pyneuphonic import Neuphonic, Agent, AgentConfig
 
 
@@ -342,6 +341,8 @@ async def main():
         greeting='Hi, how can I help you today?'
     ).data['id']
 
+    # All additional keyword arguments (such as `agent_id` and `tts_model`) are passed as
+    # parameters to the model. See AgentConfig model for full list of parameters.
     agent = Agent(client, agent_id=agent_id, tts_model='neu_hq')
 
     await agent.start()
