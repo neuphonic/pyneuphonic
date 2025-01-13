@@ -94,7 +94,7 @@ response.data  # this will contain a success message with the voice_id of the cl
 ```
 
 If you have successfully cloned a voice, the following message will be displayed: "Voice has
-successfully been cloned with ID <VOICE_ID>." Once cloned, you can use this voice just like any of
+successfully been cloned with ID `<VOICE_ID>`." Once cloned, you can use this voice just like any of
 the standard voices when calling the TTS (Text-to-Speech) service.
 
 To see a list of all available voices, including cloned ones, use `client.voices.get()` as shown in
@@ -266,13 +266,15 @@ Speech restoration involves enhancing and repairing degraded audio to improve it
 To restore an audio clip without additional input, use the following code:
 
 ```python
-voice_file_path = 'example.wav'
-response = client.restorations.restore(voice_file_path)
+# Submit a request to restore a degraded file
+voice_file_path = '<FILE_PATH>.wav'  # select a degraded file to restore
+restoration_response = client.restorations.restore(voice_file_path)
+print(restoration_response.data)  # a dictionary containing the job_id
 
-print(response) # A dictionary containing the job_id
-
-job_id = response['job_id']
-status = client.restorations.get(response['job_id'])
+# Get the status of the job
+job_id = restoration_response.data['job_id']
+status_response = client.restorations.get(job_id=job_id)
+print(status_response.data)
 ```
 If the job is completed, the status will include the URL where you can access the results (file_url). If the status is 'Not Finished,' please wait a moment before rerunning restorations.get(). Once the status changes to 'Finished,' you will be able to retrieve the results.
 
@@ -281,17 +283,15 @@ Once you queue a job for restoration using the `.restore()` method you will rece
 To get the status and the link to receive the results of your job you call the `.get()` method as following.
 
 ```python
-status = client.restorations.get(job_id = job_id)
-print(status) # Dictionary with the status of the job and the url where you can retrieve the results.
+response = client.restorations.get(job_id='<JOB_ID>')
+response.data  # a dict with the status of the job and the url where you can download the results.
 ```
 
 #### List all Active and Historic Jobs
-
 To list all your active and previous jobs you can run the `.jobs()` function.
-
 ```python
-jobs = client.restorations.jobs()
-print(jobs)
+response = client.restorations.jobs()
+response.data
 ```
 
 
@@ -314,7 +314,7 @@ voice_file_path = 'example.wav'
 transcript = 'example.txt'
 lang_code = 'eng-us'
 is_transcript_file = True # Switch this to true to feed in a file as transcript.
-response = client.restorations.restore(voice_file_path, transcript, lang_code)
+response = client.restorations.restore(voice_file_path, transcript, lang_code, is_transcript_file=True)
 ```
 **Note:** You have to set is_transcript_file to true for the program to read this as a file rather than a string.
 
