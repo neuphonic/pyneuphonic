@@ -81,7 +81,7 @@ async def test_websocket_async(client):
 
 
 def test_get_voices(client):
-    response = client.voices.get()
+    response = client.voices.list()
     voices = response.data['voices']
 
     assert len(voices) > 0

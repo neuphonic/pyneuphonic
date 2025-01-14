@@ -7,7 +7,7 @@ from .models import APIResponse, VoiceObject  # noqa: F401
 
 
 class Voices(Endpoint):
-    def get(self) -> APIResponse[dict]:
+    def list(self) -> APIResponse[dict]:
         """Lists all voices in your voice library.
 
         Returns
@@ -43,7 +43,7 @@ class Voices(Endpoint):
         ValueError
             Raised if there is no voice with the provided name.
         """
-        response = self.get()
+        response = self.list()
         voices = response.data['voices']
 
         try:
@@ -52,7 +52,7 @@ class Voices(Endpoint):
         except StopIteration as e:
             raise ValueError(f'No voice found with the name {voice_name}.')
 
-    def voice(self, voice_id: str = None, voice_name: str = None) -> APIResponse[dict]:
+    def get(self, voice_id: str = None, voice_name: str = None) -> APIResponse[dict]:
         """Get information about specific voice.
 
         Parameters
@@ -74,6 +74,8 @@ class Voices(Endpoint):
         """
 
         # Accept case if user only provide name
+        if voice_id is None and voice_name is None:
+            raise ValueError("Please provide one of voice_id or voice_name")
         if not voice_id:
             voice_id = self._get_voice_id_from_name(voice_name=voice_name)
 

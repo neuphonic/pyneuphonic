@@ -26,6 +26,8 @@ For support or to get involved, join our [Discord](https://discord.gg/G258vva7gZ
       - [Restoration with a Transcript and Language Code](#restoration-with-a-transcript-and-language-code)
       - [Restoration with a Transcript File](#restoration-with-a-transcript-file)
     - [Agents](#agents)
+      - [List agents](#list-agents)
+      - [Get agent](#get-agent)
   - [Example Applications](#example-applications)
 
 ## Documentation
@@ -60,7 +62,7 @@ from pyneuphonic import Neuphonic
 import os
 
 client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_TOKEN'))
-response = client.voices.get()  # get's all available voices
+response = client.voices.list()  # get's all available voices
 voices = response.data['voices']
 
 voices
@@ -69,7 +71,7 @@ voices
 #### Get Voice
 To get information about an existing voice please call.
 ```python
-response = client.voices.voice(voice_id='<VOICE_ID>')  # Gets information about the selected voice id
+response = client.voices.get(voice_id='<VOICE_ID>')  # Gets information about the selected voice id
 response.data  # Response contains all information about this voice
 ```
 
@@ -290,7 +292,7 @@ response.data  # a dict with the status of the job and the url where you can dow
 #### List all Active and Historic Jobs
 To list all your active and previous jobs you can run the `.jobs()` function.
 ```python
-response = client.restorations.jobs()
+response = client.restorations.list()
 response.data
 ```
 
@@ -349,6 +351,21 @@ async def main():
 
 asyncio.run(main())
 ```
+
+#### List agents
+To list all your agents:
+```python
+response = client.agents.list()
+response.data
+```
+
+#### Get agent
+To get information about a specific agent:
+```python
+response = client.agents.get(agent_id='<AGENT_ID>')
+response.data
+```
+
 
 ## Example Applications
 Check out the [examples](./examples/) folder for some example applications.

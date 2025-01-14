@@ -43,7 +43,7 @@ class Restore(Endpoint):
 
         return APIResponse(**response.json())
 
-    def jobs(self) -> APIResponse[dict]:
+    def list(self) -> APIResponse[dict]:
         response = httpx.get(f'{self.http_url}/restore', headers=self.headers)
 
         # Handle response errors
