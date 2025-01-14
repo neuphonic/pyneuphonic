@@ -118,7 +118,7 @@ async def test_get_voices(client: Neuphonic, mocker: MockerFixture):
     mock_response.json.return_value = return_value
     mock_get = mocker.patch('httpx.get', return_value=mock_response)
 
-    response = client.voices.get()
+    response = client.voices.list()
     assert isinstance(response, APIResponse)
     voices = response.data['voices']
 
@@ -385,7 +385,7 @@ def test_list_agents(client: Neuphonic, mocker: MockerFixture):
     mock_response.json.return_value = return_value
     mock_get = mocker.patch('httpx.get', return_value=mock_response)
 
-    response = client.agents.get()
+    response = client.agents.list()
 
     # Assertions
     assert isinstance(response, APIResponse)
