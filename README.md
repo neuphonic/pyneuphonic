@@ -71,7 +71,7 @@ voices
 #### Get Voice
 To get information about an existing voice please call.
 ```python
-response = client.voices.voice(voice_id='<VOICE_ID>')  # Gets information about the selected voice id
+response = client.voices.get(voice_id='<VOICE_ID>')  # Gets information about the selected voice id
 response.data  # Response contains all information about this voice
 ```
 

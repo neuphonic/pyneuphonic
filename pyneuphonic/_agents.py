@@ -7,9 +7,8 @@ from pyneuphonic.models import APIResponse, AgentObject  # noqa: F401
 
 
 class Agents(Endpoint):
-    def get(
+    def list(
         self,
-        agent_id: Optional[str] = None,
     ) -> APIResponse[dict]:
         """
         List created agents.
@@ -33,7 +32,42 @@ class Agents(Endpoint):
             If the request fails to fetch.
         """
         response = httpx.get(
-            f'{self.http_url}/agents{f"/{agent_id}" if agent_id is not None else ""}',
+            f'{self.http_url}/agents',
+            headers=self.headers,
+            timeout=self.timeout,
+        )
+
+        self.raise_for_status(response=response, message='Failed to fetch agents.')
+
+        return APIResponse(**response.json())
+
+    def get(
+        self,
+        agent_id: str,
+    ) -> APIResponse[dict]:
+        """
+        List created agents.
+
+        By default this endpoint returns only `id` and `name` for every agent, provide the `agent_id`
+        parameter to get all the fields for a specific agent.
+
+        Parameters
+        ----------
+        agent_id
+            The ID of the agent to fetch. If None, fetches all agents.
+
+        Returns
+        -------
+        APIResponse[dict]
+            response.data['agent'] will be an object of type AgentObject.
+
+        Raises
+        ------
+        httpx.HTTPStatusError
+            If the request fails to fetch.
+        """
+        response = httpx.get(
+            f'{self.http_url}/agents/{agent_id}',
             headers=self.headers,
             timeout=self.timeout,
         )
