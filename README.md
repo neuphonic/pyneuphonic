@@ -26,6 +26,8 @@ For support or to get involved, join our [Discord](https://discord.gg/G258vva7gZ
       - [Restoration with a Transcript and Language Code](#restoration-with-a-transcript-and-language-code)
       - [Restoration with a Transcript File](#restoration-with-a-transcript-file)
     - [Agents](#agents)
+      - [List agents](#list-agents)
+      - [Get agent](#get-agent)
   - [Example Applications](#example-applications)
 
 ## Documentation
