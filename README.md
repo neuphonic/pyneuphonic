@@ -60,7 +60,7 @@ from pyneuphonic import Neuphonic
 import os
 
 client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_TOKEN'))
-response = client.voices.get()  # get's all available voices
+response = client.voices.list()  # get's all available voices
 voices = response.data['voices']
 
 voices
@@ -290,7 +290,7 @@ response.data  # a dict with the status of the job and the url where you can dow
 #### List all Active and Historic Jobs
 To list all your active and previous jobs you can run the `.jobs()` function.
 ```python
-response = client.restorations.jobs()
+response = client.restorations.list()
 response.data
 ```
 
@@ -349,6 +349,21 @@ async def main():
 
 asyncio.run(main())
 ```
+
+#### List agents
+To list all your agents:
+```python
+response = client.agents.list()
+response.data
+```
+
+#### Get agent
+To get information about a specific agent:
+```python
+response = client.agents.get(agent_id='<AGENT_ID>')
+response.data
+```
+
 
 ## Example Applications
 Check out the [examples](./examples/) folder for some example applications.
