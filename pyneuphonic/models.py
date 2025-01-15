@@ -66,7 +66,7 @@ class AgentConfig(BaseConfig):
         examples=[8000, 16000, 22050],
     )
 
-    outgoing_sampling_rate: Optional[int] = Field(
+    return_sampling_rate: Optional[int] = Field(
         default=22050,
         description='Sampling rate of the audio returned from the server.',
         examples=[8000, 16000, 22050],
@@ -78,7 +78,7 @@ class AgentConfig(BaseConfig):
         examples=['pcm_linear', 'pcm_mulaw'],
     )
 
-    outgoing_encoding: Optional[str] = Field(
+    return_encoding: Optional[str] = Field(
         default='pcm_linear',
         description='Encoding of the audio returned from the server.',
         examples=['pcm_linear', 'pcm_mulaw'],
