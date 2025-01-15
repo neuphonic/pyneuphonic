@@ -52,7 +52,7 @@ class Agent:
         if 'asr' in self.config.mode:
             # passing in the websocket object will automatically forward audio to the server
             self.recorder = AsyncAudioRecorder(
-                sampling_rate=self.config.sampling_rate,
+                sampling_rate=self.config.incoming_sampling_rate,
                 websocket=self.ws,
                 player=self.player,
             )

@@ -33,6 +33,12 @@ class AgentConfig(BaseConfig):
         examples=['da78ea32-9225-436e-b10d-d5b101bb01a6'],  # example agent_id
     )
 
+    tts_model: Optional[str] = Field(
+        default=None,
+        description='The Neuphonic model to be used for text-to-speech synthesis.',
+        examples=['neu_fast', 'neu_hq'],
+    )
+
     endpointing: Optional[float] = Field(
         default=None,
         description=(
@@ -51,8 +57,6 @@ class AgentConfig(BaseConfig):
         examples=['asr-llm-tts', 'llm-tts'],
     )
 
-    sampling_rate: int = 16000
-
     incoming_sampling_rate: Optional[int] = Field(
         default=16000,
         description=(
@@ -62,7 +66,7 @@ class AgentConfig(BaseConfig):
         examples=[8000, 16000, 22050],
     )
 
-    outgoing_sampling_rate: Optional[int] = Field(
+    return_sampling_rate: Optional[int] = Field(
         default=22050,
         description='Sampling rate of the audio returned from the server.',
         examples=[8000, 16000, 22050],
@@ -74,7 +78,7 @@ class AgentConfig(BaseConfig):
         examples=['pcm_linear', 'pcm_mulaw'],
     )
 
-    outgoing_encoding: Optional[str] = Field(
+    return_encoding: Optional[str] = Field(
         default='pcm_linear',
         description='Encoding of the audio returned from the server.',
         examples=['pcm_linear', 'pcm_mulaw'],
