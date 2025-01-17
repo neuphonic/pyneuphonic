@@ -10,26 +10,28 @@ class SSEClientBase(Endpoint):
     """Contains shared functions used by both the SSEClient and the AsyncSSE Client."""
 
     def _parse_message(self, message: str) -> Optional[APIResponse[TTSResponse]]:
-        """Parse each response from the server. Return as an APIResponse object."""
-        lines = message.split('\n')
-        data = {}
+        """
+        Parse each response from the server and return it as an APIResponse object.
 
-        for line in lines:
-            if not line.strip():
-                continue
+        The message will either be:
+        - `event: error`
+        - `event: message`
+        - `data: { "status_code": 200, "data": {"audio": ... } }`
+        """
+        message = message.strip()
 
-            try:
-                key, value = line.split(': ', 1)
-            except Exception as e:
-                raise ValueError(f'Client request was malformed or incorrect: {line}')
+        if not message or 'data' not in message:
+            return None
 
-            if key == 'data':
-                data[key] = value
+        _, value = message.split(': ', 1)
+        message = APIResponse[TTSResponse](**json.loads(value))
 
-        if 'data' in data:
-            return APIResponse[TTSResponse](**json.loads(data['data']))
+        if message.errors is not None:
+            raise Exception(
+                f'Status {message.status_code} error received: {message.errors}.'
+            )
 
-        return None
+        return message
 
 
 class SSEClient(SSEClientBase):
