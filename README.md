@@ -2,9 +2,11 @@
 The official Neuphonic Python library providing simple, convenient access to the Neuphonic text-to-speech websocket
 API from any Python 3.9+ application.
 
-For support or to get involved, join our [Discord](https://discord.gg/G258vva7gZ)!
+For comprehensive guides and official documentation, check out [https://docs.neuphonic.com](https://docs.neuphonic.com).
+If you need support or want to join the community, visit our [Discord](https://discord.gg/G258vva7gZ)!
 
 
+- [PyNeuphonic](#pyneuphonic)
   - [Documentation](#documentation)
     - [Installation](#installation)
       - [API Key](#api-key)
@@ -15,6 +17,7 @@ For support or to get involved, join our [Discord](https://discord.gg/G258vva7gZ
       - [Update Voice](#update-voice)
       - [Delete Voice](#delete-voice)
     - [Audio Generation](#audio-generation)
+      - [Configure the Text-to-Speech Synthesis](#configure-the-text-to-speech-synthesis)
       - [SSE (Server Side Events)](#sse-server-side-events)
       - [Asynchronous SSE](#asynchronous-sse)
       - [Asynchronous Websocket](#asynchronous-websocket)
@@ -71,7 +74,7 @@ voices
 #### Get Voice
 To get information about an existing voice please call.
 ```python
-response = client.voices.get(voice_id='<VOICE_ID>')  # Gets information about the selected voice id
+response = client.voices.get(voice_id='<VOICE_ID>')  # gets information about the selected voice id
 response.data  # response contains all information about this voice
 ```
 
@@ -99,8 +102,7 @@ If you have successfully cloned a voice, the following message will be displayed
 successfully been cloned with ID `<VOICE_ID>`." Once cloned, you can use this voice just like any of
 the standard voices when calling the TTS (Text-to-Speech) service.
 
-To see a list of all available voices, including cloned ones, use `client.voices.list()` as shown in
-the example a few sections above.
+To see a list of all available voices, including cloned ones, use `client.voices.list()`.
 
 **Note:** Your voice reference clip must meet the following criteria: it should be at least 6
 seconds long, in .mp3 or .wav format, and no larger than 10 MB in size.
@@ -183,7 +185,7 @@ The following parameters are examples of parameters which can be adjusted. Ensur
   **Default**: `1.0`
   **Examples**: `0.7`, `1.0`, `1.5`
 
-You can access the complete documentation for TTS configuration here: [TTSConfig](/https://github.com/neuphonic/pyneuphonic/blob/main/pyneuphonic/models.py)
+View the [TTSConfig](https://github.com/neuphonic/pyneuphonic/blob/main/pyneuphonic/models.py) object to see all valid options.
 
 #### SSE (Server Side Events)
 ```python
@@ -195,7 +197,7 @@ client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_TOKEN'))
 
 sse = client.tts.SSEClient()
 
-# TTSConfig is a pydantic model so check out the source code for all valid options
+# View the TTSConfig object to see all valid options
 tts_config = TTSConfig(
     model='neu_hq',
     speed=1.05,
@@ -360,7 +362,7 @@ agent easily using the example here:
 import os
 import asyncio
 
-# See AgentConfig model for full list of parameters to configure the agent
+# View the AgentConfig object for a full list of parameters to configure the agent
 from pyneuphonic import Neuphonic, Agent, AgentConfig
 
 
