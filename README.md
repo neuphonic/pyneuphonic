@@ -159,25 +159,27 @@ response.data
 
 #### Configure the Text-to-Speech Synthesis
 To configure the TTS settings, modify the TTSConfig model.
-The following parameters can be adjusted. Ensure that the selected combination of model, language, and voice is valid. For details on supported combinations, refer to the [Models](https://docs.neuphonic.com/resources/models) and [Voices](https://docs.neuphonic.com/resources/voices) pages.
+The following parameters are examples of parameters which can be adjusted. Ensure that the selected combination of model, language, and voice is valid. For details on supported combinations, refer to the [Models](https://docs.neuphonic.com/resources/models) and [Voices](https://docs.neuphonic.com/resources/voices) pages.
 
 - **`model`**
   The text-to-speech model to use.
+
   **Default**: `'neu_fast'`
   **Examples**: `'neu_fast'`, `'neu_hq'`
 
 - **`language_id`**
   Language code for the desired language.
-  **Default**: `'en'`
-  **Examples**: `'en'`, `'es'`, `'de'`, `'nl'`
+
+  **Default**: `'en'` **Examples**: `'en'`, `'es'`, `'de'`, `'nl'`
 
 - **`voice`**
   The voice ID for the desired voice. Ensure this voice ID is available for the selected model and language.
-  **Default**: `None`
-  **Examples**: `'8e9c4bc8-3979-48ab-8626-df53befc2090'`
 
-- **`speed`** *(Optional, float)*
+  **Default**: `None` **Examples**: `'8e9c4bc8-3979-48ab-8626-df53befc2090'`
+
+- **`speed`**
   Playback speed of the audio.
+
   **Default**: `1.0`
   **Examples**: `0.7`, `1.0`, `1.5`
 
