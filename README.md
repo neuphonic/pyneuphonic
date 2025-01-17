@@ -201,7 +201,7 @@ sse = client.tts.SSEClient()
 tts_config = TTSConfig(
     model='neu_hq',
     speed=1.05,
-    langauge='en',
+    language_id='en',
     voice='e564ba7e-aa8d-46a2-96a8-8dffedade48f'  # use client.voices.list() to view all voice ids
 )
 
