@@ -98,7 +98,6 @@ class SSEClient(SSEClientBase):
             json={'text': text, 'model': to_dict(tts_config)},
         ) as response:
             for message in response.iter_lines():
-                print(message)
                 parsed_message = self._parse_message(message)
 
                 if parsed_message is not None:
