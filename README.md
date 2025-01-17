@@ -4,7 +4,7 @@ API from any Python 3.9+ application.
 
 For support or to get involved, join our [Discord](https://discord.gg/G258vva7gZ)!
 
-- [PyNeuphonic](#pyneuphonic)
+
   - [Documentation](#documentation)
     - [Installation](#installation)
       - [API Key](#api-key)
@@ -72,7 +72,7 @@ voices
 To get information about an existing voice please call.
 ```python
 response = client.voices.get(voice_id='<VOICE_ID>')  # Gets information about the selected voice id
-response.data  # Response contains all information about this voice
+response.data  # response contains all information about this voice
 ```
 
 
@@ -99,7 +99,7 @@ If you have successfully cloned a voice, the following message will be displayed
 successfully been cloned with ID `<VOICE_ID>`." Once cloned, you can use this voice just like any of
 the standard voices when calling the TTS (Text-to-Speech) service.
 
-To see a list of all available voices, including cloned ones, use `client.voices.get()` as shown in
+To see a list of all available voices, including cloned ones, use `client.voices.list()` as shown in
 the example a few sections above.
 
 **Note:** Your voice reference clip must meet the following criteria: it should be at least 6
@@ -156,6 +156,33 @@ response.data
 ```
 
 ### Audio Generation
+
+#### Configure the Text-to-Speech Synthesis
+To configure the TTS settings, modify the TTSConfig model.
+The following parameters can be adjusted. Ensure that the selected combination of model, language, and voice is valid. For details on supported combinations, refer to the [Models](https://docs.neuphonic.com/resources/models) and [Voices](https://docs.neuphonic.com/resources/voices) pages.
+
+- **`model`**
+  The text-to-speech model to use.
+  **Default**: `'neu_fast'`
+  **Examples**: `'neu_fast'`, `'neu_hq'`
+
+- **`language_id`**
+  Language code for the desired language.
+  **Default**: `'en'`
+  **Examples**: `'en'`, `'es'`, `'de'`, `'nl'`
+
+- **`voice`**
+  The voice ID for the desired voice. Ensure this voice ID is available for the selected model and language.
+  **Default**: `None`
+  **Examples**: `'8e9c4bc8-3979-48ab-8626-df53befc2090'`
+
+- **`speed`** *(Optional, float)*
+  Playback speed of the audio.
+  **Default**: `1.0`
+  **Examples**: `0.7`, `1.0`, `1.5`
+
+You can access the complete documentation for TTS configuration here: [TTSConfig](/https://github.com/neuphonic/pyneuphonic/blob/main/pyneuphonic/models.py)
+
 #### SSE (Server Side Events)
 ```python
 from pyneuphonic import Neuphonic, TTSConfig
@@ -170,7 +197,8 @@ sse = client.tts.SSEClient()
 tts_config = TTSConfig(
     model='neu_hq',
     speed=1.05,
-    voice='e564ba7e-aa8d-46a2-96a8-8dffedade48f'  # use client.voices.get() to view all voice ids
+    langauge='en',
+    voice='e564ba7e-aa8d-46a2-96a8-8dffedade48f'  # use client.voices.list() to view all voice ids
 )
 
 # Create an audio player with `pyaudio`
@@ -194,7 +222,7 @@ async def main():
     sse = client.tts.AsyncSSEClient()
 
     # Set the desired configurations: playback speed and voice
-    tts_config = TTSConfig(speed=1.05, voice='ebf2c88e-e69d-4eeb-9b9b-9f3a648787a5')
+    tts_config = TTSConfig(speed=1.05, language_id='en',voice='ebf2c88e-e69d-4eeb-9b9b-9f3a648787a5')
 
     async with AsyncAudioPlayer() as player:
         response = sse.send('Hello, world!', tts_config=tts_config)
