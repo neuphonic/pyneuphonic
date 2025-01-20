@@ -88,7 +88,6 @@ def test_get_voices(client):
 
     for voice in voices:
         assert isinstance(voice, dict)
-        print(voice)
         assert all(key in voice for key in VoiceObject.__annotations__.keys())
 
 
