@@ -200,9 +200,14 @@ class VoiceObject(TypedDict):
     Examples: [['neu_fast', 'neu_hq'], ['neu_hq']]
     """
 
-    standard: str
+    type: str
     """
     Indicates whether this is a standard voice provided by Neuphonic, or a cloned voice.
+    """
+
+    lang_code: str
+    """
+    The language code associated with this voice.
     """
 
 

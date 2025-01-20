@@ -1,3 +1,10 @@
+"""
+This example demonstrates how to use the /agent feature to directly interact with the websocket
+endpoint. The example in examples/agents/simple_agent.py acts as a wrapper around this code.
+
+Use this example for greater flexibility in handling events and interacting with the websocket.
+"""
+
 from pyneuphonic import Neuphonic, WebsocketEvents
 from pyneuphonic.player import AsyncAudioPlayer, AsyncAudioRecorder
 from pyneuphonic.models import APIResponse, AgentResponse, AgentConfig
