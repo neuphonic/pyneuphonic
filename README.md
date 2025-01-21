@@ -169,7 +169,7 @@ The following parameters are examples of parameters which can be adjusted. Ensur
   **Default**: `'neu_fast'`
   **Examples**: `'neu_fast'`, `'neu_hq'`
 
-- **`language_id`**
+- **`lang_code`**
   Language code for the desired language.
 
   **Default**: `'en'` **Examples**: `'en'`, `'es'`, `'de'`, `'nl'`
@@ -201,7 +201,7 @@ sse = client.tts.SSEClient()
 tts_config = TTSConfig(
     model='neu_hq',
     speed=1.05,
-    language_id='en',
+    lang_code='en',
     voice='e564ba7e-aa8d-46a2-96a8-8dffedade48f'  # use client.voices.list() to view all voice ids
 )
 
@@ -226,7 +226,7 @@ async def main():
     sse = client.tts.AsyncSSEClient()
 
     # Set the desired configurations: playback speed and voice
-    tts_config = TTSConfig(speed=1.05, language_id='en',voice='ebf2c88e-e69d-4eeb-9b9b-9f3a648787a5')
+    tts_config = TTSConfig(speed=1.05, lang_code='en',voice='ebf2c88e-e69d-4eeb-9b9b-9f3a648787a5')
 
     async with AsyncAudioPlayer() as player:
         response = sse.send('Hello, world!', tts_config=tts_config)
