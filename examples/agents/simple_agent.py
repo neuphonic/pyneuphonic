@@ -12,7 +12,7 @@ async def main():
         name='Agent 1',
         prompt='You are a helpful agent. Answer in 10 words or less.',
         greeting='Hi, how can I help you today?',
-    ).data['id']
+    ).data['agent_id']
 
     # All additional keyword arguments (such as `agent_id` and `tts_model`) are passed as
     # parameters to the model. See AgentConfig model for full list of parameters.
