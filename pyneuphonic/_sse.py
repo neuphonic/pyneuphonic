@@ -93,7 +93,7 @@ class SSEClient(SSEClientBase):
 
         with httpx.stream(
             method='POST',
-            url=f'{self.http_url}/sse/speak/{tts_config.lang_code}',
+            url=f'{self.http_url}/sse/speak/{tts_config.language_id}',
             headers=self.headers,
             json={'text': text, 'model': to_dict(tts_config)},
         ) as response:
@@ -132,7 +132,7 @@ class AsyncSSEClient(SSEClientBase):
         async with httpx.AsyncClient() as client:
             async with client.stream(
                 method='POST',
-                url=f'{self.http_url}/sse/speak/{tts_config.lang_code}',
+                url=f'{self.http_url}/sse/speak/{tts_config.language_id}',
                 headers=self.headers,
                 json={'text': text, 'model': to_dict(tts_config)},
             ) as response:

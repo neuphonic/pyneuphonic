@@ -209,7 +209,7 @@ class AsyncTTSWebsocketClient(AsyncWebsocketBase):
         if not isinstance(config, TTSConfig):
             config = TTSConfig(**config)
 
-        return f'{self.ws_url}/speak/{config.lang_code}?{config.to_query_params()}'
+        return f'{self.ws_url}/speak/{config.language_id}?{config.to_query_params()}'
 
     async def open(self, tts_config: Union[TTSConfig, dict] = TTSConfig()):
         """

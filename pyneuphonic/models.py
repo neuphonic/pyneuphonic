@@ -108,9 +108,9 @@ class TTSConfig(BaseConfig):
         examples=['neu_fast', 'neu_hq'],
     )
 
-    lang_code: str = Field(
+    language_id: str = Field(
         default='en',
-        description='Language code for the desired language.',
+        description='Language ID for the desired language.',
         examples=['en'],
     )
 
