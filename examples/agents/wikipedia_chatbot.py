@@ -198,7 +198,7 @@ async def main():
         name='Wikipedia Chatbot',
         prompt=prompt,
         greeting=f'Hi, what would you like to know about the wikipedia article titled "{WIKIPEDIA_ARTICLE_TITLE}"',
-    ).data['id']
+    ).data['agent_id']
 
     # All additional keyword arguments (such as `agent_id` and `tts_model`) are passed as
     # parameters to the model. See AgentConfig model for full list of parameters.
