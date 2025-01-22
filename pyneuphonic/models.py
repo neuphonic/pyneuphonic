@@ -114,7 +114,7 @@ class TTSConfig(BaseConfig):
         examples=['en'],
     )
 
-    voice: Optional[str] = Field(
+    voice_id: Optional[str] = Field(
         default=None,
         description=(
             'The voice ID for the desired voice. Ensure this voice ID is available for the '
@@ -176,7 +176,7 @@ class APIResponse(BaseModel, Generic[T]):
 class VoiceObject(TypedDict):
     """TypedDict representing a voice object with its attributes."""
 
-    id: str
+    voice_id: str
     """
     The voice ID.
     Examples: ['8e9c4bc8-3979-48ab-8626-df53befc2090']
