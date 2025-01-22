@@ -21,7 +21,7 @@ def test_tts_config():
 def test_to_dict():
     dict_repr = to_dict(TTSConfig())
 
-    assert 'voice' not in dict_repr
+    assert 'voice_id' not in dict_repr
 
 
 def test_sse_sync(client: Neuphonic, mocker: MockerFixture):
@@ -97,17 +97,17 @@ async def test_get_voices(client: Neuphonic, mocker: MockerFixture):
         'data': {
             'voices': [
                 {
-                    'id': 'b61a1969-07c9-4d10-a055-090bad4fd08e',
+                    'voice_id': 'b61a1969-07c9-4d10-a055-090bad4fd08e',
                     'name': 'Holly',
                     'tags': ['Female', 'American'],
                 },
                 {
-                    'id': '3752be08-40a1-4ad8-8266-86499c2ed51e',
+                    'voice_id': '3752be08-40a1-4ad8-8266-86499c2ed51e',
                     'name': 'Marcus',
                     'tags': ['Male'],
                 },
                 {
-                    'id': '3752be08-40a1-4ad8-8266-86499c2ed51e',
+                    'voice_id': '3752be08-40a1-4ad8-8266-86499c2ed51e',
                     'name': 'Damien',
                     'tags': ['Male'],
                 },
@@ -127,6 +127,7 @@ async def test_get_voices(client: Neuphonic, mocker: MockerFixture):
     for voice in voices:
         assert isinstance(voice, dict)
         # assert that the response only contains valid keys, and not extra keys
+        print(voice)
         assert all(key in VoiceObject.__annotations__.keys() for key in voice)
 
 
@@ -311,7 +312,7 @@ def test_create_agent(client: Neuphonic, mocker: MockerFixture):
     return_value = {
         'data': {
             'message': 'Agent successfully created.',
-            'id': random_uuid,
+            'agent_id': random_uuid,
         }
     }
 
@@ -346,7 +347,7 @@ def test_delete_agent(client: Neuphonic, mocker: MockerFixture):
     return_value = {
         'data': {
             'message': 'Agent successfully deleted.',
-            'id': random_uuid,
+            'agent_id': random_uuid,
         }
     }
 
@@ -376,8 +377,8 @@ def test_list_agents(client: Neuphonic, mocker: MockerFixture):
     return_value = {
         'data': {
             'agents': [
-                {'id': random_uuid_1, 'name': 'Agent 1'},
-                {'id': random_uuid_2, 'name': 'Agent 2'},
+                {'agent_id': random_uuid_1, 'name': 'Agent 1'},
+                {'agent_id': random_uuid_2, 'name': 'Agent 2'},
             ]
         }
     }
@@ -406,7 +407,7 @@ def test_list_single_agent(client: Neuphonic, mocker: MockerFixture):
     return_value = {
         'data': {
             'agent': {
-                'id': random_uuid,
+                'agent_id': random_uuid,
                 'name': 'Agent 1',
                 'prompt': 'You are a helpful agent.',
                 'greeting': 'Hi, how can I help you today?',
