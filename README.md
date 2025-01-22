@@ -380,6 +380,7 @@ async def main():
     agent = Agent(client, agent_id=agent_id, tts_model='neu_hq')
 
     await agent.start()
+    # await agent.stop()  # use this to stop the agent
 
 asyncio.run(main())
 ```
