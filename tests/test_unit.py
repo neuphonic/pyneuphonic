@@ -127,7 +127,6 @@ async def test_get_voices(client: Neuphonic, mocker: MockerFixture):
     for voice in voices:
         assert isinstance(voice, dict)
         # assert that the response only contains valid keys, and not extra keys
-        print(voice)
         assert all(key in VoiceObject.__annotations__.keys() for key in voice)
 
 
