@@ -204,7 +204,13 @@ async def main():
     # parameters to the model. See AgentConfig model for full list of parameters.
     agent = Agent(client, agent_id=agent_id, tts_model='neu_hq')
 
-    await agent.start()
+    try:
+        await agent.start()
+
+        while True:
+            await asyncio.sleep(1)
+    except KeyboardInterrupt:
+        await agent.stop()
 
 
 asyncio.run(main())
