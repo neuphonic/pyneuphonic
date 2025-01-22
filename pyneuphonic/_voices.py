@@ -48,7 +48,9 @@ class Voices(Endpoint):
 
         try:
             # extract the voice_id for the requested voice from the list of all voices
-            return next(voice['id'] for voice in voices if voice['name'] == voice_name)
+            return next(
+                voice['voice_id'] for voice in voices if voice['name'] == voice_name
+            )
         except StopIteration as e:
             raise ValueError(f'No voice found with the name {voice_name}.')
 
@@ -75,7 +77,7 @@ class Voices(Endpoint):
 
         # Accept case if user only provide name
         if voice_id is None and voice_name is None:
-            raise ValueError("Please provide one of voice_id or voice_name")
+            raise ValueError('Please provide one of voice_id or voice_name')
         if not voice_id:
             voice_id = self._get_voice_id_from_name(voice_name=voice_name)
 
