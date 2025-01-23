@@ -95,7 +95,7 @@ class SSEClient(SSEClientBase):
             method='POST',
             url=f'{self.http_url}/sse/speak/{tts_config.lang_code}',
             headers=self.headers,
-            json={'text': text, 'model': to_dict(tts_config)},
+            json={'text': text, **to_dict(tts_config)},
         ) as response:
             for message in response.iter_lines():
                 parsed_message = self._parse_message(message)
@@ -134,7 +134,7 @@ class AsyncSSEClient(SSEClientBase):
                 method='POST',
                 url=f'{self.http_url}/sse/speak/{tts_config.lang_code}',
                 headers=self.headers,
-                json={'text': text, 'model': to_dict(tts_config)},
+                json={'text': text, **to_dict(tts_config)},
             ) as response:
                 async for message in response.aiter_lines():
                     parsed_message = self._parse_message(message)
