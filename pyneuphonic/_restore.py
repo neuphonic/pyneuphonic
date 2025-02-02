@@ -93,3 +93,16 @@ class Restore(Endpoint):
 
         with open(file_path, 'wb') as f:
             f.write(response.content)
+
+    def delete(self, job_id=None) -> APIResponse[dict]:
+        response = httpx.delete(f'{self.http_url}/restore/{job_id}', headers=self.headers)
+
+        # Handle response errors
+        if not response.is_success:
+            raise httpx.HTTPStatusError(
+                f'Failed to delete this restoration job. Status code: {response.status_code}. Error: {response.text}',
+                request=response.request,
+                response=response,
+            )
+
+        return APIResponse(**response.json())
