@@ -210,7 +210,7 @@ with AudioPlayer() as player:
     response = sse.send('Hello, world!', tts_config=tts_config)
     player.play(response)
 
-    player.save_audio('output.wav')  # save the audio to a .wav file
+    player.save_audio('output.wav')  # save the audio to a .wav file from the player
 ```
 
 #### Asynchronous SSE
@@ -281,14 +281,18 @@ asyncio.run(main())
 ```
 
 ### Saving Audio
-As per the examples above, you can use the `AudioPlayer` object to save audio.
+To save the audio to a file, you can use the `save_audio` function from the `pyneuphonic` package.
+
 ```python
-player.save_audio('output.wav')
+from pyneuphonic import save_audio
+
+...
+response = sse.send('Hello, world!', tts_config=tts_config)
+
+save_audio(response, 'output.wav')
 ```
-However, if you do not want to play audio and simply want to save it, check out the examples
-in [examples/sse/save_audio.py](./examples/sse/save_audio.py) and
-[examples/websocket/save_audio.py](./examples/websocket/save_audio.py) for examples on how to
-do this.
+
+The `save_audio` function takes in two arguments: the response from the TTS service (or audio bytes) and the file path to save the audio to.
 
 ### Speech Restoration
 
