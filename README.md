@@ -281,7 +281,7 @@ asyncio.run(main())
 ```
 
 ### Saving Audio
-To save the audio to a file, you can use the `save_audio` function from the `pyneuphonic` package.
+To save the audio to a file, you can use the `save_audio` function from the `pyneuphonic` package to save the audio from responses from the synchronous SSE client.
 
 ```python
 from pyneuphonic import save_audio
@@ -292,7 +292,19 @@ response = sse.send('Hello, world!', tts_config=tts_config)
 save_audio(response, 'output.wav')
 ```
 
-The `save_audio` function takes in two arguments: the response from the TTS service (or audio bytes) and the file path to save the audio to.
+The `save_audio` function takes in two arguments: the response from the TTS service (as well as audio bytes) and the file path to save the audio to.
+
+For async responses, you can use the `async_save_audio` function.
+
+```python
+from pyneuphonic.player import async_save_audio
+
+...
+
+response = sse.send('Hello, world!', tts_config=tts_config)
+
+await async_save_audio(response, 'output.wav')
+```
 
 ### Speech Restoration
 
