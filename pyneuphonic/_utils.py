@@ -1,12 +1,12 @@
 import wave
 
-from typing import Optional, Iterator
+from typing import Optional, Iterator, Union
 
 from pyneuphonic.models import APIResponse, TTSResponse
 
 
 def save_audio(
-    audio_bytes: bytes | Iterator[APIResponse[TTSResponse]],
+    audio_bytes: Union[bytes, Iterator[APIResponse[TTSResponse]]],
     file_path: str,
     sample_rate: Optional[int] = 22050,
 ):
