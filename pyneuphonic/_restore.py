@@ -68,3 +68,41 @@ class Restore(Endpoint):
             )
 
         return APIResponse(**response.json())
+
+    def download(self, job_id=None, file_path=None) -> None:
+        response = httpx.get(f'{self.http_url}/restore/{job_id}', headers=self.headers)
+        url = response.json()['data']['file_url']
+
+        # Handle response errors
+        if not response.is_success:
+            raise httpx.HTTPStatusError(
+                f'Failed to download the restored audio. Status code: {response.status_code}. Error: {response.text}',
+                request=response.request,
+                response=response,
+            )
+
+        response = httpx.get(url)
+
+        # Handle response errors
+        if not response.is_success:
+            raise httpx.HTTPStatusError(
+                f'Failed to download the restored audio. Status code: {response.status_code}. Error: {response.text}',
+                request=response.request,
+                response=response,
+            )
+
+        with open(file_path, 'wb') as f:
+            f.write(response.content)
+
+    def delete(self, job_id=None) -> APIResponse[dict]:
+        response = httpx.delete(f'{self.http_url}/restore/{job_id}', headers=self.headers)
+
+        # Handle response errors
+        if not response.is_success:
+            raise httpx.HTTPStatusError(
+                f'Failed to delete this restoration job. Status code: {response.status_code}. Error: {response.text}',
+                request=response.request,
+                response=response,
+            )
+
+        return APIResponse(**response.json())
