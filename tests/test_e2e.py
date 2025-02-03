@@ -1,6 +1,6 @@
 import pytest
 from pyneuphonic.models import APIResponse, WebsocketEvents, TTSResponse, VoiceObject
-from pyneuphonic import save_audio
+from pyneuphonic import save_audio, async_save_audio
 import asyncio
 import os
 
@@ -92,7 +92,7 @@ def test_get_voices(client):
 
 
 @pytest.mark.asyncio
-async def test_sse_save_audio(client):
+async def test_sse_save_audio_bytes(client):
     sse_client = client.tts.AsyncSSEClient()
 
     response = sse_client.send(
@@ -104,9 +104,47 @@ async def test_sse_save_audio(client):
     async for item in response:
         audio_bytes += item.data.audio
 
-    save_audio(audio_bytes=audio_bytes, file_path='output.wav')
+    fname = 'output.wav'
 
-    assert os.path.exists('output.wav')
-    assert os.path.getsize('output.wav') > 100
+    save_audio(audio_bytes=audio_bytes, file_path=fname)
 
-    os.remove('output.wav')
+    assert os.path.exists(fname)
+    assert os.path.getsize(fname) > 100
+
+    os.remove(fname)
+
+
+@pytest.mark.asyncio
+async def test_sse_save_async_response(client):
+    sse_client = client.tts.AsyncSSEClient()
+
+    response = sse_client.send(
+        'Hello, world! This is an example of saving audio to a file.'
+    )
+
+    fname = 'output_async.wav'
+
+    await async_save_audio(response, file_path=fname)
+
+    assert os.path.exists(fname)
+    assert os.path.getsize(fname) > 100
+
+    os.remove(fname)
+
+
+@pytest.mark.asyncio
+def test_sse_save_sync_response(client):
+    sse_client = client.tts.SSEClient()
+
+    response = sse_client.send(
+        'Hello, world! This is an example of saving audio to a file.'
+    )
+
+    fname = 'output_sync.wav'
+
+    save_audio(response, file_path=fname)
+
+    assert os.path.exists(fname)
+    assert os.path.getsize(fname) > 100
+
+    os.remove(fname)
