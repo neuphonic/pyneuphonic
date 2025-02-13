@@ -202,7 +202,7 @@ tts_config = TTSConfig(
     model='neu_hq',
     speed=1.05,
     lang_code='en',
-    voice='e564ba7e-aa8d-46a2-96a8-8dffedade48f'  # use client.voices.list() to view all voice ids
+    voice_id='e564ba7e-aa8d-46a2-96a8-8dffedade48f'  # use client.voices.list() to view all voice ids
 )
 
 # Create an audio player with `pyaudio`
@@ -226,7 +226,7 @@ async def main():
     sse = client.tts.AsyncSSEClient()
 
     # Set the desired configurations: playback speed and voice
-    tts_config = TTSConfig(speed=1.05, lang_code='en',voice='ebf2c88e-e69d-4eeb-9b9b-9f3a648787a5')
+    tts_config = TTSConfig(speed=1.05, lang_code='en', voice_id='ebf2c88e-e69d-4eeb-9b9b-9f3a648787a5')
 
     async with AsyncAudioPlayer() as player:
         response = sse.send('Hello, world!', tts_config=tts_config)
@@ -251,7 +251,7 @@ async def main():
     ws = client.tts.AsyncWebsocketClient()
 
     # Set the desired voice
-    tts_config = TTSConfig(voice='ebf2c88e-e69d-4eeb-9b9b-9f3a648787a5')
+    tts_config = TTSConfig(voice_id='ebf2c88e-e69d-4eeb-9b9b-9f3a648787a5')
 
     player = AsyncAudioPlayer()
     await player.open()
