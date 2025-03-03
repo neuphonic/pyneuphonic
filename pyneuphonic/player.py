@@ -1,7 +1,7 @@
 import asyncio
 import logging
 
-from typing import Union, Optional, Iterator, AsyncIterator
+from typing import Union, Iterator, AsyncIterator
 from pyneuphonic.models import APIResponse, TTSResponse
 from pyneuphonic._utils import save_audio
 from base64 import b64encode
@@ -99,11 +99,10 @@ class AudioPlayer:
     def save_audio(
         self,
         file_path: str,
-        sample_rate: Optional[int] = 22050,
     ):
         """Saves the audio using pynuephonic.save_audio"""
         save_audio(
-            audio_bytes=self.audio_bytes, sample_rate=sample_rate, file_path=file_path
+            audio_bytes=self.audio_bytes, sampling_rate=self.sampling_rate, file_path=file_path
         )
 
     def __enter__(self):
