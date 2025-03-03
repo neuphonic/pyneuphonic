@@ -7,7 +7,7 @@ from pyneuphonic.models import APIResponse, TTSResponse
 def save_audio(
     audio_bytes: Union[bytes, bytearray, Iterator[APIResponse[TTSResponse]]],
     file_path: str,
-    sample_rate: Optional[int] = 22050,
+    sampling_rate: Optional[int] = 22050,
 ):
     """
     Takes in an audio buffer and saves it to a .wav file.
@@ -44,7 +44,7 @@ def save_audio(
 async def async_save_audio(
     audio_bytes: Union[bytes, bytearray, AsyncIterator[APIResponse[TTSResponse]]],
     file_path: str,
-    sample_rate: Optional[int] = 22050,
+    sampling_rate: Optional[int] = 22050,
 ):
     """
     Takes in an audio buffer and saves it to a .wav file.

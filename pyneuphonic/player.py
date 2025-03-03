@@ -99,11 +99,10 @@ class AudioPlayer:
     def save_audio(
         self,
         file_path: str,
-        sample_rate: Optional[int] = 22050,
     ):
         """Saves the audio using pynuephonic.save_audio"""
         save_audio(
-            audio_bytes=self.audio_bytes, sample_rate=sample_rate, file_path=file_path
+            audio_bytes=self.audio_bytes, sampling_rate=self.sampling_rate, file_path=file_path
         )
 
     def __enter__(self):
