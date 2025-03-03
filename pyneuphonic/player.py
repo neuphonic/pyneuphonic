@@ -1,7 +1,7 @@
 import asyncio
 import logging
 
-from typing import Union, Optional, Iterator, AsyncIterator
+from typing import Union, Iterator, AsyncIterator
 from pyneuphonic.models import APIResponse, TTSResponse
 from pyneuphonic._utils import save_audio
 from base64 import b64encode
