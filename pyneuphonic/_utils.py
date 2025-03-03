@@ -18,20 +18,20 @@ def save_audio(
         The audio buffer to save. This is all the bytes returned from the server.
     file_path
         The file path you want to save the audio to.
-    sample_rate
+    sampling_rate
         The sample rate of the audio you want to save. Default is 22050.
     """
     if isinstance(audio_bytes, bytes) or isinstance(audio_bytes, bytearray):
         with wave.open(file_path, 'wb') as wav_file:
             wav_file.setnchannels(1)
             wav_file.setsampwidth(2)
-            wav_file.setframerate(sample_rate)
+            wav_file.setframerate(sampling_rate)
             wav_file.writeframes(bytes(audio_bytes))
     elif isinstance(audio_bytes, Iterator):
         with wave.open(file_path, 'wb') as wav_file:
             wav_file.setnchannels(1)
             wav_file.setsampwidth(2)
-            wav_file.setframerate(sample_rate)
+            wav_file.setframerate(sampling_rate)
             for message in audio_bytes:
                 if not isinstance(message, APIResponse[TTSResponse]):
                     raise ValueError(
@@ -62,13 +62,13 @@ async def async_save_audio(
         with wave.open(file_path, 'wb') as wav_file:
             wav_file.setnchannels(1)
             wav_file.setsampwidth(2)
-            wav_file.setframerate(sample_rate)
+            wav_file.setframerate(sampling_rate)
             wav_file.writeframes(bytes(audio_bytes))
     elif isinstance(audio_bytes, AsyncIterator):
         with wave.open(file_path, 'wb') as wav_file:
             wav_file.setnchannels(1)
             wav_file.setsampwidth(2)
-            wav_file.setframerate(sample_rate)
+            wav_file.setframerate(sampling_rate)
             async for message in audio_bytes:
                 if not isinstance(message, APIResponse[TTSResponse]):
                     raise ValueError(
