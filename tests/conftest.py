@@ -5,7 +5,7 @@ from pyneuphonic import Neuphonic
 
 @pytest.fixture
 def client():
-    api_key = os.environ.get('NEUPHONIC_API_TOKEN')
+    api_key = os.environ.get('NEUPHONIC_API_KEY')
     base_url = os.environ.get('NEUPHONIC_API_URL')
 
     assert 'qa.api.neuphonic.com' in base_url
