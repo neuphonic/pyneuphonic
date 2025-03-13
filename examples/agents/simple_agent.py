@@ -16,7 +16,7 @@ async def main():
 
     # All additional keyword arguments (such as `agent_id` and `tts_model`) are passed as
     # parameters to the model. See AgentConfig model for full list of parameters.
-    agent = Agent(client, agent_id=agent_id, tts_model='neu_hq')
+    agent = Agent(client, agent_id=agent_id)
 
     try:
         await agent.start()

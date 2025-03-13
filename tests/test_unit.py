@@ -11,10 +11,9 @@ from unittest.mock import MagicMock
 
 
 def test_tts_config():
-    tts_config = TTSConfig(model='neu_fast', temperature=0.8)
+    tts_config = TTSConfig(temperature=0.8)
     query_param_string = tts_config.to_query_params()
 
-    assert 'model=neu_fast' in query_param_string
     assert 'temperature=0.8' in query_param_string
 
 
@@ -77,7 +76,7 @@ async def test_websocket_async(client: Neuphonic, mocker: MockerFixture):
     )
     await ws.close()
 
-    tts_config = TTSConfig(model='neu_fast', temperature=0.8)
+    tts_config = TTSConfig(temperature=0.8)
     await ws.open(tts_config=tts_config)
     ssl_context = mock_connect.call_args.kwargs['ssl']
     mock_connect.assert_called_with(

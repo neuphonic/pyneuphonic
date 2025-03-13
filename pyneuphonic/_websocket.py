@@ -63,7 +63,7 @@ class AsyncWebsocketBase(Endpoint, ABC):
         Returns
         -------
         str
-            The constructed URL. E.g.: wss://eu-west-1.api.neuphonic.com/speak/en?model=neu_hq
+            The constructed URL. E.g.: wss://eu-west-1.api.neuphonic.com/speak/en
         """
         pass
 

@@ -163,12 +163,6 @@ response.data
 To configure the TTS settings, modify the TTSConfig model.
 The following parameters are examples of parameters which can be adjusted. Ensure that the selected combination of model, language, and voice is valid. For details on supported combinations, refer to the [Models](https://docs.neuphonic.com/resources/models) and [Voices](https://docs.neuphonic.com/resources/voices) pages.
 
-- **`model`**
-  The text-to-speech model to use.
-
-  **Default**: `'neu_fast'`
-  **Examples**: `'neu_fast'`, `'neu_hq'`
-
 - **`lang_code`**
   Language code for the desired language.
 
@@ -199,7 +193,6 @@ sse = client.tts.SSEClient()
 
 # View the TTSConfig object to see all valid options
 tts_config = TTSConfig(
-    model='neu_hq',
     speed=1.05,
     lang_code='en',
     voice_id='e564ba7e-aa8d-46a2-96a8-8dffedade48f'  # use client.voices.list() to view all voice ids
@@ -393,7 +386,7 @@ async def main():
 
     # All additional keyword arguments (such as `agent_id` and `tts_model`) are passed as
     # parameters to the model. See AgentConfig model for full list of parameters.
-    agent = Agent(client, agent_id=agent_id, tts_model='neu_hq')
+    agent = Agent(client, agent_id=agent_id)
 
     try:
         await agent.start()

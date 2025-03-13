@@ -33,12 +33,6 @@ class AgentConfig(BaseConfig):
         examples=['da78ea32-9225-436e-b10d-d5b101bb01a6'],  # example agent_id
     )
 
-    tts_model: Optional[str] = Field(
-        default=None,
-        description='The Neuphonic model to be used for text-to-speech synthesis.',
-        examples=['neu_fast', 'neu_hq'],
-    )
-
     endpointing: Optional[float] = Field(
         default=None,
         description=(
@@ -100,12 +94,6 @@ class TTSConfig(BaseConfig):
         default=None,
         description='Randomness introduced into the text-to-speech model. Range: 0 to 1.0.',
         examples=[0.5, 0.7],
-    )
-
-    model: Optional[str] = Field(
-        default=None,
-        description='The text-to-speech model to use.',
-        examples=['neu_fast', 'neu_hq'],
     )
 
     lang_code: str = Field(
@@ -192,12 +180,6 @@ class VoiceObject(TypedDict):
     """
     A list of tags describing the voice.
     Examples: [['Male', 'American', 'Forties', 'Narrator'], ['Female', 'British', 'Twenties', 'Excited']]
-    """
-
-    model_availability: List[str]
-    """
-    A list of models that this voice is available on.
-    Examples: [['neu_fast', 'neu_hq'], ['neu_hq']]
     """
 
     type: str
