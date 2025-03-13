@@ -200,9 +200,9 @@ async def main():
         greeting=f'Hi, what would you like to know about the wikipedia article titled "{WIKIPEDIA_ARTICLE_TITLE}"',
     ).data['agent_id']
 
-    # All additional keyword arguments (such as `agent_id` and `tts_model`) are passed as
+    # All additional keyword arguments (such as `agent_id`) are passed as
     # parameters to the model. See AgentConfig model for full list of parameters.
-    agent = Agent(client, agent_id=agent_id, tts_model='neu_hq')
+    agent = Agent(client, agent_id=agent_id)
 
     try:
         await agent.start()
