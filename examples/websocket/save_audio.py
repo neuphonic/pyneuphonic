@@ -5,7 +5,7 @@ import asyncio
 
 
 async def main():
-    client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_TOKEN'))
+    client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_KEY'))
 
     ws = client.tts.AsyncWebsocketClient()
     audio_bytes = bytearray()

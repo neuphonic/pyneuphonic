@@ -7,7 +7,7 @@ import aioconsole
 
 async def main():
     """A simple application that echos whatever the user enters into the terminal."""
-    client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_TOKEN'))
+    client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_KEY'))
     sse = client.tts.SSEClient()
 
     with AudioPlayer() as player:
