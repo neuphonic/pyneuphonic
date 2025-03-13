@@ -3,7 +3,7 @@ import os
 
 
 def main():
-    client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_TOKEN'))
+    client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_KEY'))
     sse = client.tts.SSEClient()
 
     response = sse.send('Hello, world! This is an example of saving audio to a file.')

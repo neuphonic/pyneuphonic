@@ -6,7 +6,7 @@ from pyneuphonic import Neuphonic, Agent, AgentConfig  # noqa: F401
 
 
 async def main():
-    client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_TOKEN'))
+    client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_KEY'))
 
     agent_id = client.agents.create(
         name='Agent 1',

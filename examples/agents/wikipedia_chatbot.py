@@ -8,7 +8,7 @@ The script includes the following main components:
 2. get_wikipedia_main_body: A function to fetch and process the main body of a Wikipedia article.
 
 To use this script, set the WIKIPEDIA_ARTICLE_TITLE variable to the desired Wikipedia article title.
-Ensure that the NEUPHONIC_API_TOKEN environment variable is set with your Neuphonic API token.
+Ensure that the NEUPHONIC_API_KEY environment variable is set with your Neuphonic API token.
 """
 
 import httpx
@@ -179,7 +179,7 @@ def get_wikipedia_main_body(title):
 
 
 async def main():
-    client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_TOKEN'))
+    client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_KEY'))
 
     wikipedia_article_text = get_wikipedia_main_body(WIKIPEDIA_ARTICLE_TITLE)
     wikipedia_article_text = ' '.join(wikipedia_article_text.split(' ')[0:1000])

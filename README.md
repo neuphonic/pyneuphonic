@@ -54,7 +54,7 @@ To use these utilities, please also `pip install pyaudio`.
 Get your API key from the [Neuphonic website](https://beta.neuphonic.com) and set it in your
 environment, for example:
 ```bash
-export NEUPHONIC_API_TOKEN=<YOUR API KEY HERE>
+export NEUPHONIC_API_KEY=<YOUR API KEY HERE>
 ```
 
 ### Voices
@@ -64,7 +64,7 @@ To get all available voices you can run the following snippet.
 from pyneuphonic import Neuphonic
 import os
 
-client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_TOKEN'))
+client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_KEY'))
 response = client.voices.list()  # get's all available voices
 voices = response.data['voices']
 
@@ -87,7 +87,7 @@ To clone a voice based on a audio file, you can run the following snippet.
 from pyneuphonic import Neuphonic
 import os
 
-client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_TOKEN'))
+client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_KEY'))
 
 response = client.voices.clone(
     voice_name='<VOICE_NAME>',
@@ -193,7 +193,7 @@ from pyneuphonic import Neuphonic, TTSConfig
 from pyneuphonic.player import AudioPlayer
 import os
 
-client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_TOKEN'))
+client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_KEY'))
 
 sse = client.tts.SSEClient()
 
@@ -221,7 +221,7 @@ import os
 import asyncio
 
 async def main():
-    client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_TOKEN'))
+    client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_KEY'))
 
     sse = client.tts.AsyncSSEClient()
 
@@ -246,7 +246,7 @@ import os
 import asyncio
 
 async def main():
-    client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_TOKEN'))
+    client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_KEY'))
 
     ws = client.tts.AsyncWebsocketClient()
 
@@ -383,7 +383,7 @@ from pyneuphonic import Neuphonic, Agent, AgentConfig
 
 
 async def main():
-    client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_TOKEN'))
+    client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_KEY'))
 
     agent_id = client.agents.create(
         name='Agent 1',

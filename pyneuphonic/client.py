@@ -25,19 +25,22 @@ class Neuphonic:
         ----------
         api_key
             Your API key. Generate this on https://beta.neuphonic.com. If this is not passed in,
-            it needs to be set in your environment and retrievable via `os.getenv('NEUPHONIC_API_TOKEN')`
+            it needs to be set in your environment and retrievable via `os.getenv('NEUPHONIC_API_KEY')`
         base_url : Optional[str], optional
             The base url pointing to which regional deployment to use. If this is not passed on
             and not set in `os.getenv('NEUPHONIC_API_URL')`, then it will default to
             'eu-west-1.api.neuphonic.com'.
         """
-        if api_key is None:
-            api_key = os.getenv('NEUPHONIC_API_TOKEN')
+        api_key = (
+            api_key
+            or os.getenv('NEUPHONIC_API_KEY')
+            or os.getenv('NEUPHONIC_API_TOKEN')
+        )
 
-            if api_key is None:
-                raise EnvironmentError(
-                    '`api_key` has not been passed in and `NEUPHONIC_API_TOKEN` is not set in the environment.'
-                )
+        if api_key is None:
+            raise EnvironmentError(
+                '`api_key` has not been passed in and `NEUPHONIC_API_KEY` is not set in the environment.'
+            )
 
         if base_url is None:
             base_url = os.getenv('NEUPHONIC_API_URL')
