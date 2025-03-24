@@ -410,7 +410,7 @@ feedback (like headphones or earphones), and disables them for speakers that mig
 This behavior is automatically determined based on your default audio output device, but you can
 explicitly control it when instantiating the `Agent` class:
 ```python
-agent = Agent(client, allow_interruptions=True)
+agent = Agent(client, agent_id=agent_id, allow_interruptions=True)
 ```
 
 #### List agents
