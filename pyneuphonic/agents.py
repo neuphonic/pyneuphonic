@@ -4,6 +4,7 @@ import aioconsole
 from pyneuphonic.client import Neuphonic
 from pyneuphonic.models import APIResponse, AgentResponse, AgentConfig, WebsocketEvents
 from pyneuphonic.player import AsyncAudioPlayer, AsyncAudioRecorder
+from typing import Optional, Callable
 
 
 def default_on_message(message: APIResponse[AgentResponse]):
@@ -23,7 +24,12 @@ def default_on_message(message: APIResponse[AgentResponse]):
 
 class Agent:
     def __init__(
-        self, client: Neuphonic, mute=False, on_message=default_on_message, **kwargs
+        self,
+        client: Neuphonic,
+        mute: bool = False,
+        on_message: Callable = default_on_message,
+        allow_interruptions: Optional[bool] = None,
+        **kwargs,
     ):
         """
         Initialize an Agent instance.
@@ -36,6 +42,11 @@ class Agent:
             If True, the agent will not play audio responses. Default is False.
         on_message : callable, optional
             A callback function to handle messages from the server. Default is default_on_message.
+        allow_interruptions: Optional[bool] = None
+            Whether to allow interruptions or not, by default None and is determined based on the
+            devices default output device. If the output device is a headset, then
+            allow_interruptions will be set to True as there will be no echo. Pass a value in to
+            override the default setting.
         **kwargs
             Additional keyword arguments to configure the agent. See the `AgentConfig` model for a
             full list of agent configuration parameters.
@@ -55,6 +66,7 @@ class Agent:
                 sampling_rate=self.config.incoming_sampling_rate,
                 websocket=self.ws,
                 player=self.player,
+                allow_interruptions=allow_interruptions,
             )
 
         self.on_message_hook = on_message

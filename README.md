@@ -29,6 +29,7 @@ If you need support or want to join the community, visit our [Discord](https://d
       - [Restoration with a Transcript and Language Code](#restoration-with-a-transcript-and-language-code)
       - [Restoration with a Transcript File](#restoration-with-a-transcript-file)
     - [Agents](#agents)
+      - [Interruption handling](#interruption-handling)
       - [List agents](#list-agents)
       - [Get agent](#get-agent)
   - [Example Applications](#example-applications)
@@ -397,6 +398,19 @@ async def main():
         await agent.stop()
 
 asyncio.run(main())
+```
+
+#### Interruption handling
+The `Agent` class supports interruption handling, which allows users to interrupt the agent while
+it's speaking.
+
+By default, the system intelligently enables interruptions when using devices that won't create audio
+feedback (like headphones or earphones), and disables them for speakers that might cause echo.
+
+This behavior is automatically determined based on your default audio output device, but you can
+explicitly control it when instantiating the `Agent` class:
+```python
+agent = Agent(client, allow_interruptions=True)
 ```
 
 #### List agents
