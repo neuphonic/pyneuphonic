@@ -4,6 +4,7 @@ from typing import Optional, Iterator, Union, AsyncIterator
 
 from pyneuphonic.models import APIResponse, TTSResponse
 
+
 def save_audio(
     audio_bytes: Union[bytes, bytearray, Iterator[APIResponse[TTSResponse]]],
     file_path: str,

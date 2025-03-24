@@ -53,7 +53,14 @@ ignore = ["F841"]
 select = ["E4", "E7", "E9", "F", "W", "C901"]
 
 # Ignore unused-imports and wildcard * imports in __init__.py and __main__.py files.
-extend-per-file-ignores = { "**/__init__.py" = ["F401", "F403"], "**/__main__.py" = ["F401", "F403"] }
+extend-per-file-ignores = { "**/__init__.py" = [
+  "F401",
+  "F403",
+  "E402",
+], "**/__main__.py" = [
+  "F401",
+  "F403",
+] }
 
 [tool.ruff.format]
 # Override the default setting, which is "double".
