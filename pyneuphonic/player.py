@@ -45,7 +45,9 @@ class AudioPlayer:
         """Returns True if there is audio currently playing."""
         return time.perf_counter() < self._playback_end
 
-    def _get_default_output_device_info(self):
+    @staticmethod
+    def _get_default_output_device_info():
+        """Get the output device that pyaudio will choose by default."""
         pa = pyaudio.PyAudio()
         device_info = pa.get_default_output_device_info()
         pa.terminate()
@@ -53,7 +55,8 @@ class AudioPlayer:
 
     @property
     def output_device_possibly_has_echo(self):
-        output_device = self._get_default_output_device_info()
+        """Checks whether the default output device is likely to have echo based on naming heuristics."""
+        output_device = AudioPlayer._get_default_output_device_info()
         device_name = output_device['name'].lower()
         keywords = ['airpods', 'headphone', 'headset', 'earbuds']
 
@@ -278,7 +281,7 @@ class AsyncAudioRecorder:
             if self.player.output_device_possibly_has_echo and self.allow_interruptions:
                 logger.warning(
                     'You have set allow_interruptions=True on AsyncAudioRecorder but your output device '
-                    f'"{self.player._get_default_output_device_info()["name"]}" is not a headset. '
+                    f'"{AudioPlayer._get_default_output_device_info()["name"]}" is not a headset. '
                     'This may cause audio feedback or echo when recording while playing audio.'
                 )
             elif not self.allow_interruptions:
