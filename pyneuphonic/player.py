@@ -244,6 +244,10 @@ class AsyncAudioPlayer(AudioPlayer):
 
     async def __aexit__(self, exc_type, exc_value, traceback):
         """Exit the runtime context related to this object."""
+        while self.is_playing:
+            # Wait until all audio has finished playing before terminating audio player
+            await asyncio.sleep(1)
+
         await self.close()
 
 
