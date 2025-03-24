@@ -167,8 +167,6 @@ class AsyncAudioPlayer(AudioPlayer):
         """
         Play audio data or automatically stream over SSE responses and play the audio.
 
-        Identical to super().play.
-
         Parameters
         ----------
         data : Union[bytes, Iterator[TTSResponse]]
