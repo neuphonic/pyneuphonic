@@ -95,7 +95,9 @@ class Restore(Endpoint):
             f.write(response.content)
 
     def delete(self, job_id=None) -> APIResponse[dict]:
-        response = httpx.delete(f'{self.http_url}/restore/{job_id}', headers=self.headers)
+        response = httpx.delete(
+            f'{self.http_url}/restore/{job_id}', headers=self.headers
+        )
 
         # Handle response errors
         if not response.is_success:
