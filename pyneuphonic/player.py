@@ -209,13 +209,22 @@ class AsyncAudioPlayer(AudioPlayer):
 
     async def close(self):
         """Stop audio playback immediately and close all pyaudio resources."""
-        await self.stop_playback()
+        await self.stop_playback(closing=True)
         super().close()
 
-    async def stop_playback(self):
+    async def stop_playback(self, closing: bool = False):
         """Stops audio playback immediately and deletes all audio that still needs to be played, if
-        the player is currently playing."""
-        if isinstance(self.playback_task, asyncio.Task) and self.is_playing:
+        the player is currently playing.
+
+        Parameters
+        ----------
+        closing : bool, optional
+            If True, indicates that the player is being closed and the playback task should not be
+            recreated after cancellation. Default is False.
+        """
+        if isinstance(self.playback_task, asyncio.Task) and (
+            self.is_playing or closing
+        ):
             try:
                 self.playback_task.cancel()
                 await self.playback_task
@@ -224,7 +233,9 @@ class AsyncAudioPlayer(AudioPlayer):
             finally:
                 del self.playback_queue
                 self.playback_queue = asyncio.Queue()
-                self.playback_task = asyncio.create_task(self._playback_task())
+
+                if not closing:
+                    self.playback_task = asyncio.create_task(self._playback_task())
 
     async def __aenter__(self):
         """Enter the runtime context related to this object."""
