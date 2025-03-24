@@ -73,6 +73,10 @@ class Agent:
         if message.data.type == 'audio_response':
             if not self.mute:
                 await self.player.play(message.data.audio)
+        elif message.data.type == 'user_transcript':
+            # Stop any currently playing audio when user starts speaking
+            if not self.mute:
+                await self.player.stop_playback()
 
         if self.on_message_hook is not None and callable(self.on_message_hook):
             self.on_message_hook(message)
