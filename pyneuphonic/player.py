@@ -1,7 +1,7 @@
 import asyncio
 import logging
 
-from typing import Union, Iterator, AsyncIterator
+from typing import Union, Iterator, AsyncIterator, Optional
 from pyneuphonic.models import APIResponse, TTSResponse
 from pyneuphonic._utils import save_audio
 from base64 import b64encode
@@ -144,8 +144,8 @@ class AsyncAudioPlayer(AudioPlayer):
 
     def __init__(self, sampling_rate: int = 22050):
         super().__init__(sampling_rate)
-        self.playback_task: asyncio.Task | None = None
-        self.playback_queue: asyncio.Queue | None = asyncio.Queue()
+        self.playback_task: Optional[asyncio.Task] = None
+        self.playback_queue: Optional[asyncio.Queue] = asyncio.Queue()
 
     async def open(self):
         """Open the audio stream for playback and creates playback task. `pyaudio` must be installed."""
@@ -253,7 +253,7 @@ class AsyncAudioRecorder:
         sampling_rate: int = 16000,
         websocket=None,
         player: AudioPlayer = None,
-        allow_interruptions: bool | None = None,
+        allow_interruptions: Optional[bool] = None,
     ):
         """
         Initialize the AsyncAudioRecorder.
@@ -299,8 +299,8 @@ class AsyncAudioRecorder:
                 logger.warning(
                     'Audio interruptions are disabled (allow_interruptions=False on AsyncAudioRecorder). '
                     'This setting was either explicitly configured or automatically determined based on your output device. '
-                    'When audio is playing, microphone input will be disabled to prevent echo, '
-                    'meaning you cannot interrupt the agent while it is speaking.'
+                    'When audio is playing, microphone input will be disabled to prevent echo, meaning '
+                    'you cannot interrupt the agent while it is speaking. To enable interruptions, use earphones.'
                 )
 
     async def _send(self):
