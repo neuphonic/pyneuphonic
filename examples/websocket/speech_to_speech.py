@@ -32,8 +32,8 @@ async def main():
             print(f'User: {message.data.text}')
         elif message.data.type == 'llm_response':
             print(f'Agent: {message.data.text}')
-        elif message.data.type == 'user_speech_started':
-            # Stop playback, as the user has started speaking
+        elif message.data.type == 'stop_audio_response':
+            # Stop any currently playing audio, as the user has interrupted
             await player.stop_playback()
 
     async def on_close():
