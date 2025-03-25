@@ -30,11 +30,11 @@ async def main():
             await player.play(message.data.audio)
         elif message.data.type == 'user_transcript':
             print(f'User: {message.data.text}')
-            await (
-                player.stop_playback()
-            )  # stops playback, and allows for user to interrupt
         elif message.data.type == 'llm_response':
             print(f'Agent: {message.data.text}')
+        elif message.data.type == 'user_speech_started':
+            # Stop playback, as the user has started speaking
+            await player.stop_playback()
 
     async def on_close():
         await player.close()
