@@ -33,6 +33,18 @@ class AgentConfig(BaseConfig):
         examples=['da78ea32-9225-436e-b10d-d5b101bb01a6'],  # example agent_id
     )
 
+    voice_id: Optional[str] = Field(
+        default=None,
+        description=('The voice ID for the desired voice.'),
+        examples=['8e9c4bc8-3979-48ab-8626-df53befc2090'],
+    )
+
+    lang_code: str = Field(
+        default='en',
+        description='Language code for the desired language.',
+        examples=['en', 'es', 'fr'],
+    )
+
     endpointing: Optional[float] = Field(
         default=None,
         description=(
@@ -99,7 +111,7 @@ class TTSConfig(BaseConfig):
     lang_code: str = Field(
         default='en',
         description='Language code for the desired language.',
-        examples=['en'],
+        examples=['en', 'es', 'fr'],
     )
 
     voice_id: Optional[str] = Field(

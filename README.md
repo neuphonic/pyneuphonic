@@ -30,6 +30,7 @@ If you need support or want to join the community, visit our [Discord](https://d
       - [Restoration with a Transcript File](#restoration-with-a-transcript-file)
     - [Agents](#agents)
       - [Interruption handling](#interruption-handling)
+      - [Multilingual Agents](#multilingual-agents)
       - [List agents](#list-agents)
       - [Get agent](#get-agent)
   - [Example Applications](#example-applications)
@@ -412,6 +413,14 @@ explicitly control it when instantiating the `Agent` class:
 ```python
 agent = Agent(client, agent_id=agent_id, allow_interruptions=True)
 ```
+
+#### Multilingual Agents
+Neuphonic agents support multiple languages, allowing you to create conversational AI in your preferred language:
+
+- **Available Languages**: For a comprehensive list of supported languages, visit our [Official Documentation - Languages](https://docs.neuphonic.com/resources/languages)
+- **Example Implementation**: Check out the [Spanish agent example](./examples/agents/multilingual_agent.py) to see multilingual capabilities in action
+
+Creating a multilingual agent is as simple as specifying the `lang_code` and appropriate `voice_id` when instantiating your `Agent`.
 
 #### List agents
 To list all your agents:
