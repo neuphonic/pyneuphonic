@@ -7,8 +7,6 @@ import uuid
 from pyneuphonic import Neuphonic, TTSConfig
 from pyneuphonic.models import APIResponse, TTSResponse, VoiceObject, to_dict
 
-from unittest.mock import MagicMock
-
 
 def test_tts_config():
     tts_config = TTSConfig(temperature=0.8)
