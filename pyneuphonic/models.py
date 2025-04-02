@@ -17,8 +17,17 @@ class BaseConfig(BaseModel):
     model_config = ConfigDict(extra='allow')
 
     def to_query_params(self) -> str:
-        """Generate a query parameter string from the object, excluding None values."""
+        """Generate a query parameter string from the object, excluding None values and empty lists."""
         params = to_dict(self)
+
+        for key in list(params.keys()):
+            value = params[key]
+            if isinstance(value, list):
+                if len(value) > 0:  # convert to a comma-separated string
+                    params[key] = ','.join(map(str, value))
+                else:  # Remove empty lists
+                    del params[key]
+
         return '&'.join(f'{key}={value}' for key, value in params.items())
 
 
@@ -43,6 +52,12 @@ class AgentConfig(BaseConfig):
         default='en',
         description='Language code for the desired language.',
         examples=['en', 'es', 'fr'],
+    )
+
+    mcp_servers: Optional[List[str]] = Field(
+        default=[],
+        description='A list of URLs pointing to MCP servers that the Agent can access.',
+        examples=[['https://example.com/sse']],
     )
 
     endpointing: Optional[float] = Field(
