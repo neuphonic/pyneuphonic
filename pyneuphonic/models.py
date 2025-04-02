@@ -17,8 +17,17 @@ class BaseConfig(BaseModel):
     model_config = ConfigDict(extra='allow')
 
     def to_query_params(self) -> str:
-        """Generate a query parameter string from the object, excluding None values."""
+        """Generate a query parameter string from the object, excluding None values and empty lists."""
         params = to_dict(self)
+
+        for key in list(params.keys()):
+            value = params[key]
+            if isinstance(value, list):
+                if len(value) > 0:  # convert to a comma-separated string
+                    params[key] = ','.join(map(str, value))
+                else:  # Remove empty lists
+                    del params[key]
+
         return '&'.join(f'{key}={value}' for key, value in params.items())
 
 
@@ -45,6 +54,12 @@ class AgentConfig(BaseConfig):
         examples=['en', 'es', 'fr'],
     )
 
+    mcp_servers: Optional[List[str]] = Field(
+        default=[],
+        description='A list of URLs pointing to MCP servers that the Agent can access.',
+        examples=[['https://example.com/sse']],
+    )
+
     endpointing: Optional[float] = Field(
         default=None,
         description=(
@@ -52,15 +67,6 @@ class AgentConfig(BaseConfig):
             'silence in the received audio before concluding the user has finished speaking.'
         ),
         examples=[50, 100, 1000],
-    )
-
-    mode: Optional[str] = Field(
-        default='asr-llm-tts',
-        description=(
-            'Mode of agent usage. `asr-llm-tts` indicates audio input and output. '
-            '`llm-tts` indicates text input and audio output.'
-        ),
-        examples=['asr-llm-tts', 'llm-tts'],
     )
 
     incoming_sampling_rate: Optional[int] = Field(
