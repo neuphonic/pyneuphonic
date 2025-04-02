@@ -6,7 +6,6 @@ from pyneuphonic._sse import SSEClient, AsyncSSEClient
 from pyneuphonic._endpoint import Endpoint
 from pyneuphonic._websocket import AsyncTTSWebsocketClient
 from pyneuphonic._agents import Agents
-from pyneuphonic._restore import Restore
 
 
 class Neuphonic:
@@ -52,7 +51,6 @@ class Neuphonic:
         self._base_url = base_url
 
         self.voices = Voices(api_key=self._api_key, base_url=self._base_url)
-        self.restorations = Restore(api_key=self._api_key, base_url=self._base_url)
         self.tts = TTS(api_key=self._api_key, base_url=self._base_url)
         self.agents = Agents(api_key=self._api_key, base_url=self._base_url)
 

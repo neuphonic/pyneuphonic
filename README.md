@@ -6,39 +6,35 @@ For comprehensive guides and official documentation, check out [https://docs.neu
 If you need support or want to join the community, visit our [Discord](https://discord.gg/G258vva7gZ)!
 
 
-- [PyNeuphonic](#pyneuphonic)
-  - [Documentation](#documentation)
-    - [Installation](#installation)
-      - [API Key](#api-key)
-    - [Voices](#voices)
-      - [Get Voices](#get-voices)
-      - [Get Voice](#get-voice)
-      - [Clone Voice](#clone-voice)
-      - [Update Voice](#update-voice)
-      - [Delete Voice](#delete-voice)
-    - [Audio Generation](#audio-generation)
-      - [Configure the Text-to-Speech Synthesis](#configure-the-text-to-speech-synthesis)
-      - [SSE (Server Side Events)](#sse-server-side-events)
-      - [Asynchronous SSE](#asynchronous-sse)
-      - [Asynchronous Websocket](#asynchronous-websocket)
-    - [Saving Audio](#saving-audio)
-    - [Speech Restoration](#speech-restoration)
-      - [Basic Restoration](#basic-restoration)
-      - [Get Status of Restoration Job / Retrieve Results](#get-status-of-restoration-job--retrieve-results)
-      - [List all Active and Historic Jobs](#list-all-active-and-historic-jobs)
-      - [Restoration with a Transcript and Language Code](#restoration-with-a-transcript-and-language-code)
-      - [Restoration with a Transcript File](#restoration-with-a-transcript-file)
-    - [Agents](#agents)
-      - [Interruption handling](#interruption-handling)
-      - [Multilingual Agents](#multilingual-agents)
-      - [List agents](#list-agents)
-      - [Get agent](#get-agent)
-  - [Example Applications](#example-applications)
+- [Example Applications](#example-applications)
+- [Documentation](#documentation)
+  - [Installation](#installation)
+    - [API Key](#api-key)
+  - [Audio Generation](#audio-generation)
+    - [Configure the Text-to-Speech Synthesis](#configure-the-text-to-speech-synthesis)
+    - [SSE (Server Side Events)](#sse-server-side-events)
+    - [Asynchronous SSE](#asynchronous-sse)
+    - [Asynchronous Websocket](#asynchronous-websocket)
+  - [Voices](#voices)
+    - [Get Voices](#get-voices)
+    - [Get Voice](#get-voice)
+    - [Clone Voice](#clone-voice)
+    - [Update Voice](#update-voice)
+    - [Delete Voice](#delete-voice)
+  - [Saving Audio](#saving-audio)
+  - [Agents](#agents)
+    - [List agents](#list-agents)
+    - [Get agent](#get-agent)
+    - [Multilingual Agents](#multilingual-agents)
+    - [Interruption handling](#interruption-handling)
+
+## Example Applications
+Check out the [examples](./examples/) folder for some example applications.
 
 ## Documentation
 See [https://docs.neuphonic.com](https://docs.neuphonic.com) for the complete API documentation.
 
-### Installation
+## Installation
 Install this package into your environment using your chosen package manager:
 
 ```bash
@@ -52,116 +48,16 @@ To use these utilities, please also `pip install pyaudio`.
 > :warning: Mac users encountering a `'portaudio.h' file not found` error can resolve it by running
 > `brew install portaudio`.
 
-#### API Key
+### API Key
 Get your API key from the [Neuphonic website](https://beta.neuphonic.com) and set it in your
 environment, for example:
 ```bash
 export NEUPHONIC_API_KEY=<YOUR API KEY HERE>
 ```
 
-### Voices
-#### Get Voices
-To get all available voices you can run the following snippet.
-```python
-from pyneuphonic import Neuphonic
-import os
+## Speech Generation
 
-client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_KEY'))
-response = client.voices.list()  # get's all available voices
-voices = response.data['voices']
-
-voices
-```
-
-#### Get Voice
-To get information about an existing voice please call.
-```python
-response = client.voices.get(voice_id='<VOICE_ID>')  # gets information about the selected voice id
-response.data  # response contains all information about this voice
-```
-
-
-#### Clone Voice
-
-To clone a voice based on a audio file, you can run the following snippet.
-
-```python
-from pyneuphonic import Neuphonic
-import os
-
-client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_KEY'))
-
-response = client.voices.clone(
-    voice_name='<VOICE_NAME>',
-    voice_tags=['tag1', 'tag2'],  # optional, add descriptive tags of what your voice sounds like
-    voice_file_path='<FILE_PATH>.wav'  # replace with file path to a sample of the voice to clone
-)
-
-response.data  # this will contain a success message with the voice_id of the cloned voice
-```
-
-If you have successfully cloned a voice, the following message will be displayed: "Voice has
-successfully been cloned with ID `<VOICE_ID>`." Once cloned, you can use this voice just like any of
-the standard voices when calling the TTS (Text-to-Speech) service.
-
-To see a list of all available voices, including cloned ones, use `client.voices.list()`.
-
-**Note:** Your voice reference clip must meet the following criteria: it should be at least 6
-seconds long, in .mp3 or .wav format, and no larger than 10 MB in size.
-
-#### Update Voice
-
-You can update any of the attributes of a voice: name, tags and the reference audio file the voice
-was cloned on.
-You can select which voice to update using either it's `voice_id` or it's name.
-
-```python
-# Updating using the original voice's name
-response = client.voices.update(
-    voice_name='<ORIGINAL_VOICE_NAME>',  # this is the name of voice we want to update
-
-    # Provide any, or all of the following, to update the voice
-    new_voice_name='<NEW_VOICE_NAME>',
-    new_voice_tags=['new_tag_1', 'new_tag_2'],  # overwrite all previous tags
-    new_voice_file_path='<NEW_FILE_PATH>.wav',
-)
-
-response.data
-```
-
-```python
-# Updating using the original voice's `voice_id`
-response = client.voices.update(
-    voice_id ='<VOICE_ID>',  # this is the id of voice we want to update
-
-    # Provide any, or all of the following, to update the voice
-    new_voice_name='<NEW_VOICE_NAME>',
-    new_voice_tags=['new_tag_1', 'new_tag_2'],  # overwrite all previous tags
-    new_voice_file_path='<NEW_FILE_PATH>.wav',
-)
-
-response.data
-```
-
-**Note:** Your voice reference clip must meet the following criteria: it should be at least 6 seconds long, in .mp3 or .wav format, and no larger than 10 MB in size.
-
-#### Delete Voice
-To delete a cloned voice:
-
-```python
-# Delete using the voice's name
-response = client.voices.delete(voice_name='<VOICE_NAME>')
-response.data
-```
-```python
-# Delete using the voices `voice_id`
-response = client.voices.delete(voice_id='<VOICE_ID>')
-response.data
-```
-
-### Audio Generation
-
-#### Configure the Text-to-Speech Synthesis
+### Configure the Text-to-Speech Synthesis
 To configure the TTS settings, modify the TTSConfig model.
 The following parameters are examples of parameters which can be adjusted. Ensure that the selected combination of model, language, and voice is valid. For details on supported combinations, refer to the [Models](https://docs.neuphonic.com/resources/models) and [Voices](https://docs.neuphonic.com/resources/voices) pages.
 
@@ -183,7 +79,7 @@ The following parameters are examples of parameters which can be adjusted. Ensur
 
 View the [TTSConfig](https://github.com/neuphonic/pyneuphonic/blob/main/pyneuphonic/models.py) object to see all valid options.
 
-#### SSE (Server Side Events)
+### SSE (Server Side Events)
 ```python
 from pyneuphonic import Neuphonic, TTSConfig
 from pyneuphonic.player import AudioPlayer
@@ -208,7 +104,7 @@ with AudioPlayer() as player:
     player.save_audio('output.wav')  # save the audio to a .wav file from the player
 ```
 
-#### Asynchronous SSE
+### Asynchronous SSE
 ```python
 from pyneuphonic import Neuphonic, TTSConfig
 from pyneuphonic.player import AsyncAudioPlayer
@@ -232,7 +128,7 @@ async def main():
 asyncio.run(main())
 ```
 
-#### Asynchronous Websocket
+### Asynchronous Websocket
 ```python
 from pyneuphonic import Neuphonic, TTSConfig, WebsocketEvents
 from pyneuphonic.models import APIResponse, TTSResponse
@@ -275,7 +171,7 @@ async def main():
 asyncio.run(main())
 ```
 
-### Saving Audio
+## Saving Audio
 To save the audio to a file, you can use the `save_audio` function from the `pyneuphonic` package to save the audio from responses from the synchronous SSE client.
 
 ```python
@@ -301,72 +197,108 @@ response = sse.send('Hello, world!', tts_config=tts_config)
 await async_save_audio(response, 'output.wav')
 ```
 
-### Speech Restoration
-
-Speech restoration involves enhancing and repairing degraded audio to improve its clarity, intelligibility, and overall quality, all while preserving the original content. Follow these simple steps to restore your audio clips:
-
-**Note:** Your audio clip must meet the following criteria: it should be in .mp3 or .wav format, and no larger than 10 MB in size.
-
-#### Basic Restoration
-To restore an audio clip without additional input, use the following code:
-
+## Voices
+### Get Voices
+To get all available voices you can run the following snippet.
 ```python
-# Submit a request to restore a degraded file
-voice_file_path = '<FILE_PATH>.wav'  # select a degraded file to restore
-restoration_response = client.restorations.restore(voice_file_path)
-print(restoration_response.data)  # a dictionary containing the job_id
+from pyneuphonic import Neuphonic
+import os
 
-# Get the status of the job
-job_id = restoration_response.data['job_id']
-status_response = client.restorations.get(job_id=job_id)
-print(status_response.data)
-```
-If the job is completed, the status will include the URL where you can access the results (file_url). If the status is 'Not Finished,' please wait a moment before rerunning restorations.get(). Once the status changes to 'Finished,' you will be able to retrieve the results.
+client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_KEY'))
+response = client.voices.list()  # get's all available voices
+voices = response.data['voices']
 
-#### Get Status of Restoration Job / Retrieve Results
-Once you queue a job for restoration using the `.restore()` method you will receive an associated job id (uuid) as a member of the response.
-To get the status and the link to receive the results of your job you call the `.get()` method as following.
-
-```python
-response = client.restorations.get(job_id='<JOB_ID>')
-response.data  # a dict with the status of the job and the url where you can download the results.
+voices
 ```
 
-#### List all Active and Historic Jobs
-To list all your active and previous jobs you can run the `.jobs()` function.
+### Get Voice
+To get information about an existing voice please call.
 ```python
-response = client.restorations.list()
+response = client.voices.get(voice_id='<VOICE_ID>')  # gets information about the selected voice id
+response.data  # response contains all information about this voice
+```
+
+
+### Clone Voice
+
+To clone a voice based on a audio file, you can run the following snippet.
+
+```python
+from pyneuphonic import Neuphonic
+import os
+
+client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_KEY'))
+
+response = client.voices.clone(
+    voice_name='<VOICE_NAME>',
+    voice_tags=['tag1', 'tag2'],  # optional, add descriptive tags of what your voice sounds like
+    voice_file_path='<FILE_PATH>.wav'  # replace with file path to a sample of the voice to clone
+)
+
+response.data  # this will contain a success message with the voice_id of the cloned voice
+```
+
+If you have successfully cloned a voice, the following message will be displayed: "Voice has
+successfully been cloned with ID `<VOICE_ID>`." Once cloned, you can use this voice just like any of
+the standard voices when calling the TTS (Text-to-Speech) service.
+
+To see a list of all available voices, including cloned ones, use `client.voices.list()`.
+
+**Note:** Your voice reference clip must meet the following criteria: it should be at least 6
+seconds long, in .mp3 or .wav format, and no larger than 10 MB in size.
+
+### Update Voice
+
+You can update any of the attributes of a voice: name, tags and the reference audio file the voice
+was cloned on.
+You can select which voice to update using either it's `voice_id` or it's name.
+
+```python
+# Updating using the original voice's name
+response = client.voices.update(
+    voice_name='<ORIGINAL_VOICE_NAME>',  # this is the name of voice we want to update
+
+    # Provide any, or all of the following, to update the voice
+    new_voice_name='<NEW_VOICE_NAME>',
+    new_voice_tags=['new_tag_1', 'new_tag_2'],  # overwrite all previous tags
+    new_voice_file_path='<NEW_FILE_PATH>.wav',
+)
+
+response.data
+```
+
+```python
+# Updating using the original voice's `voice_id`
+response = client.voices.update(
+    voice_id ='<VOICE_ID>',  # this is the id of voice we want to update
+
+    # Provide any, or all of the following, to update the voice
+    new_voice_name='<NEW_VOICE_NAME>',
+    new_voice_tags=['new_tag_1', 'new_tag_2'],  # overwrite all previous tags
+    new_voice_file_path='<NEW_FILE_PATH>.wav',
+)
+
+response.data
+```
+
+**Note:** Your voice reference clip must meet the following criteria: it should be at least 6 seconds long, in .mp3 or .wav format, and no larger than 10 MB in size.
+
+### Delete Voice
+To delete a cloned voice:
+
+```python
+# Delete using the voice's name
+response = client.voices.delete(voice_name='<VOICE_NAME>')
+response.data
+```
+```python
+# Delete using the voices `voice_id`
+response = client.voices.delete(voice_id='<VOICE_ID>')
 response.data
 ```
 
 
-#### Restoration with a Transcript and Language Code
-For better restoration quality, you can provide a transcript of the audio and specify a language code (default is English). Here's how:
-
-```python
-voice_file_path = 'example.wav'
-transcript = 'Example Transcript' # Specify Transcript
-lang_code = 'eng-us'  # Specify language code
-is_transcript_file = False # Transcript is string
-response = client.restorations.restore(voice_file_path, transcript, lang_code)
-```
-
-#### Restoration with a Transcript File
-If you have the transcript stored in a file, you can use it instead of a transcript string:
-
-```python
-voice_file_path = 'example.wav'
-transcript = 'example.txt'
-lang_code = 'eng-us'
-is_transcript_file = True # Switch this to true to feed in a file as transcript.
-response = client.restorations.restore(voice_file_path, transcript, lang_code, is_transcript_file=True)
-```
-**Note:** You have to set is_transcript_file to true for the program to read this as a file rather than a string.
-
-**Note:** Providing a transcript significantly improves the restoration quality of your audio clip. If no transcript is provided, the output may not be as refined.
-
-
-### Agents
+## Agents
 With Agents, you can create, manage, and interact with intelligent AI assistants. You can create an
 agent easily using the example here:
 ```python
@@ -401,7 +333,29 @@ async def main():
 asyncio.run(main())
 ```
 
-#### Interruption handling
+### List agents
+To list all your agents:
+```python
+response = client.agents.list()
+response.data
+```
+
+### Get agent
+To get information about a specific agent:
+```python
+response = client.agents.get(agent_id='<AGENT_ID>')
+response.data
+```
+
+### Multilingual Agents
+Neuphonic agents support multiple languages, allowing you to create conversational AI in your preferred language:
+
+- **Available Languages**: For a comprehensive list of supported languages, visit our [Official Documentation - Languages](https://docs.neuphonic.com/resources/languages)
+- **Example Implementation**: Check out the [Spanish agent example](./examples/agents/multilingual_agent.py) to see multilingual capabilities in action
+
+Creating a multilingual agent is as simple as specifying the `lang_code` and appropriate `voice_id` when instantiating your `Agent`.
+
+### Interruption handling
 The `Agent` class supports interruption handling, which allows users to interrupt the agent while
 it's speaking.
 
@@ -413,29 +367,3 @@ explicitly control it when instantiating the `Agent` class:
 ```python
 agent = Agent(client, agent_id=agent_id, allow_interruptions=True)
 ```
-
-#### Multilingual Agents
-Neuphonic agents support multiple languages, allowing you to create conversational AI in your preferred language:
-
-- **Available Languages**: For a comprehensive list of supported languages, visit our [Official Documentation - Languages](https://docs.neuphonic.com/resources/languages)
-- **Example Implementation**: Check out the [Spanish agent example](./examples/agents/multilingual_agent.py) to see multilingual capabilities in action
-
-Creating a multilingual agent is as simple as specifying the `lang_code` and appropriate `voice_id` when instantiating your `Agent`.
-
-#### List agents
-To list all your agents:
-```python
-response = client.agents.list()
-response.data
-```
-
-#### Get agent
-To get information about a specific agent:
-```python
-response = client.agents.get(agent_id='<AGENT_ID>')
-response.data
-```
-
-
-## Example Applications
-Check out the [examples](./examples/) folder for some example applications.
