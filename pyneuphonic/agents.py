@@ -1,5 +1,4 @@
 import asyncio
-import aioconsole
 
 from pyneuphonic.client import Neuphonic
 from pyneuphonic.models import APIResponse, AgentResponse, AgentConfig, WebsocketEvents
@@ -60,14 +59,12 @@ class Agent:
         if not self.mute:
             self.player = AsyncAudioPlayer()
 
-        if 'asr' in self.config.mode:
-            # passing in the websocket object will automatically forward audio to the server
-            self.recorder = AsyncAudioRecorder(
-                sampling_rate=self.config.incoming_sampling_rate,
-                websocket=self.ws,
-                player=self.player,
-                allow_interruptions=allow_interruptions,
-            )
+        self.recorder = AsyncAudioRecorder(
+            sampling_rate=self.config.incoming_sampling_rate,
+            websocket=self.ws,
+            player=self.player,
+            allow_interruptions=allow_interruptions,
+        )
 
         self.on_message_hook = on_message
         self._tasks = []
@@ -105,26 +102,13 @@ class Agent:
                 await self.player.open()
             await self.ws.open(self.config)
 
-            if 'asr' in self.config.mode:
-                await self.recorder.record()
+            await self.recorder.record()
 
-                try:
-                    while True:
-                        await asyncio.sleep(0.01)
-                except KeyboardInterrupt:
-                    await self.close()
-
-            else:
+            try:
                 while True:
-                    user_text = await aioconsole.ainput(
-                        "\nEnter text to speak (or 'quit' to exit): "
-                    )
-
-                    if user_text.lower() == 'quit':
-                        break
-
-                    await self.ws.send({'text': user_text})
-                    await asyncio.sleep(1)  # simply for formatting
+                    await asyncio.sleep(0.01)
+            except KeyboardInterrupt:
+                await self.close()
 
             await self.close()
 
@@ -137,7 +121,6 @@ class Agent:
         """
         if not self.mute:
             await self.player.close()
-        if 'asr' in self.config.mode:
             await self.recorder.close()
 
     async def stop(self):

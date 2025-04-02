@@ -54,15 +54,6 @@ class AgentConfig(BaseConfig):
         examples=[50, 100, 1000],
     )
 
-    mode: Optional[str] = Field(
-        default='asr-llm-tts',
-        description=(
-            'Mode of agent usage. `asr-llm-tts` indicates audio input and output. '
-            '`llm-tts` indicates text input and audio output.'
-        ),
-        examples=['asr-llm-tts', 'llm-tts'],
-    )
-
     incoming_sampling_rate: Optional[int] = Field(
         default=16000,
         description=(
