@@ -3,6 +3,8 @@ import websockets
 from typing import Callable, Union
 import json
 from abc import ABC, abstractmethod
+import importlib.metadata
+from packaging import version
 
 from pyneuphonic._endpoint import Endpoint
 from pyneuphonic.models import (
@@ -16,6 +18,15 @@ from pyneuphonic.models import (
     AgentResponse,
 )
 from pydantic import BaseModel
+
+# websockets v14.0 introduced a breaking change in connection parameter naming.
+# See: https://websockets.readthedocs.io/en/stable/howto/upgrade.html#arguments-of-connect
+WEBSOCKETS_VERSION = version.parse(importlib.metadata.version('websockets'))
+HEADER_ARG = (
+    'additional_headers'
+    if WEBSOCKETS_VERSION >= version.parse('14.0')
+    else 'extra_headers'
+)
 
 
 class AsyncWebsocketBase(Endpoint, ABC):
@@ -102,7 +113,7 @@ class AsyncWebsocketBase(Endpoint, ABC):
         self._ws = await websockets.connect(
             self.url(config),
             ssl=self.ssl_context,
-            extra_headers=self.headers,
+            **{HEADER_ARG: self.headers},
         )
 
         if self.event_handlers.open is not None:
@@ -148,9 +159,9 @@ class AsyncWebsocketBase(Endpoint, ABC):
         AssertionError
             If the message is not a string or dictionary.
         """
-        assert isinstance(message, (str, dict)), (
-            'Message must be an instance of str or dict'
-        )
+        assert isinstance(
+            message, (str, dict)
+        ), 'Message must be an instance of str or dict'
 
         message = message if isinstance(message, str) else json.dumps(message)
 
