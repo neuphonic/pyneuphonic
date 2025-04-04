@@ -70,7 +70,7 @@ async def test_websocket_async(client: Neuphonic, mocker: MockerFixture):
     mock_connect.assert_called_with(
         f'{ws.ws_url}/speak/en?{TTSConfig().to_query_params()}',
         ssl=ssl_context,
-        extra_headers=ws.headers,
+        additional_headers=ws.headers,
     )
     await ws.close()
 
@@ -80,7 +80,7 @@ async def test_websocket_async(client: Neuphonic, mocker: MockerFixture):
     mock_connect.assert_called_with(
         f'{ws.ws_url}/speak/en?{tts_config.to_query_params()}',
         ssl=ssl_context,
-        extra_headers=ws.headers,
+        additional_headers=ws.headers,
     )
     await ws.close()
 

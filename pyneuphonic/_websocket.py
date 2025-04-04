@@ -102,7 +102,7 @@ class AsyncWebsocketBase(Endpoint, ABC):
         self._ws = await websockets.connect(
             self.url(config),
             ssl=self.ssl_context,
-            extra_headers=self.headers,
+            additional_headers=self.headers,
         )
 
         if self.event_handlers.open is not None:
@@ -148,9 +148,9 @@ class AsyncWebsocketBase(Endpoint, ABC):
         AssertionError
             If the message is not a string or dictionary.
         """
-        assert isinstance(message, (str, dict)), (
-            'Message must be an instance of str or dict'
-        )
+        assert isinstance(
+            message, (str, dict)
+        ), 'Message must be an instance of str or dict'
 
         message = message if isinstance(message, str) else json.dumps(message)
 
