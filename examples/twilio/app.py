@@ -6,11 +6,14 @@ import base64
 from pyneuphonic import Neuphonic, WebsocketEvents, AgentConfig
 from pyneuphonic.models import APIResponse, TTSResponse
 import os
+from twilio.twiml.voice_response import VoiceResponse, Connect
+from fastapi.responses import HTMLResponse
 from fastapi import (
     FastAPI,
     APIRouter,
     WebSocket,
     WebSocketDisconnect,
+    Request
 )
 
 load_dotenv(override=True)
@@ -25,19 +28,22 @@ def ping():
     return {'message': 'pong'}
 
 
+@app.api_route("/twilio/inbound_call", methods=["GET", "POST"])
+async def handle_incoming_call(request: Request):
+    """Handle incoming call and return TwiML response."""
+    response = VoiceResponse()
+    host = request.url.hostname
+    connect = Connect()
+    connect.stream(url=f'wss://{os.getenv("SERVER_BASE_URL")}/twilio/agent')
+    response.append(connect)
+    return HTMLResponse(content=str(response), media_type="application/xml")
+
+
 @app.websocket('/twilio/agent')
 async def agent_websocket(  # noqa: C901
     websocket: WebSocket,
 ):
-    """
-    WebSocket endpoint for Twilio agent communication.
-
-    This endpoint handles the WebSocket connection for a Twilio agent, allowing real-time
-    voice conversation.
-
-    Args:
-        websocket (WebSocket): The WebSocket connection instance.
-    """
+    """Handles the WebSocket connection for a Twilio agent, allowing real-time voice conversation."""
     await websocket.accept()
     stream_sid = None
 
