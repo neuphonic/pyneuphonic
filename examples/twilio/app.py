@@ -32,7 +32,6 @@ def ping():
 async def handle_incoming_call(request: Request):
     """Handle incoming call and return TwiML response."""
     response = VoiceResponse()
-    host = request.url.hostname
     connect = Connect()
     connect.stream(url=f'wss://{os.getenv("SERVER_BASE_URL")}/twilio/agent')
     response.append(connect)
