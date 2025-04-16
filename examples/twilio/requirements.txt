@@ -2,4 +2,3 @@ twilio~=9.3
 fastapi[standard]~=0.114
 python-dotenv~=1.0
 pyneuphonic~=1.5.13
-uvicorn[standard]~=0.30

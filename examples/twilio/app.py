@@ -79,7 +79,6 @@ async def agent_websocket(  # noqa: C901
             return_sampling_rate=8000,
             incoming_encoding='pcm_mulaw',
             return_encoding='pcm_mulaw',
-            speed=1.2,
             voice_id='fc854436-2dac-4d21-aa69-ae17b54e98eb',
         )
     )
