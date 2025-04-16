@@ -60,10 +60,8 @@ The server, built with FastAPI, handles communication between Twilio and Neuphon
 
 2. Start the FastAPI server:
    ```bash
-   fastapi run app.py --host 0.0.0.0 --port 8000 --reload
+   python app.py
    ```
-   
-   The `--reload` flag enables development mode, automatically restarting the server when you make changes to `app.py`.
 
 ## Initiate an Outbound Call
 To test the integration, you can initiate an outbound call from your Twilio number to your personal phone number:
@@ -74,5 +72,5 @@ python make_outbound_call.py
 ## Next Steps
 This demo provides a basic introduction to integrating Neuphonic Agents with Twilio. To explore more advanced features and capabilities:
 
-- Check out the [Twilio Voice Documentation](https://www.twilio.com/docs/voice) for deeper integration possibilities
+- Check out the [Twilio Voice Documentation](https://www.twilio.com/docs/voice)
 - Visit the [Neuphonic Documentation](https://docs.neuphonic.com/quickstart) for additional integration guides and examples
