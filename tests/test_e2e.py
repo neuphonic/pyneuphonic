@@ -132,7 +132,6 @@ async def test_sse_save_async_response(client):
     os.remove(fname)
 
 
-@pytest.mark.asyncio
 def test_sse_save_sync_response(client):
     sse_client = client.tts.SSEClient()
 
