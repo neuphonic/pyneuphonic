@@ -1,10 +1,10 @@
-# Neuphonic Agents - LiveKit Integration Guide
+# Neuphonic - LiveKit Integration Guide
 
 This demo illustrates how to integrate Neuphonic with LiveKit to create an interactive and intelligent
 voice agent capable of real-time audio processing and conversation handling.
-This demo utilises the [Python LiveKit plugin](https://pypi.org/project/livekit-plugins-neuphonic/)
+This demo utilises the [Neuphonic LiveKit plugin](https://pypi.org/project/livekit-plugins-neuphonic/).
 
-- [Neuphonic Agents - LiveKit Integration Guide](#neuphonic-agents---livekit-integration-guide)
+- [Neuphonic - LiveKit Integration Guide](#neuphonic---livekit-integration-guide)
   - [Prerequisites](#prerequisites)
   - [Setup](#setup)
     - [Environment Setup](#environment-setup)
@@ -16,7 +16,7 @@ Before getting started, ensure you have:
 - A Neuphonic API Key
 - A [LiveKit account](https://livekit.io/) with API Credentials.
 - Python 3.9 or higher
-- An OpenAI API Key and a Deepgram API Key. These demos use OpenAI as the LLM and Deepgram as for
+- An OpenAI API Key and a Deepgram API Key. These demos use OpenAI as the LLM and Deepgram for
   STT, but you can switch these out for something else if you prefer.
 
 ## Setup
