@@ -16,7 +16,7 @@ Before getting started, ensure you have:
 - A Neuphonic API Key
 - A [LiveKit account](https://livekit.io/) with API Credentials.
 - Python 3.9 or higher
-- An OpenAI API Key and a Deepgram API Key. These demos use OpenAI as the LLM and Deepgram as for
+- An OpenAI API Key and a Deepgram API Key. These demos use OpenAI as the LLM and Deepgram for
   STT, but you can switch these out for something else if you prefer.
 
 ## Setup
