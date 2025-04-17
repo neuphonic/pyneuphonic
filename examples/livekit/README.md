@@ -1,10 +1,10 @@
-# Neuphonic Agents - LiveKit Integration Guide
+# Neuphonic - LiveKit Integration Guide
 
 This demo illustrates how to integrate Neuphonic with LiveKit to create an interactive and intelligent
 voice agent capable of real-time audio processing and conversation handling.
 This demo utilises the [Neuphonic LiveKit plugin](https://pypi.org/project/livekit-plugins-neuphonic/).
 
-- [Neuphonic Agents - LiveKit Integration Guide](#neuphonic-agents---livekit-integration-guide)
+- [Neuphonic - LiveKit Integration Guide](#neuphonic---livekit-integration-guide)
   - [Prerequisites](#prerequisites)
   - [Setup](#setup)
     - [Environment Setup](#environment-setup)
