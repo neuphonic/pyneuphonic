@@ -27,9 +27,14 @@ class SSEClientBase(Endpoint):
         message = APIResponse[TTSResponse](**json.loads(value))
 
         if message.errors is not None:
-            raise Exception(
-                f'Status {message.status_code} error received: {message.errors}.'
-            )
+            if len(message.errors) > 0:
+                raise Exception(
+                    f'Status {message.status_code} error received: {message.errors}.'
+                )
+            else:
+                raise Exception(
+                    f'Status {message.status_code} error received: check your configuration.'
+                )
 
         return message
 
