@@ -99,11 +99,14 @@ class AsyncWebsocketBase(Endpoint, ABC):
         config : Union[BaseConfig, dict]
             Configuration for the websocket connection.
         """
-        self._ws = await websockets.connect(
-            self.url(config),
-            ssl=self.ssl_context,
-            additional_headers=self.headers,
-        )
+        try:
+            self._ws = await websockets.connect(
+                self.url(config),
+                ssl=self.ssl_context,
+                additional_headers=self.headers,
+            )
+        except Exception as exce:
+            raise Exception("Connection to Neuphonic server failed, please check your configuration.")
 
         if self.event_handlers.open is not None:
             await self.event_handlers.open()
@@ -126,8 +129,7 @@ class AsyncWebsocketBase(Endpoint, ABC):
                     else:
                         await self.message_queue.put(message)
         except Exception as e:
-            if self.event_handlers.error is not None:
-                await self.event_handlers.error(e)
+            raise Exception("Message from websocket could not be received correctly.")
         finally:
             if self.event_handlers.close:
                 await self.event_handlers.close()
