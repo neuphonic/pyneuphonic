@@ -16,10 +16,10 @@ def default_on_message(message: APIResponse[AgentResponse]):
     message : APIResponse[AgentResponse]
         The message received from the server, containing the type and text.
     """
-    if message.data.type == 'user_transcript':
-        print(f'User: {message.data.text}')
-    elif message.data.type == 'llm_response':
-        print(f'Agent: {message.data.text}')
+    if message.data.type == "user_transcript":
+        print(f"User: {message.data.text}")
+    elif message.data.type == "llm_response":
+        print(f"Agent: {message.data.text}")
 
 
 class Agent:
@@ -60,7 +60,7 @@ class Agent:
         if not self.mute:
             self.player = AsyncAudioPlayer()
 
-        if 'asr' in self.config.mode:
+        if "asr" in self.config.mode:
             # passing in the websocket object will automatically forward audio to the server
             self.recorder = AsyncAudioRecorder(
                 sampling_rate=self.config.incoming_sampling_rate,
@@ -82,10 +82,10 @@ class Agent:
             The message received from the server, containing the type and content.
         """
         # server will return 3 types of messages: audio_response, user_transcript, llm_response
-        if message.data.type == 'audio_response':
+        if message.data.type == "audio_response":
             if not self.mute:
                 await self.player.play(message.data.audio)
-        elif message.data.type == 'stop_audio_response':
+        elif message.data.type == "stop_audio_response":
             # Stop any currently playing audio as the user has interrupted
             if not self.mute:
                 await self.player.stop_playback()
@@ -105,7 +105,7 @@ class Agent:
                 await self.player.open()
             await self.ws.open(self.config)
 
-            if 'asr' in self.config.mode:
+            if "asr" in self.config.mode:
                 await self.recorder.record()
 
                 try:
@@ -120,10 +120,10 @@ class Agent:
                         "\nEnter text to speak (or 'quit' to exit): "
                     )
 
-                    if user_text.lower() == 'quit':
+                    if user_text.lower() == "quit":
                         break
 
-                    await self.ws.send({'text': user_text})
+                    await self.ws.send({"text": user_text})
                     await asyncio.sleep(1)  # simply for formatting
 
             await self.close()
@@ -137,7 +137,7 @@ class Agent:
         """
         if not self.mute:
             await self.player.close()
-        if 'asr' in self.config.mode:
+        if "asr" in self.config.mode:
             await self.recorder.close()
 
     async def stop(self):

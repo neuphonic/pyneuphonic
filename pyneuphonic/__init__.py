@@ -1,10 +1,10 @@
 import logging
 
-logger = logging.getLogger('pyneuphonic')
+logger = logging.getLogger("pyneuphonic")
 logging.basicConfig(
-    format='%(asctime)s - %(levelname)s - (%(name)s) %(message)s',
+    format="%(asctime)s - %(levelname)s - (%(name)s) %(message)s",
     level=logging.WARNING,
-    datefmt='%Y-%m-%d %H:%M:%S',
+    datefmt="%Y-%m-%d %H:%M:%S",
 )
 
 from pyneuphonic.agents import Agent

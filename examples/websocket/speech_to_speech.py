@@ -14,7 +14,7 @@ import asyncio
 
 
 async def main():
-    client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_KEY'))
+    client = Neuphonic(api_key=os.environ.get("NEUPHONIC_API_KEY"))
 
     ws = client.agents.AsyncWebsocketClient()
     player = AsyncAudioPlayer()
@@ -26,13 +26,13 @@ async def main():
 
     async def on_message(message: APIResponse[AgentResponse]):
         # server will return 3 types of messages: audio_response, user_transcript, llm_response
-        if message.data.type == 'audio_response':
+        if message.data.type == "audio_response":
             await player.play(message.data.audio)
-        elif message.data.type == 'user_transcript':
-            print(f'User: {message.data.text}')
-        elif message.data.type == 'llm_response':
-            print(f'Agent: {message.data.text}')
-        elif message.data.type == 'stop_audio_response':
+        elif message.data.type == "user_transcript":
+            print(f"User: {message.data.text}")
+        elif message.data.type == "llm_response":
+            print(f"Agent: {message.data.text}")
+        elif message.data.type == "stop_audio_response":
             # Stop any currently playing audio, as the user has interrupted
             await player.stop_playback()
 

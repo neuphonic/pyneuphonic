@@ -12,35 +12,35 @@ def test_tts_config():
     tts_config = TTSConfig(temperature=0.8)
     query_param_string = tts_config.to_query_params()
 
-    assert 'temperature=0.8' in query_param_string
+    assert "temperature=0.8" in query_param_string
 
 
 def test_to_dict():
     dict_repr = to_dict(TTSConfig())
 
-    assert 'voice_id' not in dict_repr
+    assert "voice_id" not in dict_repr
 
 
 def test_sse_sync(client: Neuphonic, mocker: MockerFixture):
     sse_client = client.tts.SSEClient()
 
-    mock_stream = mocker.patch('httpx.stream')
+    mock_stream = mocker.patch("httpx.stream")
 
     mock_response = mocker.Mock()
     mock_response.iter_lines.return_value = iter(
         [
-            'event: message',
+            "event: message",
             'data: {"status_code": 200, "data": {"audio": "test"}}',
-            'event: message',
+            "event: message",
             'data: {"status_code": 200, "data": {"audio": "test"}}',
-            'event: message',
+            "event: message",
             'data: {"status_code": 200, "data": {"audio": "test"}}',
         ]
     )
 
     mock_stream.return_value.__enter__.return_value = mock_response
 
-    response = sse_client.send('This is a test.')
+    response = sse_client.send("This is a test.")
 
     count = 0
 
@@ -51,10 +51,10 @@ def test_sse_sync(client: Neuphonic, mocker: MockerFixture):
     assert count == 3
 
     mock_stream.assert_called_once_with(
-        method='POST',
-        url=f'{sse_client.http_url}/sse/speak/en',
+        method="POST",
+        url=f"{sse_client.http_url}/sse/speak/en",
         headers=sse_client.headers,
-        json={'text': 'This is a test.', **to_dict(TTSConfig())},
+        json={"text": "This is a test.", **to_dict(TTSConfig())},
     )
 
 
@@ -62,13 +62,13 @@ def test_sse_sync(client: Neuphonic, mocker: MockerFixture):
 async def test_websocket_async(client: Neuphonic, mocker: MockerFixture):
     ws = client.tts.AsyncWebsocketClient()
 
-    mock_connect = mocker.patch('websockets.connect', new_callable=mocker.AsyncMock)
+    mock_connect = mocker.patch("websockets.connect", new_callable=mocker.AsyncMock)
 
     assert ws._ws is None
     await ws.open()
-    ssl_context = mock_connect.call_args.kwargs['ssl']
+    ssl_context = mock_connect.call_args.kwargs["ssl"]
     mock_connect.assert_called_with(
-        f'{ws.ws_url}/speak/en?{TTSConfig().to_query_params()}',
+        f"{ws.ws_url}/speak/en?{TTSConfig().to_query_params()}",
         ssl=ssl_context,
         additional_headers=ws.headers,
     )
@@ -76,9 +76,9 @@ async def test_websocket_async(client: Neuphonic, mocker: MockerFixture):
 
     tts_config = TTSConfig(temperature=0.8)
     await ws.open(tts_config=tts_config)
-    ssl_context = mock_connect.call_args.kwargs['ssl']
+    ssl_context = mock_connect.call_args.kwargs["ssl"]
     mock_connect.assert_called_with(
-        f'{ws.ws_url}/speak/en?{tts_config.to_query_params()}',
+        f"{ws.ws_url}/speak/en?{tts_config.to_query_params()}",
         ssl=ssl_context,
         additional_headers=ws.headers,
     )
@@ -91,33 +91,33 @@ async def test_get_voices(client: Neuphonic, mocker: MockerFixture):
     mock_response.is_success = True
 
     return_value = {
-        'data': {
-            'voices': [
+        "data": {
+            "voices": [
                 {
-                    'voice_id': 'b61a1969-07c9-4d10-a055-090bad4fd08e',
-                    'name': 'Holly',
-                    'tags': ['Female', 'American'],
+                    "voice_id": "b61a1969-07c9-4d10-a055-090bad4fd08e",
+                    "name": "Holly",
+                    "tags": ["Female", "American"],
                 },
                 {
-                    'voice_id': '3752be08-40a1-4ad8-8266-86499c2ed51e',
-                    'name': 'Marcus',
-                    'tags': ['Male'],
+                    "voice_id": "3752be08-40a1-4ad8-8266-86499c2ed51e",
+                    "name": "Marcus",
+                    "tags": ["Male"],
                 },
                 {
-                    'voice_id': '3752be08-40a1-4ad8-8266-86499c2ed51e',
-                    'name': 'Damien',
-                    'tags': ['Male'],
+                    "voice_id": "3752be08-40a1-4ad8-8266-86499c2ed51e",
+                    "name": "Damien",
+                    "tags": ["Male"],
                 },
             ]
         }
     }
 
     mock_response.json.return_value = return_value
-    mock_get = mocker.patch('httpx.get', return_value=mock_response)
+    mock_get = mocker.patch("httpx.get", return_value=mock_response)
 
     response = client.voices.list()
     assert isinstance(response, APIResponse)
-    voices = response.data['voices']
+    voices = response.data["voices"]
 
     assert len(voices) == 3
 
@@ -130,31 +130,31 @@ async def test_get_voices(client: Neuphonic, mocker: MockerFixture):
 @pytest.mark.asyncio
 async def test_clone_voice(client: Neuphonic, mocker: MockerFixture):
     # Set up inputs
-    voice_name = 'TestVoice-SDK'
-    voice_tags = ['tag1', 'tag2']
-    voice_tags_adapted = 'tag1, tag2'
+    voice_name = "TestVoice-SDK"
+    voice_tags = ["tag1", "tag2"]
+    voice_tags_adapted = "tag1, tag2"
 
     # Mock the file content
-    with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as temp_file:
+    with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp_file:
         voice_file_path = temp_file.name
 
     try:
         # Create a valid .wav file
-        with wave.open(voice_file_path, 'wb') as wav_file:
+        with wave.open(voice_file_path, "wb") as wav_file:
             wav_file.setnchannels(1)  # Mono audio
             wav_file.setsampwidth(2)  # 16-bit samples
             wav_file.setframerate(44100)  # 44.1 kHz sample rate
-            wav_file.writeframes(b'\x00\x00' * 44100)  # 1 second of silence
+            wav_file.writeframes(b"\x00\x00" * 44100)  # 1 second of silence
 
         # Mock the httpx.post response
-        mock_post = mocker.patch('httpx.post')
+        mock_post = mocker.patch("httpx.post")
 
         # Configure the mock response
         mock_response = mocker.Mock()
         return_value = {
-            'data': {
-                'message': 'Voice has successfully been cloned.',
-                'voice_id': '12345',
+            "data": {
+                "message": "Voice has successfully been cloned.",
+                "voice_id": "12345",
             }
         }
         mock_response.json.return_value = return_value
@@ -165,15 +165,15 @@ async def test_clone_voice(client: Neuphonic, mocker: MockerFixture):
 
         # Assertions
         assert isinstance(response, APIResponse)
-        assert return_value['data'] == response.data
+        assert return_value["data"] == response.data
 
         # Ensure httpx.post was called with correct parameters
-        base_url = os.getenv('NEUPHONIC_API_URL', 'default-api-url')
+        base_url = os.getenv("NEUPHONIC_API_URL", "default-api-url")
         mock_post.assert_called_once_with(
-            f'https://{base_url}/voices?voice_name={voice_name}',
-            params={'voice_tags': voice_tags_adapted},
-            files={'voice_file': mocker.ANY},  # Matches the file object
-            headers={'x-api-key': mocker.ANY},  # Ensure the API key is present
+            f"https://{base_url}/voices?voice_name={voice_name}",
+            params={"voice_tags": voice_tags_adapted},
+            files={"voice_file": mocker.ANY},  # Matches the file object
+            headers={"x-api-key": mocker.ANY},  # Ensure the API key is present
             timeout=10,
         )
     finally:
@@ -186,31 +186,31 @@ def test_delete_voice(client: Neuphonic, mocker: MockerFixture):
     mock_response = mocker.Mock()
     mock_response.is_success = True  # Simulate a successful deletion
 
-    voice_id = 'ec8722cf-a44f-492e-90a6-0412658a64df'
+    voice_id = "ec8722cf-a44f-492e-90a6-0412658a64df"
     return_value = {
-        'data': {
-            'message': 'Voice was successfully deleted',  # Correct message
-            'voice_id': voice_id,
+        "data": {
+            "message": "Voice was successfully deleted",  # Correct message
+            "voice_id": voice_id,
         }
     }
 
     mock_response.json.return_value = return_value
 
     # Initialise Patcher
-    mock_delete = mocker.patch('httpx.delete', return_value=mock_response)
+    mock_delete = mocker.patch("httpx.delete", return_value=mock_response)
 
     # Delete Voice
     response = client.voices.delete(voice_id)
 
     # Assertions
     assert isinstance(response, APIResponse)
-    assert return_value['data'] == response.data
+    assert return_value["data"] == response.data
 
     # Assert the HTTP method and endpoint were called correctly
-    base_url = os.getenv('NEUPHONIC_API_URL')
+    base_url = os.getenv("NEUPHONIC_API_URL")
     mock_delete.assert_called_once_with(
-        f'https://{base_url}/voices/{voice_id}',
-        headers={'x-api-key': mocker.ANY},  # Ensures api key was present
+        f"https://{base_url}/voices/{voice_id}",
+        headers={"x-api-key": mocker.ANY},  # Ensures api key was present
         timeout=10,
     )
 
@@ -221,31 +221,31 @@ def test_create_agent(client: Neuphonic, mocker: MockerFixture):
     random_uuid = str(uuid.uuid4())
 
     return_value = {
-        'data': {
-            'message': 'Agent successfully created.',
-            'agent_id': random_uuid,
+        "data": {
+            "message": "Agent successfully created.",
+            "agent_id": random_uuid,
         }
     }
 
     mock_response.json.return_value = return_value
-    mock_create = mocker.patch('httpx.post', return_value=mock_response)
+    mock_create = mocker.patch("httpx.post", return_value=mock_response)
 
     data = {
-        'name': 'test_create_agent',
-        'prompt': 'You are a helpful agent.',
-        'greeting': None,
+        "name": "test_create_agent",
+        "prompt": "You are a helpful agent.",
+        "greeting": None,
     }
 
     response = client.agents.create(**data)
 
     # Assertions
     assert isinstance(response, APIResponse)
-    assert return_value['data'] == response.data
+    assert return_value["data"] == response.data
 
     mock_create.assert_called_once_with(
-        f'https://{client._base_url}/agents',
+        f"https://{client._base_url}/agents",
         json=data,
-        headers={'x-api-key': client._api_key},
+        headers={"x-api-key": client._api_key},
         timeout=mocker.ANY,
     )
 
@@ -256,24 +256,24 @@ def test_delete_agent(client: Neuphonic, mocker: MockerFixture):
     random_uuid = str(uuid.uuid4())
 
     return_value = {
-        'data': {
-            'message': 'Agent successfully deleted.',
-            'agent_id': random_uuid,
+        "data": {
+            "message": "Agent successfully deleted.",
+            "agent_id": random_uuid,
         }
     }
 
     mock_response.json.return_value = return_value
-    mock_delete = mocker.patch('httpx.delete', return_value=mock_response)
+    mock_delete = mocker.patch("httpx.delete", return_value=mock_response)
 
     response = client.agents.delete(agent_id=random_uuid)
 
     # Assertions
     assert isinstance(response, APIResponse)
-    assert return_value['data'] == response.data
+    assert return_value["data"] == response.data
 
     mock_delete.assert_called_once_with(
-        f'https://{client._base_url}/agents/{random_uuid}',
-        headers={'x-api-key': client._api_key},
+        f"https://{client._base_url}/agents/{random_uuid}",
+        headers={"x-api-key": client._api_key},
         timeout=mocker.ANY,
     )
 
@@ -286,26 +286,26 @@ def test_list_agents(client: Neuphonic, mocker: MockerFixture):
     random_uuid_2 = str(uuid.uuid4())
 
     return_value = {
-        'data': {
-            'agents': [
-                {'agent_id': random_uuid_1, 'name': 'Agent 1'},
-                {'agent_id': random_uuid_2, 'name': 'Agent 2'},
+        "data": {
+            "agents": [
+                {"agent_id": random_uuid_1, "name": "Agent 1"},
+                {"agent_id": random_uuid_2, "name": "Agent 2"},
             ]
         }
     }
 
     mock_response.json.return_value = return_value
-    mock_get = mocker.patch('httpx.get', return_value=mock_response)
+    mock_get = mocker.patch("httpx.get", return_value=mock_response)
 
     response = client.agents.list()
 
     # Assertions
     assert isinstance(response, APIResponse)
-    assert return_value['data'] == response.data
+    assert return_value["data"] == response.data
 
     mock_get.assert_called_once_with(
-        f'https://{client._base_url}/agents',
-        headers={'x-api-key': client._api_key},
+        f"https://{client._base_url}/agents",
+        headers={"x-api-key": client._api_key},
         timeout=mocker.ANY,
     )
 
@@ -316,27 +316,27 @@ def test_list_single_agent(client: Neuphonic, mocker: MockerFixture):
     random_uuid = str(uuid.uuid4())
 
     return_value = {
-        'data': {
-            'agent': {
-                'agent_id': random_uuid,
-                'name': 'Agent 1',
-                'prompt': 'You are a helpful agent.',
-                'greeting': 'Hi, how can I help you today?',
+        "data": {
+            "agent": {
+                "agent_id": random_uuid,
+                "name": "Agent 1",
+                "prompt": "You are a helpful agent.",
+                "greeting": "Hi, how can I help you today?",
             },
         }
     }
 
     mock_response.json.return_value = return_value
-    mock_get = mocker.patch('httpx.get', return_value=mock_response)
+    mock_get = mocker.patch("httpx.get", return_value=mock_response)
 
     response = client.agents.get(agent_id=random_uuid)
 
     # Assertions
     assert isinstance(response, APIResponse)
-    assert return_value['data'] == response.data
+    assert return_value["data"] == response.data
 
     mock_get.assert_called_once_with(
-        f'https://{client._base_url}/agents/{random_uuid}',
-        headers={'x-api-key': client._api_key},
+        f"https://{client._base_url}/agents/{random_uuid}",
+        headers={"x-api-key": client._api_key},
         timeout=mocker.ANY,
     )

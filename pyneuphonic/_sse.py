@@ -20,15 +20,15 @@ class SSEClientBase(Endpoint):
         """
         message = message.strip()
 
-        if not message or 'data' not in message:
+        if not message or "data" not in message:
             return None
 
-        _, value = message.split(': ', 1)
+        _, value = message.split(": ", 1)
         message = APIResponse[TTSResponse](**json.loads(value))
 
         if message.errors is not None:
             raise Exception(
-                f'Status {message.status_code} error received: {message.errors}.'
+                f"Status {message.status_code} error received: {message.errors}."
             )
 
         return message
@@ -53,19 +53,19 @@ class SSEClient(SSEClientBase):
             details about the failure.
         """
         response = httpx.post(
-            f'{self.http_url}/sse/auth', headers=self.headers, timeout=self.timeout
+            f"{self.http_url}/sse/auth", headers=self.headers, timeout=self.timeout
         )
 
         if not response.is_success:
             raise httpx.HTTPStatusError(
-                f'Failed to authenticate for a JWT. Status code: {response.status_code}. Error: {response.text}',
+                f"Failed to authenticate for a JWT. Status code: {response.status_code}. Error: {response.text}",
                 request=response.request,
                 response=response,
             )
 
-        jwt_token = response.json()['data']['jwt_token']
+        jwt_token = response.json()["data"]["jwt_token"]
 
-        self.headers['Authorization'] = f'Bearer: {jwt_token}'
+        self.headers["Authorization"] = f"Bearer: {jwt_token}"
 
     def send(
         self, text: str, tts_config: Union[TTSConfig, dict] = TTSConfig()
@@ -89,13 +89,13 @@ class SSEClient(SSEClientBase):
         if not isinstance(tts_config, TTSConfig):
             tts_config = TTSConfig(**tts_config)
 
-        assert isinstance(text, str), '`text` should be an instance of type `str`.'
+        assert isinstance(text, str), "`text` should be an instance of type `str`."
 
         with httpx.stream(
-            method='POST',
-            url=f'{self.http_url}/sse/speak/{tts_config.lang_code}',
+            method="POST",
+            url=f"{self.http_url}/sse/speak/{tts_config.lang_code}",
             headers=self.headers,
-            json={'text': text, **to_dict(tts_config)},
+            json={"text": text, **to_dict(tts_config)},
         ) as response:
             for message in response.iter_lines():
                 parsed_message = self._parse_message(message)
@@ -108,18 +108,18 @@ class AsyncSSEClient(SSEClientBase):
     async def jwt_auth(self) -> None:
         async with httpx.AsyncClient() as client:
             response = await client.post(
-                f'{self.http_url}/sse/auth', headers=self.headers, timeout=self.timeout
+                f"{self.http_url}/sse/auth", headers=self.headers, timeout=self.timeout
             )
 
             if not response.is_success:
                 raise httpx.HTTPStatusError(
-                    f'Failed to authenticate for a JWT. Status code: {response.status_code}. Error: {response.text}',
+                    f"Failed to authenticate for a JWT. Status code: {response.status_code}. Error: {response.text}",
                     request=response.request,
                     response=response,
                 )
 
-            jwt_token = response.json()['data']['jwt_token']
-            self.headers['Authorization'] = f'Bearer: {jwt_token}'
+            jwt_token = response.json()["data"]["jwt_token"]
+            self.headers["Authorization"] = f"Bearer: {jwt_token}"
 
     async def send(
         self, text: str, tts_config: Union[TTSConfig, dict] = TTSConfig()
@@ -127,14 +127,14 @@ class AsyncSSEClient(SSEClientBase):
         if not isinstance(tts_config, TTSConfig):
             tts_config = TTSConfig(**tts_config)
 
-        assert isinstance(text, str), '`text` should be an instance of type `str`.'
+        assert isinstance(text, str), "`text` should be an instance of type `str`."
 
         async with httpx.AsyncClient() as client:
             async with client.stream(
-                method='POST',
-                url=f'{self.http_url}/sse/speak/{tts_config.lang_code}',
+                method="POST",
+                url=f"{self.http_url}/sse/speak/{tts_config.lang_code}",
                 headers=self.headers,
-                json={'text': text, **to_dict(tts_config)},
+                json={"text": text, **to_dict(tts_config)},
             ) as response:
                 async for message in response.aiter_lines():
                     parsed_message = self._parse_message(message)

@@ -7,7 +7,7 @@ import aioconsole
 
 async def main():
     """A simple application that echos whatever the user enters into the terminal."""
-    client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_KEY'))
+    client = Neuphonic(api_key=os.environ.get("NEUPHONIC_API_KEY"))
     sse = client.tts.SSEClient()
 
     with AudioPlayer() as player:
@@ -16,12 +16,12 @@ async def main():
                 "Enter text to speak (or 'quit' to exit): "
             )
 
-            if user_text.lower() == 'quit':
+            if user_text.lower() == "quit":
                 break
 
             response = sse.send(user_text)
             player.play(response)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     asyncio.run(main())

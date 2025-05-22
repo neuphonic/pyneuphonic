@@ -11,21 +11,21 @@ from pyneuphonic import Neuphonic, Agent, AgentConfig  # noqa: F401
 
 
 async def main():
-    client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_KEY'))
+    client = Neuphonic(api_key=os.environ.get("NEUPHONIC_API_KEY"))
 
     agent_id = client.agents.create(
-        name='Asistente',  # Assistant
-        prompt='Eres un agente español útil.',  # You are a helpful spanish agent.
-        greeting='¿Cómo puedo ayudarte hoy?',  # How can I help you today?
-    ).data['agent_id']
+        name="Asistente",  # Assistant
+        prompt="Eres un agente español útil.",  # You are a helpful spanish agent.
+        greeting="¿Cómo puedo ayudarte hoy?",  # How can I help you today?
+    ).data["agent_id"]
 
     # All additional keyword arguments (such as `agent_id`) are passed as
     # parameters to the model. See AgentConfig model for full list of parameters.
     agent = Agent(
         client,
         agent_id=agent_id,
-        lang_code='es',
-        voice_id='ea66187e-eef6-4c83-a777-52d15cfdc8e2',
+        lang_code="es",
+        voice_id="ea66187e-eef6-4c83-a777-52d15cfdc8e2",
     )
 
     try:

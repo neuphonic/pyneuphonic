@@ -23,21 +23,21 @@ def save_audio(
         The sample rate of the audio you want to save. Default is 22050.
     """
     if isinstance(audio_bytes, bytes) or isinstance(audio_bytes, bytearray):
-        with wave.open(file_path, 'wb') as wav_file:
+        with wave.open(file_path, "wb") as wav_file:
             wav_file.setnchannels(1)
             wav_file.setsampwidth(2)
             wav_file.setframerate(sampling_rate)
             wav_file.writeframes(bytes(audio_bytes))
     elif isinstance(audio_bytes, Iterator):
-        with wave.open(file_path, 'wb') as wav_file:
+        with wave.open(file_path, "wb") as wav_file:
             wav_file.setnchannels(1)
             wav_file.setsampwidth(2)
             wav_file.setframerate(sampling_rate)
             for message in audio_bytes:
                 if not isinstance(message, APIResponse[TTSResponse]):
                     raise ValueError(
-                        '`audio_bytes` must be an Iterator yielding an object of type'
-                        '`pyneuphonic.models.APIResponse[TTSResponse]`'
+                        "`audio_bytes` must be an Iterator yielding an object of type"
+                        "`pyneuphonic.models.APIResponse[TTSResponse]`"
                     )
                 wav_file.writeframes(message.data.audio)
 
@@ -60,20 +60,20 @@ async def async_save_audio(
         The sample rate of the audio you want to save. Default is 22050.
     """
     if isinstance(audio_bytes, bytes) or isinstance(audio_bytes, bytearray):
-        with wave.open(file_path, 'wb') as wav_file:
+        with wave.open(file_path, "wb") as wav_file:
             wav_file.setnchannels(1)
             wav_file.setsampwidth(2)
             wav_file.setframerate(sampling_rate)
             wav_file.writeframes(bytes(audio_bytes))
     elif isinstance(audio_bytes, AsyncIterator):
-        with wave.open(file_path, 'wb') as wav_file:
+        with wave.open(file_path, "wb") as wav_file:
             wav_file.setnchannels(1)
             wav_file.setsampwidth(2)
             wav_file.setframerate(sampling_rate)
             async for message in audio_bytes:
                 if not isinstance(message, APIResponse[TTSResponse]):
                     raise ValueError(
-                        '`audio_bytes` must be an AsyncIterator yielding an object of type'
-                        '`pyneuphonic.models.APIResponse[TTSResponse]`'
+                        "`audio_bytes` must be an AsyncIterator yielding an object of type"
+                        "`pyneuphonic.models.APIResponse[TTSResponse]`"
                     )
                 wav_file.writeframes(message.data.audio)

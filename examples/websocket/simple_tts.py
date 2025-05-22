@@ -7,7 +7,7 @@ import aioconsole
 
 
 async def main():
-    client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_KEY'))
+    client = Neuphonic(api_key=os.environ.get("NEUPHONIC_API_KEY"))
 
     ws = client.tts.AsyncWebsocketClient()
 
@@ -29,7 +29,7 @@ async def main():
     while True:
         user_text = await aioconsole.ainput("Enter text to speak (or 'quit' to exit): ")
 
-        if user_text.lower() == 'quit':
+        if user_text.lower() == "quit":
             break
 
         await ws.send(user_text, autocomplete=True)

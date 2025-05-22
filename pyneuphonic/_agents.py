@@ -32,12 +32,12 @@ class Agents(Endpoint):
             If the request fails to fetch.
         """
         response = httpx.get(
-            f'{self.http_url}/agents',
+            f"{self.http_url}/agents",
             headers=self.headers,
             timeout=self.timeout,
         )
 
-        self.raise_for_status(response=response, message='Failed to fetch agents.')
+        self.raise_for_status(response=response, message="Failed to fetch agents.")
 
         return APIResponse(**response.json())
 
@@ -67,12 +67,12 @@ class Agents(Endpoint):
             If the request fails to fetch.
         """
         response = httpx.get(
-            f'{self.http_url}/agents/{agent_id}',
+            f"{self.http_url}/agents/{agent_id}",
             headers=self.headers,
             timeout=self.timeout,
         )
 
-        self.raise_for_status(response=response, message='Failed to fetch agents.')
+        self.raise_for_status(response=response, message="Failed to fetch agents.")
 
         return APIResponse(**response.json())
 
@@ -105,19 +105,19 @@ class Agents(Endpoint):
             If the request fails to create.
         """
         data = {
-            'name': name,
-            'prompt': prompt,
-            'greeting': greeting,
+            "name": name,
+            "prompt": prompt,
+            "greeting": greeting,
         }
 
         response = httpx.post(
-            f'{self.http_url}/agents',
+            f"{self.http_url}/agents",
             json=data,
             headers=self.headers,
             timeout=self.timeout,
         )
 
-        self.raise_for_status(response=response, message='Failed to create agent.')
+        self.raise_for_status(response=response, message="Failed to create agent.")
 
         return APIResponse(**response.json())
 
@@ -144,12 +144,12 @@ class Agents(Endpoint):
             If the request fails to delete.
         """
         response = httpx.delete(
-            f'{self.http_url}/agents/{agent_id}',
+            f"{self.http_url}/agents/{agent_id}",
             headers=self.headers,
             timeout=self.timeout,
         )
 
-        self.raise_for_status(response=response, message='Failed to delete agent.')
+        self.raise_for_status(response=response, message="Failed to delete agent.")
 
         return APIResponse(**response.json())
 

@@ -16,14 +16,14 @@ class Voices(Endpoint):
             response.data['voices'] will be a list of VoiceObject objects.
         """
         response = httpx.get(
-            f'{self.http_url}/voices',
+            f"{self.http_url}/voices",
             headers=self.headers,
             timeout=self.timeout,
         )
 
         if not response.is_success:
             raise httpx.HTTPStatusError(
-                f'Failed to fetch voices. Status code: {response.status_code}. Error: {response.text}',
+                f"Failed to fetch voices. Status code: {response.status_code}. Error: {response.text}",
                 request=response.request,
                 response=response,
             )
@@ -44,15 +44,15 @@ class Voices(Endpoint):
             Raised if there is no voice with the provided name.
         """
         response = self.list()
-        voices = response.data['voices']
+        voices = response.data["voices"]
 
         try:
             # extract the voice_id for the requested voice from the list of all voices
             return next(
-                voice['voice_id'] for voice in voices if voice['name'] == voice_name
+                voice["voice_id"] for voice in voices if voice["name"] == voice_name
             )
         except StopIteration as e:
-            raise ValueError(f'No voice found with the name {voice_name}.')
+            raise ValueError(f"No voice found with the name {voice_name}.")
 
     def get(self, voice_id: str = None, voice_name: str = None) -> APIResponse[dict]:
         """Get information about specific voice.
@@ -77,19 +77,19 @@ class Voices(Endpoint):
 
         # Accept case if user only provide name
         if voice_id is None and voice_name is None:
-            raise ValueError('Please provide one of voice_id or voice_name')
+            raise ValueError("Please provide one of voice_id or voice_name")
         if not voice_id:
             voice_id = self._get_voice_id_from_name(voice_name=voice_name)
 
         response = httpx.get(
-            f'{self.http_url}/voices/{voice_id}',
+            f"{self.http_url}/voices/{voice_id}",
             headers=self.headers,
             timeout=self.timeout,
         )
 
         if not response.is_success:
             raise httpx.HTTPStatusError(
-                f'Failed to fetch voice. Status code: {response.status_code}. Error: {response.text}',
+                f"Failed to fetch voice. Status code: {response.status_code}. Error: {response.text}",
                 request=response.request,
                 response=response,
             )
@@ -124,17 +124,17 @@ class Voices(Endpoint):
 
         # Convert voice tags to a string
         if voice_tags:
-            voice_tags = (', ').join(voice_tags)
+            voice_tags = (", ").join(voice_tags)
 
         # Prepare the multipart form-data payload
         params = {
-            'voice_tags': voice_tags,
+            "voice_tags": voice_tags,
         }
-        files = {'voice_file': open(voice_file_path, 'rb')}
+        files = {"voice_file": open(voice_file_path, "rb")}
 
         # Send the POST request with voice_name as a query parameter
         response = httpx.post(
-            f'{self.http_url}/voices?voice_name={voice_name}',
+            f"{self.http_url}/voices?voice_name={voice_name}",
             params=params,
             files=files,
             headers=self.headers,
@@ -144,7 +144,7 @@ class Voices(Endpoint):
         # Handle response errors
         if not response.is_success:
             raise httpx.HTTPStatusError(
-                f'Failed to clone voice. Status code: {response.status_code}. Error: {response.text}',
+                f"Failed to clone voice. Status code: {response.status_code}. Error: {response.text}",
                 request=response.request,
                 response=response,
             )
@@ -157,7 +157,7 @@ class Voices(Endpoint):
         voice_id: Optional[str] = None,
         voice_name: Optional[str] = None,
         new_voice_file_path: Optional[str] = None,
-        new_voice_name: str = '',
+        new_voice_name: str = "",
         new_voice_tags: Optional[List[str]] = None,
     ) -> APIResponse[dict]:
         """
@@ -195,31 +195,31 @@ class Voices(Endpoint):
                 voice_id = self._get_voice_id_from_name(voice_name=voice_name)
             except ValueError as e:
                 raise ValueError(
-                    f'No voice found with the name {voice_name}. You cannot update this voice.'
+                    f"No voice found with the name {voice_name}. You cannot update this voice."
                 )
 
         # Convert voice tags to a string
         if new_voice_tags:
-            new_voice_tags = (', ').join(new_voice_tags)
+            new_voice_tags = (", ").join(new_voice_tags)
 
         # If voice_file is not given
         if new_voice_file_path is None:
             params = {
-                'new_voice_tags': new_voice_tags,
-                'new_voice_file': new_voice_file_path,
+                "new_voice_tags": new_voice_tags,
+                "new_voice_file": new_voice_file_path,
             }
             files = {}
 
         # If voice file is given
         else:
             params = {
-                'new_voice_tags': new_voice_tags,
+                "new_voice_tags": new_voice_tags,
             }
-            files = {'new_voice_file': open(new_voice_file_path, 'rb')}
+            files = {"new_voice_file": open(new_voice_file_path, "rb")}
 
         # Call API
         response = httpx.patch(
-            f'{self.http_url}/voices/{voice_id}?new_voice_name={new_voice_name}',
+            f"{self.http_url}/voices/{voice_id}?new_voice_name={new_voice_name}",
             params=params,
             headers=self.headers,
             timeout=self.timeout,
@@ -229,7 +229,7 @@ class Voices(Endpoint):
         # Handle response errors
         if not response.is_success:
             raise httpx.HTTPStatusError(
-                f'Failed to update voice. Status code: {response.status_code}. Error: {response.text}',
+                f"Failed to update voice. Status code: {response.status_code}. Error: {response.text}",
                 request=response.request,
                 response=response,
             )
@@ -262,11 +262,11 @@ class Voices(Endpoint):
                 voice_id = self._get_voice_id_from_name(voice_name=voice_name)
             except ValueError as e:
                 raise ValueError(
-                    f'No voice found with the name {voice_name}. You cannot Delete this voice.'
+                    f"No voice found with the name {voice_name}. You cannot Delete this voice."
                 )
 
         response = httpx.delete(
-            f'{self.http_url}/voices/{voice_id}',
+            f"{self.http_url}/voices/{voice_id}",
             headers=self.headers,
             timeout=self.timeout,
         )
@@ -274,7 +274,7 @@ class Voices(Endpoint):
         # Handle response errors
         if not response.is_success:
             raise httpx.HTTPStatusError(
-                f'Failed to delete voice. Status code: {response.status_code}. Error: {response.text}',
+                f"Failed to delete voice. Status code: {response.status_code}. Error: {response.text}",
                 request=response.request,
                 response=response,
             )

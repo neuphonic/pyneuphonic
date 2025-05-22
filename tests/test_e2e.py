@@ -8,7 +8,7 @@ import os
 def test_sse_sync(client):
     sse_client = client.tts.SSEClient()
 
-    response = sse_client.send('This is a test.')
+    response = sse_client.send("This is a test.")
 
     count = 0
 
@@ -23,7 +23,7 @@ def test_sse_sync(client):
 async def test_sse_async(client):
     sse_client = client.tts.AsyncSSEClient()
 
-    response = sse_client.send('This is a test.')
+    response = sse_client.send("This is a test.")
 
     count = 0
 
@@ -69,7 +69,7 @@ async def test_websocket_async(client):
     await ws.open()
     await asyncio.sleep(0.5)
 
-    await ws.send('This is a test.', autocomplete=True)
+    await ws.send("This is a test.", autocomplete=True)
     await asyncio.sleep(1)
     await ws.close()
     await asyncio.sleep(0.5)
@@ -82,7 +82,7 @@ async def test_websocket_async(client):
 
 def test_get_voices(client):
     response = client.voices.list()
-    voices = response.data['voices']
+    voices = response.data["voices"]
 
     assert len(voices) > 0
 
@@ -96,7 +96,7 @@ async def test_sse_save_audio_bytes(client):
     sse_client = client.tts.AsyncSSEClient()
 
     response = sse_client.send(
-        'Hello, world! This is an example of saving audio to a file.'
+        "Hello, world! This is an example of saving audio to a file."
     )
 
     audio_bytes = bytearray()
@@ -104,7 +104,7 @@ async def test_sse_save_audio_bytes(client):
     async for item in response:
         audio_bytes += item.data.audio
 
-    fname = 'output.wav'
+    fname = "output.wav"
 
     save_audio(audio_bytes=audio_bytes, file_path=fname)
 
@@ -119,10 +119,10 @@ async def test_sse_save_async_response(client):
     sse_client = client.tts.AsyncSSEClient()
 
     response = sse_client.send(
-        'Hello, world! This is an example of saving audio to a file.'
+        "Hello, world! This is an example of saving audio to a file."
     )
 
-    fname = 'output_async.wav'
+    fname = "output_async.wav"
 
     await async_save_audio(response, file_path=fname)
 
@@ -136,10 +136,10 @@ def test_sse_save_sync_response(client):
     sse_client = client.tts.SSEClient()
 
     response = sse_client.send(
-        'Hello, world! This is an example of saving audio to a file.'
+        "Hello, world! This is an example of saving audio to a file."
     )
 
-    fname = 'output_sync.wav'
+    fname = "output_sync.wav"
 
     save_audio(response, file_path=fname)
 

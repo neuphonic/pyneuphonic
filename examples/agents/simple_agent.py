@@ -6,13 +6,13 @@ from pyneuphonic import Neuphonic, Agent, AgentConfig  # noqa: F401
 
 
 async def main():
-    client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_KEY'))
+    client = Neuphonic(api_key=os.environ.get("NEUPHONIC_API_KEY"))
 
     agent_id = client.agents.create(
-        name='Agent 1',
-        prompt='You are a helpful agent. Answer in 10 words or less.',
-        greeting='Hi, how can I help you today?',
-    ).data['agent_id']
+        name="Agent 1",
+        prompt="You are a helpful agent. Answer in 10 words or less.",
+        greeting="Hi, how can I help you today?",
+    ).data["agent_id"]
 
     # All additional keyword arguments (such as `agent_id`) are passed as
     # parameters to the model. See AgentConfig model for full list of parameters.
