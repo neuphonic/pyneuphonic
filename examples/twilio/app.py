@@ -8,13 +8,7 @@ from pyneuphonic.models import APIResponse, TTSResponse
 import os
 from twilio.twiml.voice_response import VoiceResponse, Connect
 from fastapi.responses import HTMLResponse
-from fastapi import (
-    FastAPI,
-    APIRouter,
-    WebSocket,
-    WebSocketDisconnect,
-    Request
-)
+from fastapi import FastAPI, APIRouter, WebSocket, WebSocketDisconnect, Request
 
 load_dotenv(override=True)
 
@@ -23,9 +17,9 @@ app = FastAPI()
 router = APIRouter()
 
 
-@app.get('/ping')
+@app.get("/ping")
 def ping():
-    return {'message': 'pong'}
+    return {"message": "pong"}
 
 
 @app.api_route("/twilio/inbound_call", methods=["GET", "POST"])
@@ -38,7 +32,7 @@ async def handle_incoming_call(request: Request):
     return HTMLResponse(content=str(response), media_type="application/xml")
 
 
-@app.websocket('/twilio/agent')
+@app.websocket("/twilio/agent")
 async def agent_websocket(  # noqa: C901
     websocket: WebSocket,
 ):
@@ -46,33 +40,33 @@ async def agent_websocket(  # noqa: C901
     await websocket.accept()
     stream_sid = None
 
-    client = Neuphonic(api_key=os.getenv('NEUPHONIC_API_KEY'))
+    client = Neuphonic(api_key=os.getenv("NEUPHONIC_API_KEY"))
     neuphonic_agent_websocket = client.agents.AsyncWebsocketClient()
 
     async def on_message(message: APIResponse[TTSResponse]):
         """Handles messages that are returned from the Neuphonic server to the websocket client."""
-        if stream_sid is not None and message.data.type == 'audio_response':
+        if stream_sid is not None and message.data.type == "audio_response":
             # Forward audio to the users's phone
             await websocket.send_json(
                 {
-                    'event': 'media',
-                    'streamSid': stream_sid,
-                    'media': {
-                        'payload': base64.b64encode(message.data.audio).decode('utf-8')
+                    "event": "media",
+                    "streamSid": stream_sid,
+                    "media": {
+                        "payload": base64.b64encode(message.data.audio).decode("utf-8")
                     },
                 }
             )
-        elif message.data.type == 'user_transcript':
-            logging.info(f'user_transcript: {message.data.text}')
-        elif message.data.type == 'llm_response':
-            logging.info(f'llm_response: {message.data.text}')
-        elif message.data.type == 'stop_audio_response':
+        elif message.data.type == "user_transcript":
+            logging.info(f"user_transcript: {message.data.text}")
+        elif message.data.type == "llm_response":
+            logging.info(f"llm_response: {message.data.text}")
+        elif message.data.type == "stop_audio_response":
             # If the user interrupts then stop playing any currently queued audio
             if stream_sid is not None:
                 await websocket.send_json(
                     {
-                        'event': 'clear',
-                        'streamSid': stream_sid,
+                        "event": "clear",
+                        "streamSid": stream_sid,
                     }
                 )
 
@@ -82,9 +76,9 @@ async def agent_websocket(  # noqa: C901
         agent_config=AgentConfig(
             incoming_sampling_rate=8000,
             return_sampling_rate=8000,
-            incoming_encoding='pcm_mulaw',
-            return_encoding='pcm_mulaw',
-            voice_id='fc854436-2dac-4d21-aa69-ae17b54e98eb',
+            incoming_encoding="pcm_mulaw",
+            return_encoding="pcm_mulaw",
+            voice_id="fc854436-2dac-4d21-aa69-ae17b54e98eb",
         )
     )
 
@@ -92,34 +86,35 @@ async def agent_websocket(  # noqa: C901
         while websocket.client_state == WebSocketState.CONNECTED:
             message = await websocket.receive()
 
-            if message is None or message['type'] == 'websocket.disconnect':
+            if message is None or message["type"] == "websocket.disconnect":
                 continue
 
-            data = json.loads(message['text'])
+            data = json.loads(message["text"])
 
-            if data['event'] == 'connected':
-                logging.info(f'Connected Message received: {message}')
+            if data["event"] == "connected":
+                logging.info(f"Connected Message received: {message}")
 
-            if data['event'] == 'start':
-                stream_sid = data['start']['streamSid']
+            if data["event"] == "start":
+                stream_sid = data["start"]["streamSid"]
 
-            if data['event'] == 'media':
+            if data["event"] == "media":
                 # Send incoming audio to the Neuphonic agent
                 await neuphonic_agent_websocket.send(
-                    {'audio': data['media']['payload']}
+                    {"audio": data["media"]["payload"]}
                 )
 
-            if data['event'] == 'closed':
-                logging.info(f'Closed Message received: {message}')
+            if data["event"] == "closed":
+                logging.info(f"Closed Message received: {message}")
                 break
     except WebSocketDisconnect as e:
-        logging.error(f'WebSocketDisconnect: {e}')
+        logging.error(f"WebSocketDisconnect: {e}")
     except Exception as e:
-        logging.error(f'Error occured: {e}')
+        logging.error(f"Error occured: {e}")
     finally:
         await neuphonic_agent_websocket.close()
 
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8000)

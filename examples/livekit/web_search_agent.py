@@ -28,7 +28,7 @@ from livekit.plugins import (
 
 load_dotenv()
 
-logger = logging.getLogger('web_search')
+logger = logging.getLogger("web_search")
 
 
 @dataclass
@@ -46,12 +46,12 @@ async def search_web(ctx: RunContext[AppData], query: str):
     """
     ddgs_client = ctx.userdata.ddgs_client
 
-    logger.info(f'Searching for {query}')
+    logger.info(f"Searching for {query}")
 
     # using asyncio.to_thread because the DDGS client is not asyncio compatible
     search = await asyncio.to_thread(ddgs_client.text, query)
     if len(search) == 0:
-        raise ToolError('Tell the user that no results were found for the query.')
+        raise ToolError("Tell the user that no results were found for the query.")
 
     return search
 
@@ -61,11 +61,11 @@ async def entrypoint(ctx: JobContext):
 
     app_data = AppData(ddgs_client=DDGS())
 
-    agent = Agent(instructions='You are a helpful assistant.', tools=[search_web])
+    agent = Agent(instructions="You are a helpful assistant.", tools=[search_web])
 
     session = AgentSession(
-        stt=deepgram.STT(model='nova-3', language='multi'),
-        llm=openai.LLM(model='gpt-4o-mini'),
+        stt=deepgram.STT(model="nova-3", language="multi"),
+        llm=openai.LLM(model="gpt-4o-mini"),
         tts=neuphonic.TTS(),
         vad=silero.VAD.load(),
         userdata=app_data,
@@ -74,5 +74,5 @@ async def entrypoint(ctx: JobContext):
     await session.start(agent=agent, room=ctx.room)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     cli.run_app(WorkerOptions(entrypoint_fnc=entrypoint))

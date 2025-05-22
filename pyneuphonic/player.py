@@ -7,16 +7,16 @@ from pyneuphonic._utils import save_audio
 from base64 import b64encode
 import time
 
-logger = logging.getLogger('pyneuphonic')
+logger = logging.getLogger("pyneuphonic")
 
 try:
     import pyaudio
 except ModuleNotFoundError:
     logger.warning(
-        '`pyaudio` is not installed, so audio playback and audio recording'
-        ' functionality will not be enabled, and attempting to use this functionality may'
-        ' throw errors. `pip install pyaudio` to resolve. This message may be ignored if'
-        ' audio playback and recording features are not required.'
+        "`pyaudio` is not installed, so audio playback and audio recording"
+        " functionality will not be enabled, and attempting to use this functionality may"
+        " throw errors. `pip install pyaudio` to resolve. This message may be ignored if"
+        " audio playback and recording features are not required."
     )
 
 
@@ -57,8 +57,8 @@ class AudioPlayer:
     def output_device_possibly_has_echo(self):
         """Checks whether the default output device is likely to have echo based on naming heuristics."""
         output_device = AudioPlayer._get_default_output_device_info()
-        device_name = output_device['name'].lower()
-        keywords = ['airpods', 'headphone', 'headset', 'earbuds']
+        device_name = output_device["name"].lower()
+        keywords = ["airpods", "headphone", "headset", "earbuds"]
 
         if any(keyword in device_name for keyword in keywords):
             return False
@@ -98,14 +98,14 @@ class AudioPlayer:
             for message in data:
                 if not isinstance(message, APIResponse[TTSResponse]):
                     raise ValueError(
-                        '`data` must be an Iterator yielding an object of type'
-                        '`pyneuphonic.models.APIResponse[TTSResponse]`'
+                        "`data` must be an Iterator yielding an object of type"
+                        "`pyneuphonic.models.APIResponse[TTSResponse]`"
                     )
 
                 self.play(message.data.audio)
         else:
             raise TypeError(
-                '`data` must be of type bytes or an Iterator of APIResponse[TTSResponse]'
+                "`data` must be of type bytes or an Iterator of APIResponse[TTSResponse]"
             )
 
     def close(self):
@@ -160,7 +160,7 @@ class AsyncAudioPlayer(AudioPlayer):
                 await self._play(audio_chunk)
             else:
                 raise Exception(
-                    f'`audio_queue` is an invalid type: {type(self.playback_queue)}'
+                    f"`audio_queue` is an invalid type: {type(self.playback_queue)}"
                 )
 
     async def _play(self, data: Union[bytes, AsyncIterator[APIResponse[TTSResponse]]]):
@@ -183,14 +183,14 @@ class AsyncAudioPlayer(AudioPlayer):
             async for message in data:
                 if not isinstance(message, APIResponse[TTSResponse]):
                     raise ValueError(
-                        '`data` must be an AsyncIterator yielding an object of type'
-                        '`pyneuphonic.models.APIResponse[TTSResponse]`'
+                        "`data` must be an AsyncIterator yielding an object of type"
+                        "`pyneuphonic.models.APIResponse[TTSResponse]`"
                     )
 
                 await self.play(message.data.audio)
         else:
             raise TypeError(
-                '`data` must be of type bytes or an AsyncIterator of APIResponse[TTSResponse]'
+                "`data` must be of type bytes or an AsyncIterator of APIResponse[TTSResponse]"
             )
 
     async def play(self, data: Union[bytes, AsyncIterator[APIResponse[TTSResponse]]]):
@@ -202,7 +202,7 @@ class AsyncAudioPlayer(AudioPlayer):
                 await self.playback_queue.put(message.data.audio)
         else:
             raise TypeError(
-                '`data` must be of type bytes or an AsyncIterator of APIResponse[TTSResponse]'
+                "`data` must be of type bytes or an AsyncIterator of APIResponse[TTSResponse]"
             )
 
     async def close(self):
@@ -299,10 +299,10 @@ class AsyncAudioRecorder:
                 )
             elif not self.allow_interruptions:
                 logger.warning(
-                    'Audio interruptions are disabled (allow_interruptions=False on AsyncAudioRecorder). '
-                    'This setting was either explicitly configured or automatically determined based on your output device. '
-                    'When audio is playing, microphone input will be disabled to prevent echo, meaning '
-                    'you cannot interrupt the agent while it is speaking. To enable interruptions, use earphones.'
+                    "Audio interruptions are disabled (allow_interruptions=False on AsyncAudioRecorder). "
+                    "This setting was either explicitly configured or automatically determined based on your output device. "
+                    "When audio is playing, microphone input will be disabled to prevent echo, meaning "
+                    "you cannot interrupt the agent while it is speaking. To enable interruptions, use earphones."
                 )
 
     async def _send(self):
@@ -314,16 +314,16 @@ class AsyncAudioRecorder:
                 if self.player is not None and (
                     not self.player.is_playing or self.allow_interruptions
                 ):
-                    await self._ws.send({'audio': b64encode(data).decode('utf-8')})
+                    await self._ws.send({"audio": b64encode(data).decode("utf-8")})
             except Exception as e:
-                logger.error(f'Error in _send: {e}')
+                logger.error(f"Error in _send: {e}")
 
     def _callback(self, in_data, frame_count, time_info, status):
         try:
             # Enqueue the incoming audio data for processing in the async loop
             self._queue.put_nowait(in_data)
         except asyncio.QueueFull:
-            logger.error('Audio queue is full! Dropping frames.')
+            logger.error("Audio queue is full! Dropping frames.")
         return None, pyaudio.paContinue
 
     async def record(self):

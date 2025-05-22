@@ -21,7 +21,7 @@ load_dotenv(override=True)
 
 def make_outbound_call():
     # Initialize the Twilio client with account credentials
-    client = Client(os.getenv('TWILIO_ACCOUNT_SID'), os.getenv('TWILIO_AUTH_TOKEN'))
+    client = Client(os.getenv("TWILIO_ACCOUNT_SID"), os.getenv("TWILIO_AUTH_TOKEN"))
 
     # Construct the TwiML message to connect the call to the WebSocket endpoint
     twiml_message = f'<?xml version="1.0" encoding="UTF-8"?><Response><Connect><Stream url="wss://{os.getenv("SERVER_BASE_URL")}/twilio/agent" /></Connect></Response>'
@@ -29,8 +29,8 @@ def make_outbound_call():
     # Create the call with the specified parameters
     call = client.calls.create(
         twiml=twiml_message,
-        to=os.getenv('TO_NUMBER'),
-        from_=os.getenv('FROM_NUMBER'),
+        to=os.getenv("TO_NUMBER"),
+        from_=os.getenv("FROM_NUMBER"),
         record=True,
     )
 
@@ -38,6 +38,6 @@ def make_outbound_call():
     print(call.sid)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Execute the make_outbound_call function if the script is run directly
     make_outbound_call()

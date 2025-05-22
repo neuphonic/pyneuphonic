@@ -16,7 +16,7 @@ class Endpoint:
         self.timeout = timeout
 
         self.headers = {
-            'x-api-key': self._api_key,
+            "x-api-key": self._api_key,
         }
 
     @property
@@ -24,17 +24,17 @@ class Endpoint:
         return self._base_url
 
     def _is_localhost(self):
-        return True if 'localhost' in self.base_url else False
+        return True if "localhost" in self.base_url else False
 
     @property
     def http_url(self):
-        prefix = 'http' if self._is_localhost() else 'https'
-        return f'{prefix}://{self.base_url}'
+        prefix = "http" if self._is_localhost() else "https"
+        return f"{prefix}://{self.base_url}"
 
     @property
     def ws_url(self):
-        prefix = 'ws' if self._is_localhost() else 'wss'
-        return f'{prefix}://{self.base_url}'
+        prefix = "ws" if self._is_localhost() else "wss"
+        return f"{prefix}://{self.base_url}"
 
     @property
     def ssl_context(self):

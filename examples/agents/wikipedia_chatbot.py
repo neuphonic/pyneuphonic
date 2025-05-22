@@ -21,7 +21,7 @@ import asyncio
 from pyneuphonic import Neuphonic, Agent, AgentConfig  # noqa: F401
 
 # You can change this to any Wikipedia article title you want to fetch.
-WIKIPEDIA_ARTICLE_TITLE = 'Python (programming language)'
+WIKIPEDIA_ARTICLE_TITLE = "Python (programming language)"
 
 
 class WikipediaHTMLParser(html.parser.HTMLParser):
@@ -59,7 +59,7 @@ class WikipediaHTMLParser(html.parser.HTMLParser):
         attrs : list of tuple
             A list of attributes for the tag.
         """
-        if tag == 'p':
+        if tag == "p":
             if not self.is_in_paragraph:  # Start a new paragraph
                 self.is_in_paragraph = True
                 self.current_paragraph = []
@@ -73,9 +73,9 @@ class WikipediaHTMLParser(html.parser.HTMLParser):
         tag : str
             The name of the tag (e.g., "p").
         """
-        if tag == 'p' and self.is_in_paragraph:  # End of the current paragraph
+        if tag == "p" and self.is_in_paragraph:  # End of the current paragraph
             self.is_in_paragraph = False
-            self.paragraphs.append(''.join(self.current_paragraph).strip())
+            self.paragraphs.append("".join(self.current_paragraph).strip())
 
     def handle_data(self, data):
         """
@@ -126,10 +126,10 @@ def extract_text_from_html(html):
     paragraphs = parser.get_paragraphs()
 
     # Remove reference superscripts (e.g., [1], [2], etc.) and clean up each paragraph
-    clean_paragraphs = [re.sub(r'\[\d+\]', '', p).strip() for p in paragraphs]
+    clean_paragraphs = [re.sub(r"\[\d+\]", "", p).strip() for p in paragraphs]
 
     # Combine paragraphs into a single text block
-    return '\n\n'.join(clean_paragraphs)
+    return "\n\n".join(clean_paragraphs)
 
 
 def get_wikipedia_main_body(title):
@@ -150,18 +150,18 @@ def get_wikipedia_main_body(title):
     str
         The cleaned text content of the article's main body.
     """
-    API_URL = 'https://en.wikipedia.org/w/api.php'
+    API_URL = "https://en.wikipedia.org/w/api.php"
 
     # Parameters for the MediaWiki API
     params = {
-        'action': 'parse',
-        'page': title,
-        'prop': 'text',
-        'format': 'json',
-        'formatversion': 2,
-        'redirects': 1,
-        'disabletoc': 1,
-        'disablelimitreport': 1,
+        "action": "parse",
+        "page": title,
+        "prop": "text",
+        "format": "json",
+        "formatversion": 2,
+        "redirects": 1,
+        "disabletoc": 1,
+        "disablelimitreport": 1,
     }
 
     # Fetch the data using httpx
@@ -171,18 +171,18 @@ def get_wikipedia_main_body(title):
         data = response.json()
 
     # Extract the HTML content of the main body
-    if 'parse' in data and 'text' in data['parse']:
-        html_content = data['parse']['text']
+    if "parse" in data and "text" in data["parse"]:
+        html_content = data["parse"]["text"]
         return extract_text_from_html(html_content)
     else:
-        return ''  # Return an empty string if the data is not available
+        return ""  # Return an empty string if the data is not available
 
 
 async def main():
-    client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_KEY'))
+    client = Neuphonic(api_key=os.environ.get("NEUPHONIC_API_KEY"))
 
     wikipedia_article_text = get_wikipedia_main_body(WIKIPEDIA_ARTICLE_TITLE)
-    wikipedia_article_text = ' '.join(wikipedia_article_text.split(' ')[0:1000])
+    wikipedia_article_text = " ".join(wikipedia_article_text.split(" ")[0:1000])
 
     prompt = f"""
     You are a helpful chatbot. Below is the main body of a wikipedia article titled:
@@ -195,10 +195,10 @@ async def main():
     """
 
     agent_id = client.agents.create(
-        name='Wikipedia Chatbot',
+        name="Wikipedia Chatbot",
         prompt=prompt,
         greeting=f'Hi, what would you like to know about the wikipedia article titled "{WIKIPEDIA_ARTICLE_TITLE}"',
-    ).data['agent_id']
+    ).data["agent_id"]
 
     # All additional keyword arguments (such as `agent_id`) are passed as
     # parameters to the model. See AgentConfig model for full list of parameters.

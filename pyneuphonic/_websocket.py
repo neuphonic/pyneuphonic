@@ -107,7 +107,7 @@ class AsyncWebsocketBase(Endpoint, ABC):
             )
         except Exception as exce:
             raise Exception(
-                'Connection to Neuphonic server failed, please check your configuration.'
+                "Connection to Neuphonic server failed, please check your configuration."
             )
 
         if self.event_handlers.open is not None:
@@ -131,7 +131,7 @@ class AsyncWebsocketBase(Endpoint, ABC):
                     else:
                         await self.message_queue.put(message)
         except Exception as e:
-            raise Exception('Message from websocket could not be received correctly.')
+            raise Exception("Message from websocket could not be received correctly.")
         finally:
             if self.event_handlers.close:
                 await self.event_handlers.close()
@@ -154,7 +154,7 @@ class AsyncWebsocketBase(Endpoint, ABC):
         """
         assert isinstance(
             message, (str, dict)
-        ), 'Message must be an instance of str or dict'
+        ), "Message must be an instance of str or dict"
 
         message = message if isinstance(message, str) else json.dumps(message)
 
@@ -213,7 +213,7 @@ class AsyncTTSWebsocketClient(AsyncWebsocketBase):
         if not isinstance(config, TTSConfig):
             config = TTSConfig(**config)
 
-        return f'{self.ws_url}/speak/{config.lang_code}?{config.to_query_params()}'
+        return f"{self.ws_url}/speak/{config.lang_code}?{config.to_query_params()}"
 
     async def open(self, tts_config: Union[TTSConfig, dict] = TTSConfig()):
         """
@@ -235,13 +235,13 @@ class AsyncTTSWebsocketClient(AsyncWebsocketBase):
         await super().send(message=message)
 
         if autocomplete:
-            await self._ws.send(json.dumps({'text': ' <STOP>'}))
+            await self._ws.send(json.dumps({"text": " <STOP>"}))
 
     async def complete(self):
         """
         Send a completion signal '<STOP>' through the TTS websocket.
         """
-        await self.send({'text': ' <STOP>'}, autocomplete=False)
+        await self.send({"text": " <STOP>"}, autocomplete=False)
 
 
 class AsyncAgentWebsocketClient(AsyncWebsocketBase):
@@ -270,7 +270,7 @@ class AsyncAgentWebsocketClient(AsyncWebsocketBase):
         if not isinstance(config, AgentConfig):
             config = AgentConfig(**config)
 
-        return f'{self.ws_url}/agents?{config.to_query_params()}'
+        return f"{self.ws_url}/agents?{config.to_query_params()}"
 
     async def open(self, agent_config: Union[TTSConfig, dict] = AgentConfig()):
         """

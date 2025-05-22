@@ -32,20 +32,20 @@ class Neuphonic:
         """
         api_key = (
             api_key
-            or os.getenv('NEUPHONIC_API_KEY')
-            or os.getenv('NEUPHONIC_API_TOKEN')
+            or os.getenv("NEUPHONIC_API_KEY")
+            or os.getenv("NEUPHONIC_API_TOKEN")
         )
 
         if api_key is None:
             raise EnvironmentError(
-                '`api_key` has not been passed in and `NEUPHONIC_API_KEY` is not set in the environment.'
+                "`api_key` has not been passed in and `NEUPHONIC_API_KEY` is not set in the environment."
             )
 
         if base_url is None:
-            base_url = os.getenv('NEUPHONIC_API_URL')
+            base_url = os.getenv("NEUPHONIC_API_URL")
 
             if base_url is None:
-                base_url = 'api.neuphonic.com'
+                base_url = "api.neuphonic.com"
 
         self._api_key = api_key
         self._base_url = base_url
