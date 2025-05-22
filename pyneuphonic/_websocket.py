@@ -63,7 +63,7 @@ class AsyncWebsocketBase(Endpoint, ABC):
         Returns
         -------
         str
-            The constructed URL. E.g.: wss://eu-west-1.api.neuphonic.com/speak/en
+            The constructed URL. E.g.: wss://api.neuphonic.com/speak/en
         """
         pass
 
@@ -106,7 +106,9 @@ class AsyncWebsocketBase(Endpoint, ABC):
                 additional_headers=self.headers,
             )
         except Exception as exce:
-            raise Exception("Connection to Neuphonic server failed, please check your configuration.")
+            raise Exception(
+                'Connection to Neuphonic server failed, please check your configuration.'
+            )
 
         if self.event_handlers.open is not None:
             await self.event_handlers.open()
@@ -129,7 +131,7 @@ class AsyncWebsocketBase(Endpoint, ABC):
                     else:
                         await self.message_queue.put(message)
         except Exception as e:
-            raise Exception("Message from websocket could not be received correctly.")
+            raise Exception('Message from websocket could not be received correctly.')
         finally:
             if self.event_handlers.close:
                 await self.event_handlers.close()

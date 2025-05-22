@@ -28,7 +28,7 @@ class Neuphonic:
         base_url : Optional[str], optional
             The base url pointing to which regional deployment to use. If this is not passed on
             and not set in `os.getenv('NEUPHONIC_API_URL')`, then it will default to
-            'eu-west-1.api.neuphonic.com'.
+            'api.neuphonic.com'.
         """
         api_key = (
             api_key
@@ -45,7 +45,7 @@ class Neuphonic:
             base_url = os.getenv('NEUPHONIC_API_URL')
 
             if base_url is None:
-                base_url = 'eu-west-1.api.neuphonic.com'
+                base_url = 'api.neuphonic.com'
 
         self._api_key = api_key
         self._base_url = base_url
