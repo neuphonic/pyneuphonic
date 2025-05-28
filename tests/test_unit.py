@@ -55,6 +55,7 @@ def test_sse_sync(client: Neuphonic, mocker: MockerFixture):
         url=f"{sse_client.http_url}/sse/speak/en",
         headers=sse_client.headers,
         json={"text": "This is a test.", **to_dict(TTSConfig())},
+        timeout=20,
     )
 
 
