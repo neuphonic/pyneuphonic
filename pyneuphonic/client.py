@@ -56,12 +56,12 @@ class Neuphonic:
 
 
 class TTS(Endpoint):
-    def SSEClient(self, timeout: Optional[int] = 10) -> SSEClient:
+    def SSEClient(self, timeout: Optional[int] = 20) -> SSEClient:
         return SSEClient(
             api_key=self._api_key, base_url=self._base_url, timeout=timeout
         )
 
-    def AsyncSSEClient(self, timeout: Optional[int] = 10) -> AsyncSSEClient:
+    def AsyncSSEClient(self, timeout: Optional[int] = 20) -> AsyncSSEClient:
         return AsyncSSEClient(
             api_key=self._api_key, base_url=self._base_url, timeout=timeout
         )

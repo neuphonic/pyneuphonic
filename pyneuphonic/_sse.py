@@ -68,7 +68,10 @@ class SSEClient(SSEClientBase):
         self.headers["Authorization"] = f"Bearer: {jwt_token}"
 
     def send(
-        self, text: str, tts_config: Union[TTSConfig, dict] = TTSConfig()
+        self,
+        text: str,
+        tts_config: Union[TTSConfig, dict] = TTSConfig(),
+        timeout: Optional[float] = None,
     ) -> Generator[APIResponse[TTSResponse], None, None]:
         """
         Send a text to the TTS (text-to-speech) service and receive a stream of APIResponse messages.
@@ -80,6 +83,9 @@ class SSEClient(SSEClientBase):
         tts_config : Union[TTSConfig, dict], optional
             The TTS configuration settings. Can be an instance of TTSConfig or a dictionary which
             will be parsed into a TTSConfig.
+        timeout : Optional[float]
+            The timeout in seconds for the request. If not provided, uses the default timeout
+            set during client initialization.
 
         Yields
         ------
@@ -96,6 +102,7 @@ class SSEClient(SSEClientBase):
             url=f"{self.http_url}/sse/speak/{tts_config.lang_code}",
             headers=self.headers,
             json={"text": text, **to_dict(tts_config)},
+            timeout=timeout or self.timeout,
         ) as response:
             for message in response.iter_lines():
                 parsed_message = self._parse_message(message)
@@ -122,7 +129,10 @@ class AsyncSSEClient(SSEClientBase):
             self.headers["Authorization"] = f"Bearer: {jwt_token}"
 
     async def send(
-        self, text: str, tts_config: Union[TTSConfig, dict] = TTSConfig()
+        self,
+        text: str,
+        tts_config: Union[TTSConfig, dict] = TTSConfig(),
+        timeout: Optional[float] = None,
     ) -> AsyncGenerator[APIResponse[TTSResponse], None]:
         if not isinstance(tts_config, TTSConfig):
             tts_config = TTSConfig(**tts_config)
@@ -135,6 +145,7 @@ class AsyncSSEClient(SSEClientBase):
                 url=f"{self.http_url}/sse/speak/{tts_config.lang_code}",
                 headers=self.headers,
                 json={"text": text, **to_dict(tts_config)},
+                timeout=timeout or self.timeout,
             ) as response:
                 async for message in response.aiter_lines():
                     parsed_message = self._parse_message(message)
