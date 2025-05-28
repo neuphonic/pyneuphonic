@@ -71,7 +71,7 @@ class SSEClient(SSEClientBase):
         self,
         text: str,
         tts_config: Union[TTSConfig, dict] = TTSConfig(),
-        timeout: Optional[float] = None,
+        timeout: float = 20,
     ) -> Generator[APIResponse[TTSResponse], None, None]:
         """
         Send a text to the TTS (text-to-speech) service and receive a stream of APIResponse messages.
@@ -84,8 +84,7 @@ class SSEClient(SSEClientBase):
             The TTS configuration settings. Can be an instance of TTSConfig or a dictionary which
             will be parsed into a TTSConfig.
         timeout : Optional[float]
-            The timeout in seconds for the request. If not provided, uses the default timeout
-            set during client initialization.
+            The timeout in seconds for the request.
 
         Yields
         ------
@@ -102,7 +101,7 @@ class SSEClient(SSEClientBase):
             url=f"{self.http_url}/sse/speak/{tts_config.lang_code}",
             headers=self.headers,
             json={"text": text, **to_dict(tts_config)},
-            timeout=timeout or self.timeout,
+            timeout=timeout,
         ) as response:
             for message in response.iter_lines():
                 parsed_message = self._parse_message(message)
@@ -132,7 +131,7 @@ class AsyncSSEClient(SSEClientBase):
         self,
         text: str,
         tts_config: Union[TTSConfig, dict] = TTSConfig(),
-        timeout: Optional[float] = None,
+        timeout: float = 20,
     ) -> AsyncGenerator[APIResponse[TTSResponse], None]:
         if not isinstance(tts_config, TTSConfig):
             tts_config = TTSConfig(**tts_config)
@@ -145,7 +144,7 @@ class AsyncSSEClient(SSEClientBase):
                 url=f"{self.http_url}/sse/speak/{tts_config.lang_code}",
                 headers=self.headers,
                 json={"text": text, **to_dict(tts_config)},
-                timeout=timeout or self.timeout,
+                timeout=timeout,
             ) as response:
                 async for message in response.aiter_lines():
                     parsed_message = self._parse_message(message)
