@@ -70,7 +70,14 @@ async def test_websocket_async(client):
     await asyncio.sleep(0.5)
 
     await ws.send("This is a test.", autocomplete=True)
-    await asyncio.sleep(1)
+
+    for _ in range(20):
+        # wait up to 2s for audio to return
+        await asyncio.sleep(0.1)
+
+        if message_count > 0:
+            break
+
     await ws.close()
     await asyncio.sleep(0.5)
 
