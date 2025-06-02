@@ -117,7 +117,7 @@ async def main():
     sse = client.tts.AsyncSSEClient()
 
     # Set the desired configurations: playback speed and voice
-    tts_config = TTSConfig(speed=1.05, lang_code='en', voice_id='ebf2c88e-e69d-4eeb-9b9b-9f3a648787a5')
+    tts_config = TTSConfig(speed=1.05, lang_code='en', voice_id=None)
 
     async with AsyncAudioPlayer() as player:
         response = sse.send('Hello, world!', tts_config=tts_config)
@@ -142,7 +142,7 @@ async def main():
     ws = client.tts.AsyncWebsocketClient()
 
     # Set the desired voice
-    tts_config = TTSConfig(voice_id='ebf2c88e-e69d-4eeb-9b9b-9f3a648787a5')
+    tts_config = TTSConfig(voice_id=None) # will default to the default voice_id, please refer to the Neuphonic Docs
 
     player = AsyncAudioPlayer()
     await player.open()
