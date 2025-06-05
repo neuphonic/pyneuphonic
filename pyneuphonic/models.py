@@ -135,6 +135,12 @@ class TTSConfig(BaseConfig):
         examples=["pcm_linear", "pcm_mulaw"],
     )
 
+    output_format: Optional[str] = Field(
+        default=None,
+        description="An output format for the audio.",
+        examples=["wav", "mp3"],
+    )
+
 
 class APIResponse(BaseModel, Generic[T]):
     """All API responses will be typed with this pydantic model."""
