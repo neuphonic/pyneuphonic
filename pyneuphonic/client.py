@@ -6,6 +6,7 @@ from pyneuphonic._sse import SSEClient, AsyncSSEClient
 from pyneuphonic._endpoint import Endpoint
 from pyneuphonic._websocket import AsyncTTSWebsocketClient
 from pyneuphonic._agents import Agents
+from pyneuphonic._longform_inference import LongformInference
 
 
 class Neuphonic:
@@ -64,3 +65,6 @@ class TTS(Endpoint):
 
     def AsyncWebsocketClient(self) -> AsyncTTSWebsocketClient:
         return AsyncTTSWebsocketClient(api_key=self._api_key, base_url=self._base_url)
+
+    def LongformInference(self) -> LongformInference:
+        return LongformInference(api_key=self._api_key, base_url=self._base_url)
