@@ -1,55 +1,21 @@
 import httpx
-import json
-from typing import Generator, Optional, Union
+from typing import Generator, Union
 
 from pyneuphonic._endpoint import Endpoint
 from pyneuphonic.models import TTSConfig, APIResponse, TTSResponse, to_dict
 
 
 class LongformInference(Endpoint):
-    def _parse_message(self, message: str) -> Optional[APIResponse[TTSResponse]]:
-        """
-        Parse each response from the server and return it as an APIResponse object.
-
-        The message will either be:
-        - `event: error`
-        - `event: message`
-        - `data: { "status_code": 200, "data": {"audio": ... } }`
-        """
-        message = message.strip()
-
-        if not message or "data" not in message:
-            return None
-
-        _, value = message.split(": ", 1)
-        message = APIResponse[TTSResponse](**json.loads(value))
-
-        if message.errors is not None:
-            raise Exception(
-                f"Status {message.status_code} error received: {message.errors}."
-            )
-
-        return message
-
     def get(self, job_id) -> APIResponse[dict]:
-        """Get information about specific voice.
-
+        """Retrieve the status of a longform TTS job by its job ID.
         Parameters
         ----------
-        voice_name : str
-            The voice name you want to retreive the information for.
-        voice_id : str
-            The voice id you want to retreive the information for.
-
+        job_id : str
+            The unique identifier for the longform TTS job.
         Returns
         -------
         APIResponse[dict]
-            response.data['voice'] will be a single VoiceObject object.
-
-        Raises
-        ------
-        httpx.HTTPStatusError
-            If the request to clone the voice fails.
+            An APIResponse object containing the status and details of the longform TTS job.
         """
 
         # Accept case if user only provide name
@@ -83,10 +49,10 @@ class LongformInference(Endpoint):
         timeout : Optional[float]
             The timeout in seconds for the request.
 
-        Yields
-        ------
-        Generator[APIResponse[TTSResponse], None, None]
-            A generator yielding APIResponse messages.
+        Returns
+        -------
+        APIResponse[TTSResponse]
+            An APIResponse object containing the status and details of the longform TTS job.
         """
         if not isinstance(tts_config, TTSConfig):
             tts_config = TTSConfig(**tts_config)
