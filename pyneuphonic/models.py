@@ -90,6 +90,10 @@ class AgentConfig(BaseConfig):
         examples=["pcm_linear", "pcm_mulaw"],
     )
 
+    mcp_servers: Optional[str] = Field(
+        default=None,
+        description="A comma separated list of MCP servers",
+    )
 
 class TTSConfig(BaseConfig):
     """
