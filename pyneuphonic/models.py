@@ -90,10 +90,14 @@ class AgentConfig(BaseConfig):
         examples=["pcm_linear", "pcm_mulaw"],
     )
 
-    mcp_servers: Optional[str] = Field(
+    mcp_servers: Optional[Union[str, List[str]]] = Field(
         default=None,
-        description="A comma separated list of MCP servers",
+        description="A list of MCP servers",
     )
+
+    @field_validator("mcp_servers", mode="before")
+    def mcp_servers_check(cls, v):
+        return ",".join(v) if isinstance(v, list) else v
 
 class TTSConfig(BaseConfig):
     """
