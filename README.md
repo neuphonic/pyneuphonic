@@ -23,6 +23,7 @@ If you need support or want to join the community, visit our [Discord](https://d
   - [Delete Voice](#delete-voice)
 - [Saving Audio](#saving-audio)
 - [Agents](#agents)
+  - [Connecting MCP Servers](#connecting-mcp-servers)
   - [List agents](#list-agents)
   - [Get agent](#get-agent)
   - [Multilingual Agents](#multilingual-agents)
@@ -331,6 +332,21 @@ async def main():
         await agent.stop()
 
 asyncio.run(main())
+```
+
+### Connecting MCP Servers
+Connect your custom MCP servers to enhance your agent with unlimited capabilities.
+
+You can connect MCP servers to your Agent to provide it with any functionality you need. The Agent will automatically utilize these tools throughout the conversation as appropriate. For an introduction to MCP, refer to the [official documentation](https://modelcontextprotocol.io/introduction).
+
+```python
+client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_KEY'))
+
+agent = Agent(
+    client,
+    agent_id='<AGENT_ID>',
+    mcp_servers=['https://1234-56-789-123-4.ngrok-free.app/sse']
+)
 ```
 
 ### List agents
