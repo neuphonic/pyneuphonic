@@ -75,26 +75,20 @@ class Voices(Endpoint):
             If the request to clone the voice fails.
         """
 
-        # Accept case if user only provide name
-        if voice_id is None and voice_name is None:
-            raise ValueError("Please provide one of voice_id or voice_name")
-        if not voice_id:
-            voice_id = self._get_voice_id_from_name(voice_name=voice_name)
+        response = self.list()
+        voices = response.data["voices"]
 
-        response = httpx.get(
-            f"{self.http_url}/voices/{voice_id}",
-            headers=self.headers,
-            timeout=self.timeout,
-        )
-
-        if not response.is_success:
-            raise httpx.HTTPStatusError(
-                f"Failed to fetch voice. Status code: {response.status_code}. Error: {response.text}",
-                request=response.request,
-                response=response,
+        if voice_id:
+            voice = next((voice for voice in voices if voice["id"] == voice_id), None)
+        else:
+            voice = next(
+                (voice for voice in voices if voice["name"] == voice_name), None
             )
 
-        return APIResponse(**response.json())
+        if not voice:
+            raise ValueError("No voice found")
+
+        return APIResponse(data=voice)
 
     def clone(
         self, voice_name: str, voice_file_path: str, voice_tags: List[str] = []
