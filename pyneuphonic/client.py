@@ -31,25 +31,18 @@ class Neuphonic:
             and not set in `os.getenv('NEUPHONIC_API_URL')`, then it will default to
             'api.neuphonic.com'.
         """
-        api_key = (
+
+        # Initialise the API key and base URL
+        self._api_key = (
             api_key
             or os.getenv("NEUPHONIC_API_KEY")
             or os.getenv("NEUPHONIC_API_TOKEN")
         )
-
-        if api_key is None:
+        if self._api_key is None:
             raise EnvironmentError(
                 "`api_key` has not been passed in and `NEUPHONIC_API_KEY` is not set in the environment."
             )
-
-        if base_url is None:
-            base_url = os.getenv("NEUPHONIC_API_URL")
-
-            if base_url is None:
-                base_url = "api.neuphonic.com"
-
-        self._api_key = api_key
-        self._base_url = base_url
+        self._base_url = base_url or os.getenv("NEUPHONIC_API_URL", "api.neuphonic.com")
 
         self.voices = Voices(api_key=self._api_key, base_url=self._base_url)
         self.tts = TTS(api_key=self._api_key, base_url=self._base_url)
