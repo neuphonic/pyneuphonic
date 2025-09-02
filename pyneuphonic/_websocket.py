@@ -2,6 +2,8 @@ import asyncio
 import websockets
 from typing import Callable, Union
 import json
+import ssl
+import certifi
 from abc import ABC, abstractmethod
 
 from pyneuphonic._endpoint import Endpoint
@@ -48,6 +50,16 @@ class AsyncWebsocketBase(Endpoint, ABC):
         self._tasks = []
 
         self.response_type = response_type
+
+    @property
+    def ssl_context(self):
+        ssl_context = (
+            None
+            if self._is_localhost()
+            else ssl.create_default_context(cafile=certifi.where())
+        )
+
+        return ssl_context
 
     @abstractmethod
     def url(self, config: Union[BaseConfig, dict]) -> str:
@@ -235,13 +247,13 @@ class AsyncTTSWebsocketClient(AsyncWebsocketBase):
         await super().send(message=message)
 
         if autocomplete:
-            await self._ws.send(json.dumps({"text": " <STOP>"}))
+            await self.complete()
 
     async def complete(self):
         """
         Send a completion signal '<STOP>' through the TTS websocket.
         """
-        await self.send({"text": " <STOP>"}, autocomplete=False)
+        await self.send({"text": " <STOP>"})
 
 
 class AsyncAgentWebsocketClient(AsyncWebsocketBase):
