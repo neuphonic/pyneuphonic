@@ -4,7 +4,7 @@ from pyneuphonic.models import TTSConfig, APIResponse, to_dict
 
 
 class LongformInference(Endpoint):
-    def get(self, job_id, timeout=20) -> APIResponse[dict]:
+    def get(self, job_id) -> APIResponse[dict]:
         """Retrieve the status of a longform TTS job by its job ID.
         Parameters
         ----------
@@ -25,7 +25,6 @@ class LongformInference(Endpoint):
         self,
         text: str,
         tts_config: Union[TTSConfig, dict] = TTSConfig(),
-        timeout: float = 20,
     ) -> Generator[APIResponse[dict], None, None]:
         """
         Send a text to the TTS (text-to-speech) service and receive a stream of APIResponse messages.

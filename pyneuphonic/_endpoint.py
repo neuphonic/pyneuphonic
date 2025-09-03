@@ -75,10 +75,7 @@ class Endpoint:
         message: str = "Failed to fetch.",
     ) -> APIResponse[dict]:
         """
-        List created agents.
-
-        By default this endpoint returns only `id` and `name` for every agent, provide the `agent_id`
-        parameter to get all the fields for a specific agent.
+        Fetch items from the API.
 
         Parameters
         ----------
@@ -161,7 +158,7 @@ class Endpoint:
         message: str = "Failed to delete.",
     ) -> APIResponse[dict]:
         """
-        Delete an agent.
+        Delete a resource by its ID.
 
         Parameters
         ----------
