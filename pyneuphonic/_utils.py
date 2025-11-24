@@ -1,7 +1,5 @@
 import wave
-
 from typing import Optional, Iterator, Union, AsyncIterator
-
 from pyneuphonic.models import APIResponse, TTSResponse
 
 

@@ -1,5 +1,5 @@
 from pydantic import BaseModel as BaseModel, field_validator, ConfigDict, Field
-from typing import List, Optional, Callable, Awaitable, Union, TypedDict
+from typing import List, Optional, Callable, Awaitable, Union
 import base64
 from enum import Enum
 from typing import Generic, TypeVar
@@ -99,6 +99,7 @@ class AgentConfig(BaseConfig):
     def mcp_servers_check(cls, v):
         return ",".join(v) if isinstance(v, list) else v
 
+
 class TTSConfig(BaseConfig):
     """
     Model parameters for the text-to-speech endpoints.
@@ -185,66 +186,6 @@ class APIResponse(BaseModel, Generic[T]):
             "All errors associated with the SSE response, if the status_code is non-2XX."
         ),
     )
-
-
-class VoiceObject(TypedDict):
-    """TypedDict representing a voice object with its attributes."""
-
-    voice_id: str
-    """
-    The voice ID.
-    Examples: ['8e9c4bc8-3979-48ab-8626-df53befc2090']
-    """
-
-    name: str
-    """
-    The name of the voice.
-    Examples: ['Holly', 'Annie', 'Miles']
-    """
-
-    tags: List[str]
-    """
-    A list of tags describing the voice.
-    Examples: [['Male', 'American', 'Forties', 'Narrator'], ['Female', 'British', 'Twenties', 'Excited']]
-    """
-
-    type: str
-    """
-    Indicates whether this is a standard voice provided by Neuphonic, or a cloned voice.
-    """
-
-    lang_code: str
-    """
-    The language code associated with this voice.
-    """
-
-
-class AgentObject(TypedDict):
-    """TypedDict representing an agent object with its attributes."""
-
-    id: str
-    """
-    The agent ID.
-    Examples: ['1234abcd-5678-efgh-9101-ijklmnopqrst']
-    """
-
-    name: str
-    """
-    The name of the agent.
-    Examples: ['Helpful Receptionist', 'Delivery Person', 'John Smith']
-    """
-
-    prompt: Optional[str]
-    """
-    The prompt used by the agent.
-    Examples: ['You are a helpful agent. Answer in 20 words or less.']
-    """
-
-    greeting: Optional[str]
-    """
-    The greeting message of the agent.
-    Examples: ['Hello! How can I help you?', 'Hi there! What can I do for you today?']
-    """
 
 
 class AudioBaseModel(BaseModel):

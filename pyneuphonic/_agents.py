@@ -1,12 +1,13 @@
 from typing import Optional
-import httpx
 
 from pyneuphonic._endpoint import Endpoint
 from pyneuphonic._websocket import AsyncAgentWebsocketClient
-from pyneuphonic.models import APIResponse, AgentObject  # noqa: F401
+from pyneuphonic.models import APIResponse  # noqa: F401
 
 
 class Agents(Endpoint):
+    """Manage and interact with agents."""
+
     def list(
         self,
     ) -> APIResponse[dict]:
@@ -24,22 +25,14 @@ class Agents(Endpoint):
         Returns
         -------
         APIResponse[dict]
-            response.data['agent'] will be an object of type AgentObject.
+            response.data['agent'] will be an dictionary.
 
         Raises
         ------
         httpx.HTTPStatusError
             If the request fails to fetch.
         """
-        response = httpx.get(
-            f"{self.http_url}/agents",
-            headers=self.headers,
-            timeout=self.timeout,
-        )
-
-        self.raise_for_status(response=response, message="Failed to fetch agents.")
-
-        return APIResponse(**response.json())
+        return super().get(endpoint="/agents", message="Failed to fetch agents.")
 
     def get(
         self,
@@ -59,22 +52,16 @@ class Agents(Endpoint):
         Returns
         -------
         APIResponse[dict]
-            response.data['agent'] will be an object of type AgentObject.
+            response.data['agent'] will be a dictionary.
 
         Raises
         ------
         httpx.HTTPStatusError
             If the request fails to fetch.
         """
-        response = httpx.get(
-            f"{self.http_url}/agents/{agent_id}",
-            headers=self.headers,
-            timeout=self.timeout,
+        return super().get(
+            id=agent_id, endpoint="/agents/", message="Failed to fetch agent."
         )
-
-        self.raise_for_status(response=response, message="Failed to fetch agents.")
-
-        return APIResponse(**response.json())
 
     def create(
         self,
@@ -110,16 +97,9 @@ class Agents(Endpoint):
             "greeting": greeting,
         }
 
-        response = httpx.post(
-            f"{self.http_url}/agents",
-            json=data,
-            headers=self.headers,
-            timeout=self.timeout,
+        return super().post(
+            data=data, endpoint="/agents", message="Failed to create agent."
         )
-
-        self.raise_for_status(response=response, message="Failed to create agent.")
-
-        return APIResponse(**response.json())
 
     def delete(
         self,
@@ -143,15 +123,9 @@ class Agents(Endpoint):
         httpx.HTTPStatusError
             If the request fails to delete.
         """
-        response = httpx.delete(
-            f"{self.http_url}/agents/{agent_id}",
-            headers=self.headers,
-            timeout=self.timeout,
+        return super().delete(
+            id=agent_id, endpoint="/agents/", message="Failed to delete agent."
         )
-
-        self.raise_for_status(response=response, message="Failed to delete agent.")
-
-        return APIResponse(**response.json())
 
     def AsyncWebsocketClient(self):
         return AsyncAgentWebsocketClient(api_key=self._api_key, base_url=self._base_url)

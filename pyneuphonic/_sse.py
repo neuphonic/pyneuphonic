@@ -1,7 +1,6 @@
 import httpx
 import json
 from typing import Generator, AsyncGenerator, Optional, Union
-
 from pyneuphonic._endpoint import Endpoint
 from pyneuphonic.models import TTSConfig, APIResponse, TTSResponse, to_dict
 
@@ -52,16 +51,11 @@ class SSEClient(SSEClientBase):
             If the authentication request fails, an HTTPStatusError is raised with
             details about the failure.
         """
-        response = httpx.post(
-            f"{self.http_url}/sse/auth", headers=self.headers, timeout=self.timeout
-        )
 
-        if not response.is_success:
-            raise httpx.HTTPStatusError(
-                f"Failed to authenticate for a JWT. Status code: {response.status_code}. Error: {response.text}",
-                request=response.request,
-                response=response,
-            )
+        response = super().post(
+            endpoint="/sse/auth",
+            message="Failed to authenticate for a JWT.",
+        )
 
         jwt_token = response.json()["data"]["jwt_token"]
 
@@ -117,12 +111,10 @@ class AsyncSSEClient(SSEClientBase):
                 f"{self.http_url}/sse/auth", headers=self.headers, timeout=self.timeout
             )
 
-            if not response.is_success:
-                raise httpx.HTTPStatusError(
-                    f"Failed to authenticate for a JWT. Status code: {response.status_code}. Error: {response.text}",
-                    request=response.request,
-                    response=response,
-                )
+            self.raise_for_status(
+                response=response,
+                message="Failed to authenticate for a JWT.",
+            )
 
             jwt_token = response.json()["data"]["jwt_token"]
             self.headers["Authorization"] = f"Bearer: {jwt_token}"
