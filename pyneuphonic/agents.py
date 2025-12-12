@@ -7,27 +7,12 @@ from pyneuphonic.player import AsyncAudioPlayer, AsyncAudioRecorder
 from typing import Optional, Callable
 
 
-def default_on_message(message: APIResponse[AgentResponse]):
-    """
-    Default callback function to handle messages from the server.
-
-    Parameters
-    ----------
-    message : APIResponse[AgentResponse]
-        The message received from the server, containing the type and text.
-    """
-    if message.data.type == "user_transcript":
-        print(f"User: {message.data.text}")
-    elif message.data.type == "llm_response":
-        print(f"Agent: {message.data.text}")
-
-
 class Agent:
     def __init__(
         self,
         client: Neuphonic,
         mute: bool = False,
-        on_message: Callable = default_on_message,
+        on_message: Callable = None,
         allow_interruptions: Optional[bool] = None,
         **kwargs,
     ):
@@ -69,8 +54,24 @@ class Agent:
                 allow_interruptions=allow_interruptions,
             )
 
-        self.on_message_hook = on_message
+        self.on_message_hook = (
+            on_message if on_message is not None else self.default_on_message
+        )
         self._tasks = []
+
+    def default_on_message(self, message: APIResponse[AgentResponse]):
+        """
+        Default callback function to handle messages from the server.
+
+        Parameters
+        ----------
+        message : APIResponse[AgentResponse]
+            The message received from the server, containing the type and text.
+        """
+        if message.data.type == "user_transcript":
+            print(f"User: {message.data.text}")
+        elif message.data.type == "llm_response":
+            print(f"Agent: {message.data.text}")
 
     async def on_message(self, message: APIResponse[AgentResponse]):
         """

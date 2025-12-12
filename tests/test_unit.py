@@ -5,7 +5,7 @@ import wave
 from pytest_mock import MockerFixture
 import uuid
 from pyneuphonic import Neuphonic, TTSConfig
-from pyneuphonic.models import APIResponse, TTSResponse, VoiceObject, to_dict
+from pyneuphonic.models import APIResponse, TTSResponse, to_dict
 
 
 def test_tts_config():
@@ -124,8 +124,6 @@ async def test_get_voices(client: Neuphonic, mocker: MockerFixture):
 
     for voice in voices:
         assert isinstance(voice, dict)
-        # assert that the response only contains valid keys, and not extra keys
-        assert all(key in VoiceObject.__annotations__.keys() for key in voice)
 
 
 @pytest.mark.asyncio
@@ -249,6 +247,8 @@ def test_create_agent(client: Neuphonic, mocker: MockerFixture):
     mock_create.assert_called_once_with(
         f"https://{client._base_url}/agents",
         json=data,
+        params=None,
+        files=None,
         headers={"x-api-key": client._api_key},
         timeout=mocker.ANY,
     )

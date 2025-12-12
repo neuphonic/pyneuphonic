@@ -3,7 +3,7 @@ from typing import List, Optional
 import httpx
 
 from ._endpoint import Endpoint
-from .models import APIResponse, VoiceObject  # noqa: F401
+from .models import APIResponse  # noqa: F401
 
 
 class Voices(Endpoint):
@@ -13,22 +13,9 @@ class Voices(Endpoint):
         Returns
         -------
         APIResponse[dict]
-            response.data['voices'] will be a list of VoiceObject objects.
+            response.data['dict'] will be a list of voices.
         """
-        response = httpx.get(
-            f"{self.http_url}/voices",
-            headers=self.headers,
-            timeout=self.timeout,
-        )
-
-        if not response.is_success:
-            raise httpx.HTTPStatusError(
-                f"Failed to fetch voices. Status code: {response.status_code}. Error: {response.text}",
-                request=response.request,
-                response=response,
-            )
-
-        return APIResponse(**response.json())
+        return super().get(endpoint="/voices", message="Failed to fetch voices.")
 
     def _get_voice_id_from_name(self, voice_name) -> str:
         """Gets the voice_id given a voice name.
@@ -67,7 +54,7 @@ class Voices(Endpoint):
         Returns
         -------
         APIResponse[dict]
-            response.data['voice'] will be a single VoiceObject object.
+            response.data['voice'] will be a single voice.
 
         Raises
         ------
@@ -131,25 +118,12 @@ class Voices(Endpoint):
         }
         files = {"voice_file": open(voice_file_path, "rb")}
 
-        # Send the POST request with voice_name as a query parameter
-        response = httpx.post(
-            f"{self.http_url}/voices?voice_name={voice_name}",
+        return super().post(
             params=params,
             files=files,
-            headers=self.headers,
-            timeout=self.timeout,
+            endpoint=f"/voices?voice_name={voice_name}",
+            message="Failed to clone voice.",
         )
-
-        # Handle response errors
-        if not response.is_success:
-            raise httpx.HTTPStatusError(
-                f"Failed to clone voice. Status code: {response.status_code}. Error: {response.text}",
-                request=response.request,
-                response=response,
-            )
-
-        # Return the JSON response content as a dictionary
-        return APIResponse(**response.json())
 
     def update(
         self,
@@ -226,12 +200,10 @@ class Voices(Endpoint):
         )
 
         # Handle response errors
-        if not response.is_success:
-            raise httpx.HTTPStatusError(
-                f"Failed to update voice. Status code: {response.status_code}. Error: {response.text}",
-                request=response.request,
-                response=response,
-            )
+        self.raise_for_status(
+            response=response,
+            message="Failed to update voice.",
+        )
 
         # Return the JSON response content as a dictionary
         return APIResponse(**response.json())
@@ -264,19 +236,6 @@ class Voices(Endpoint):
                     f"No voice found with the name {voice_name}. You cannot Delete this voice."
                 )
 
-        response = httpx.delete(
-            f"{self.http_url}/voices/{voice_id}",
-            headers=self.headers,
-            timeout=self.timeout,
+        return super().delete(
+            id=voice_id, endpoint="/voices/", message="Failed to delete voice."
         )
-
-        # Handle response errors
-        if not response.is_success:
-            raise httpx.HTTPStatusError(
-                f"Failed to delete voice. Status code: {response.status_code}. Error: {response.text}",
-                request=response.request,
-                response=response,
-            )
-
-        # Return the JSON response content as a dictionary
-        return APIResponse(**response.json())
