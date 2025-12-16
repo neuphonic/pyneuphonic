@@ -78,7 +78,11 @@ class Voices(Endpoint):
         return APIResponse(data=voice)
 
     def clone(
-        self, voice_name: str, voice_file_path: str, voice_tags: List[str] = []
+        self,
+        voice_name: str,
+        voice_file_path: str,
+        voice_tags: List[str] = [],
+        lang_code: str = "en",
     ) -> APIResponse[dict]:
         """
         Clone a voice by uploading a file with the specified name and tags.
@@ -110,6 +114,7 @@ class Voices(Endpoint):
         # Prepare the multipart form-data payload
         params = {
             "voice_tags": voice_tags,
+            "lang_code": lang_code,
         }
         files = {"voice_file": open(voice_file_path, "rb")}
 

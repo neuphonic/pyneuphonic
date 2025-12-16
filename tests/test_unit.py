@@ -132,6 +132,7 @@ async def test_clone_voice(client: Neuphonic, mocker: MockerFixture):
     voice_name = "TestVoice-SDK"
     voice_tags = ["tag1", "tag2"]
     voice_tags_adapted = "tag1, tag2"
+    lang_code = "en"
 
     # Mock the file content
     with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp_file:
@@ -160,7 +161,9 @@ async def test_clone_voice(client: Neuphonic, mocker: MockerFixture):
         mock_post.return_value = mock_response
 
         # Call the clone method
-        response = client.voices.clone(voice_name, voice_file_path, voice_tags)
+        response = client.voices.clone(
+            voice_name, voice_file_path, voice_tags, lang_code
+        )
 
         # Assertions
         assert isinstance(response, APIResponse)
@@ -171,7 +174,7 @@ async def test_clone_voice(client: Neuphonic, mocker: MockerFixture):
         mock_post.assert_called_once_with(
             f"https://{base_url}/voices?voice_name={voice_name}",
             json=None,
-            params={"voice_tags": voice_tags_adapted},
+            params={"lang_code": "en", "voice_tags": voice_tags_adapted},
             files={"voice_file": mocker.ANY},  # Matches the file object
             headers={"x-api-key": mocker.ANY},  # Ensure the API key is present
             timeout=10,
