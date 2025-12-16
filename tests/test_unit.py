@@ -173,6 +173,7 @@ async def test_clone_voice(client: Neuphonic, mocker: MockerFixture):
         base_url = os.getenv("NEUPHONIC_API_URL", "default-api-url")
         mock_post.assert_called_once_with(
             f"https://{base_url}/voices?voice_name={voice_name}",
+            json=None,
             params={"lang_code": "en", "voice_tags": voice_tags_adapted},
             files={"voice_file": mocker.ANY},  # Matches the file object
             headers={"x-api-key": mocker.ANY},  # Ensure the API key is present
