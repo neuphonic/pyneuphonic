@@ -1,3 +1,6 @@
+### Setup
+Create .env file using the env.example template
+
 ### Unit tests
 python unit_test.py --simple
 python unit_test.py --initialization
