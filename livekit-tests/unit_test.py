@@ -6,11 +6,9 @@ from livekit import rtc
 from livekit.agents import JobContext, JobProcess, Agent, AgentSession, inference
 from livekit.plugins import silero, neuphonic
 from dotenv import load_dotenv
-import pytest
 
 load_dotenv()
 
-@pytest.mark.asyncio
 async def test_neuphonic_tts_simple(text: str = "Hello, this is a test of the Neuphonic text to speech system."):
     """
     Simple direct test of Neuphonic TTS.
@@ -91,7 +89,6 @@ async def test_neuphonic_tts_simple(text: str = "Hello, this is a test of the Ne
             raise
 
 
-@pytest.mark.asyncio
 async def test_neuphonic_agent_initialization(text: str = "This is an initialization test of the agent with Neuphonic TTS."):
     """
     initialization test: Test Neuphonic TTS within an agent session context.
