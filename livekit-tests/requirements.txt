@@ -1,0 +1,6 @@
+python-dotenv
+livekit-agents
+livekit-agents[silero,neuphonic]
+aiohttp
+pytest
+pytest-asyncio
