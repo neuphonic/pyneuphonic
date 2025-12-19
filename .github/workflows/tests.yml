@@ -1,0 +1,66 @@
+name: LiveKit Tests
+
+on:
+  pull_request:
+
+jobs:
+  livekit-unit:
+    name: LiveKit Unit Tests
+    runs-on: ubuntu-latest
+    if: ${{ secrets.NEUPHONIC_API_KEY != '' }}
+    defaults:
+      run:
+        working-directory: livekit-tests
+    env:
+      NEUPHONIC_API_KEY: ${{ secrets.NEUPHONIC_API_KEY }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install LiveKit test dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run simple TTS unit test
+        run: python unit_test.py --simple
+
+      - name: Run agent initialization unit test
+        run: python unit_test.py --initialization
+
+  livekit-integration:
+    name: LiveKit Integration Test
+    runs-on: ubuntu-latest
+    if: ${{ secrets.LIVEKIT_URL != '' && secrets.LIVEKIT_API_KEY != '' && secrets.LIVEKIT_API_SECRET != '' && secrets.NEUPHONIC_API_KEY != '' }}
+    continue-on-error: true
+    defaults:
+      run:
+        working-directory: livekit-tests
+    env:
+      LIVEKIT_URL: ${{ secrets.LIVEKIT_URL }}
+      LIVEKIT_API_KEY: ${{ secrets.LIVEKIT_API_KEY }}
+      LIVEKIT_API_SECRET: ${{ secrets.LIVEKIT_API_SECRET }}
+      NEUPHONIC_API_KEY: ${{ secrets.NEUPHONIC_API_KEY }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install LiveKit test dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run integration CLI test
+        run: python test_agent_cli.py

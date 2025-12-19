@@ -170,3 +170,5 @@ cython_debug/
 .idea/
 
 !pyneuphonic/lib
+
+test_output
