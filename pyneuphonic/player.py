@@ -286,7 +286,7 @@ class AsyncAudioRecorder:
 
                 if self.player is not None:
                     await self._ws.send({"audio": b64encode(data).decode("utf-8")})
-                    
+
             except Exception as e:
                 logger.error(f"Error in _send: {e}")
 

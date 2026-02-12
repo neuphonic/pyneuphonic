@@ -34,13 +34,13 @@ Before getting started, ensure you have:
    ```bash
    cp .env.example .env
    ```
-   
+
    Add the following variables to your `.env` file:
    - `NEUPHONIC_API_KEY`: Found on the [Neuphonic portal](https://app.neuphonic.com/)
    - `TWILIO_AUTH_TOKEN` and `TWILIO_ACCOUNT_SID`: Available in your Twilio portal
    - `FROM_NUMBER`: Your Twilio-purchased phone number
    - `TO_NUMBER`: Your personal phone number for receiving test calls
-   
+
    Leave `SERVER_BASE_URL` blank for now - we'll fill this in the next step.
 
 ### Running the Server
@@ -50,7 +50,7 @@ The server, built with FastAPI, handles communication between Twilio and Neuphon
    ```bash
    ngrok http http://localhost:8000
    ```
-   
+
    Copy the displayed URL (excluding the `https://` prefix) and add it to your `.env` file as `SERVER_BASE_URL`. It will look something like `123d-45-678-912-3.ngrok-free.app`.
 
    <details>

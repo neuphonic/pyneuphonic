@@ -4,7 +4,7 @@ import aioconsole
 from pyneuphonic.client import Neuphonic
 from pyneuphonic.models import APIResponse, AgentResponse, AgentConfig, WebsocketEvents
 from pyneuphonic.player import AsyncAudioPlayer, AsyncAudioRecorder
-from typing import Optional, Callable
+from typing import Callable
 
 
 class Agent:
@@ -44,7 +44,7 @@ class Agent:
             self.recorder = AsyncAudioRecorder(
                 sampling_rate=self.config.incoming_sampling_rate,
                 websocket=self.ws,
-                player=self.player
+                player=self.player,
             )
 
         self.on_message_hook = (
