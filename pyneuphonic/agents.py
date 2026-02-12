@@ -13,7 +13,6 @@ class Agent:
         client: Neuphonic,
         mute: bool = False,
         on_message: Callable = None,
-        allow_interruptions: Optional[bool] = None,
         **kwargs,
     ):
         """
@@ -27,11 +26,6 @@ class Agent:
             If True, the agent will not play audio responses. Default is False.
         on_message : callable, optional
             A callback function to handle messages from the server. Default is default_on_message.
-        allow_interruptions: Optional[bool] = None
-            Whether to allow interruptions or not, by default None and is determined based on the
-            devices default output device. If the output device is a headset, then
-            allow_interruptions will be set to True as there will be no echo. Pass a value in to
-            override the default setting.
         **kwargs
             Additional keyword arguments to configure the agent. See the `AgentConfig` model for a
             full list of agent configuration parameters.
@@ -50,8 +44,7 @@ class Agent:
             self.recorder = AsyncAudioRecorder(
                 sampling_rate=self.config.incoming_sampling_rate,
                 websocket=self.ws,
-                player=self.player,
-                allow_interruptions=allow_interruptions,
+                player=self.player
             )
 
         self.on_message_hook = (
