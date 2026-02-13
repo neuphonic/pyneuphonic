@@ -255,7 +255,6 @@ class AsyncAudioRecorder:
         sampling_rate: int = 16000,
         websocket=None,
         player: AudioPlayer = None,
-        allow_interruptions: Optional[bool] = None,
     ):
         """
         Initialize the AsyncAudioRecorder.
@@ -268,10 +267,6 @@ class AsyncAudioRecorder:
             Websocket client for sending audio data, by default None.
         player : AudioPlayer, optional
             Audio player instance that may be used for playback, by default None.
-        allow_interruptions : bool or None, optional
-            Whether to allow recording while playing audio, by default None and is determined based
-            on devices default output device. If the output device is a headset, then
-            allow_interruptions will be set to True as there will be no echo.
         """
         self.p = None
         self.stream = None
@@ -283,38 +278,15 @@ class AsyncAudioRecorder:
 
         self._tasks = []
 
-        if isinstance(player, (AudioPlayer, AsyncAudioPlayer)):
-            if allow_interruptions is None:
-                self.allow_interruptions = (
-                    not self.player.output_device_possibly_has_echo
-                )
-            else:
-                self.allow_interruptions = allow_interruptions
-
-            if self.player.output_device_possibly_has_echo and self.allow_interruptions:
-                logger.warning(
-                    'You have set allow_interruptions=True on AsyncAudioRecorder but your output device '
-                    f'"{AudioPlayer._get_default_output_device_info()["name"]}" is not a headset. '
-                    'This may cause audio feedback or echo when recording while playing audio.'
-                )
-            elif not self.allow_interruptions:
-                logger.warning(
-                    "Audio interruptions are disabled (allow_interruptions=False on AsyncAudioRecorder). "
-                    "This setting was either explicitly configured or automatically determined based on your output device. "
-                    "When audio is playing, microphone input will be disabled to prevent echo, meaning "
-                    "you cannot interrupt the agent while it is speaking. To enable interruptions, use earphones."
-                )
-
     async def _send(self):
         while True:
             try:
                 # Wait for audio data from the queue
                 data = await self._queue.get()
 
-                if self.player is not None and (
-                    not self.player.is_playing or self.allow_interruptions
-                ):
+                if self.player is not None:
                     await self._ws.send({"audio": b64encode(data).decode("utf-8")})
+
             except Exception as e:
                 logger.error(f"Error in _send: {e}")
 

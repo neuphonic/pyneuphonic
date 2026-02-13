@@ -1,6 +1,6 @@
 # PyNeuphonic
 The official Neuphonic Python library providing simple, convenient access to the Neuphonic text-to-speech websocket
-API from any Python 3.9+ application.
+API from any Python 3.10+ application.
 
 For comprehensive guides and official documentation, check out [https://docs.neuphonic.com](https://docs.neuphonic.com).
 If you need support or want to join the community, visit our [Discord](https://discord.gg/G258vva7gZ)!
@@ -370,16 +370,3 @@ Neuphonic agents support multiple languages, allowing you to create conversation
 - **Example Implementation**: Check out the [Spanish agent example](./examples/agents/multilingual_agent.py) to see multilingual capabilities in action
 
 Creating a multilingual agent is as simple as specifying the `lang_code` and appropriate `voice_id` when instantiating your `Agent`.
-
-### Interruption handling
-The `Agent` class supports interruption handling, which allows users to interrupt the agent while
-it's speaking.
-
-By default, the system intelligently enables interruptions when using devices that won't create audio
-feedback (like headphones or earphones), and disables them for speakers that might cause echo.
-
-This behavior is automatically determined based on your default audio output device, but you can
-explicitly control it when instantiating the `Agent` class:
-```python
-agent = Agent(client, agent_id=agent_id, allow_interruptions=True)
-```

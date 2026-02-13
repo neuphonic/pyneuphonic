@@ -15,7 +15,7 @@ This demo utilises the [Neuphonic LiveKit plugin](https://pypi.org/project/livek
 Before getting started, ensure you have:
 - A Neuphonic API Key
 - A [LiveKit account](https://livekit.io/) with API Credentials.
-- Python 3.9 or higher
+- Python 3.10 or higher
 - An OpenAI API Key and a Deepgram API Key. These demos use OpenAI as the LLM and Deepgram for
   STT, but you can switch these out for something else if you prefer.
 
