@@ -1,14 +1,14 @@
 # POETRY CONFIG
 [tool.poetry]
 name = "pyneuphonic"
-version = "1.8.9"
+version = "2.0.0"
 description = "A python SDK for the Neuphonic TTS Engine."
 authors = ["Neuphonic <support@neuphonic.com>"]
 readme = "README.md"
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.10"
 websockets = ">=14.0,<16.0"
 certifi = ">=2025.6.15"
 pydantic = "^2.9.2"
