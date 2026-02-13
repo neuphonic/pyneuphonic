@@ -14,7 +14,7 @@ This demo illustrates how to integrate Neuphonic's agent features with Twilio to
 Before getting started, ensure you have:
 - A Neuphonic API Key
 - A Twilio account with a Twilio phone number
-- Python 3.9 or higher
+- Python 3.10 or higher
 - A free [ngrok](https://ngrok.com/) account with the ngrok CLI installed and authenticated
 
 ## Setup

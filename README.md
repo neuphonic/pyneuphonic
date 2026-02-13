@@ -1,6 +1,6 @@
 # PyNeuphonic
 The official Neuphonic Python library providing simple, convenient access to the Neuphonic text-to-speech websocket
-API from any Python 3.9+ application.
+API from any Python 3.10+ application.
 
 For comprehensive guides and official documentation, check out [https://docs.neuphonic.com](https://docs.neuphonic.com).
 If you need support or want to join the community, visit our [Discord](https://discord.gg/G258vva7gZ)!
