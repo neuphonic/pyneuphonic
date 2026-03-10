@@ -23,7 +23,7 @@ except ModuleNotFoundError:
 class AudioPlayer:
     """Handles audio playback and audio exporting."""
 
-    def __init__(self, sampling_rate: int = 22050):
+    def __init__(self, sampling_rate: int = 24000):
         """
         Initialize with a default sampling rate.
 
@@ -142,7 +142,7 @@ class AudioPlayer:
 class AsyncAudioPlayer(AudioPlayer):
     """Asynchronous version of AudioPlayer that allows for smoother handling of interruptions."""
 
-    def __init__(self, sampling_rate: int = 22050):
+    def __init__(self, sampling_rate: int = 24000):
         super().__init__(sampling_rate)
         self.playback_task: Optional[asyncio.Task] = None
         self.playback_queue: Optional[asyncio.Queue] = asyncio.Queue()
