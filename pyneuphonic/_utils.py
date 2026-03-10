@@ -6,7 +6,7 @@ from pyneuphonic.models import APIResponse, TTSResponse
 def save_audio(
     audio_bytes: Union[bytes, bytearray, Iterator[APIResponse[TTSResponse]]],
     file_path: str,
-    sampling_rate: Optional[int] = 22050,
+    sampling_rate: Optional[int] = 24000,
 ):
     """
     Takes in an audio buffer and saves it to a .wav file.
@@ -18,7 +18,7 @@ def save_audio(
     file_path
         The file path you want to save the audio to.
     sampling_rate
-        The sample rate of the audio you want to save. Default is 22050.
+        The sample rate of the audio you want to save. Default is 24000.
     """
     if isinstance(audio_bytes, bytes) or isinstance(audio_bytes, bytearray):
         with wave.open(file_path, "wb") as wav_file:
@@ -43,7 +43,7 @@ def save_audio(
 async def async_save_audio(
     audio_bytes: Union[bytes, bytearray, AsyncIterator[APIResponse[TTSResponse]]],
     file_path: str,
-    sampling_rate: Optional[int] = 22050,
+    sampling_rate: Optional[int] = 24000,
 ):
     """
     Takes in an audio buffer and saves it to a .wav file.
@@ -55,7 +55,7 @@ async def async_save_audio(
     file_path
         The file path you want to save the audio to.
     sample_rate
-        The sample rate of the audio you want to save. Default is 22050.
+        The sample rate of the audio you want to save. Default is 24000.
     """
     if isinstance(audio_bytes, bytes) or isinstance(audio_bytes, bytearray):
         with wave.open(file_path, "wb") as wav_file:

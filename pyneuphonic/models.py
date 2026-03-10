@@ -73,9 +73,9 @@ class AgentConfig(BaseConfig):
     )
 
     return_sampling_rate: Optional[int] = Field(
-        default=22050,
+        default=24000,
         description="Sampling rate of the audio returned from the server.",
-        examples=[8000, 16000, 22050],
+        examples=[8000, 16000, 22050, 24000],
     )
 
     incoming_encoding: Optional[str] = Field(
@@ -133,9 +133,9 @@ class TTSConfig(BaseConfig):
     )
 
     sampling_rate: Optional[int] = Field(
-        default=22050,
+        default=24000,
         description="Sampling rate of the audio returned from the server.",
-        examples=[8000, 16000, 22050],
+        examples=[8000, 16000, 22050, 24000],
     )
 
     encoding: Optional[str] = Field(
@@ -226,7 +226,7 @@ class TTSResponse(AudioBaseModel):
     sampling_rate: Optional[int] = Field(
         default=None,
         description="Sampling rate of the audio snippet.",
-        examples=[8000, 16000, 22050],
+        examples=[8000, 16000, 22050, 24000],
     )
 
 
